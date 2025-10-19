@@ -1,5 +1,7 @@
+USE smartchef;
+
 -- ============================
--- Tabla: UsuarioModel
+-- Tabla: Usuario
 -- ============================
 CREATE TABLE Usuario (
     id INT AUTO_INCREMENT PRIMARY KEY,
