@@ -1,0 +1,45 @@
+.producto-card {
+  background-color: #217A43;
+  padding: 16px;
+  color: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+  transition: box-shadow 0.3s ease;
+  width: calc(100% - 32px);
+  max-width: 400px;
+  margin: 20px auto;
+  border: none;
+}
+
+.producto-info {
+  flex: 1;
+  margin-left: 10px;
+}
+
+.producto-nombre {
+  font-weight: bold;
+  font-size: 1.2rem;
+  margin-bottom: 4px;
+}
+
+.producto-descripcion p {
+  font-size: 0.9rem;
+  margin: 4px 0;
+}
+
+.producto-acciones {
+  margin-top: 50px;
+  display: flex;
+  gap: 8px;
+  margin-left: 50%;
+}
+
+.boton {
+  --background: #ffffff;
+  --color: #000000;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+  font-weight: 600;
+  height: 50px;
+  width: 190px;
+}

@@ -1,0 +1,19 @@
+<ion-header>
+  <app-cabecera></app-cabecera>
+</ion-header>
+
+<ion-content>
+  <ion-toolbar>
+    <app-search-bar (searchChange)="onSearch($event)"></app-search-bar>
+    <div class="titulo-img">
+      <img src="/assets/images/explorar_logo.png">
+    </div>
+    <app-tarjeta-receta></app-tarjeta-receta>
+    <app-tarjeta-receta></app-tarjeta-receta>
+    <app-tarjeta-receta></app-tarjeta-receta>
+  </ion-toolbar>
+</ion-content>
+
+<ion-footer>
+  <app-footer></app-footer>
+</ion-footer>

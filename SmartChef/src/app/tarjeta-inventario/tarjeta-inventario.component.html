@@ -1,0 +1,29 @@
+<ion-card class="inventario-card">
+
+  <ion-card-content>
+
+    <div class="input-container">
+      <ion-input
+        [(ngModel)]="nuevoItem"
+        placeholder="Añadir nuevo elemento..."
+        class="inventario-input"
+      ></ion-input>
+
+      <ion-button class="boton-mas" (click)="agregarItem()">
+        <img src="assets/images/boton_mas.png" alt="Agregar" />
+      </ion-button>
+    </div>
+
+    <div class="inventario-elementos" *ngIf="items.length > 0">
+      <div class="inventario-elemento" *ngFor="let item of items">
+        <span>{{ item }}</span>
+        <img src="assets/images/boton_eliminar.png" class="eliminar-icono" alt="Eliminar" (click)="eliminarItem(item)" />
+      </div>
+    </div>
+
+    <p *ngIf="items.length === 0" class="vacia-texto">
+      Tu lista está vacía.
+    </p>
+
+  </ion-card-content>
+</ion-card>

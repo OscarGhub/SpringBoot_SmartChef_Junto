@@ -1,0 +1,24 @@
+<ion-content class="ion-padding login-container">
+  <div class="login-imagen-container">
+    <img src="assets/images/logo.png" alt="Login Image" />
+  </div>
+
+  <ion-item>
+    <ion-label position="floating">Email</ion-label>
+    <ion-input type="email" [(ngModel)]="email"></ion-input>
+  </ion-item>
+
+  <ion-item>
+    <ion-label position="floating">Contraseña</ion-label>
+    <ion-input type="password" [(ngModel)]="password"></ion-input>
+  </ion-item>
+
+  <ion-item lines="none">
+    <ion-checkbox slot="start" [(ngModel)]="rememberMe"></ion-checkbox>
+    <ion-label>Recordar contraseña</ion-label>
+  </ion-item>
+
+  <ion-button expand="block" class="login-boton" (click)="login()">
+    Iniciar Sesión
+  </ion-button>
+</ion-content>

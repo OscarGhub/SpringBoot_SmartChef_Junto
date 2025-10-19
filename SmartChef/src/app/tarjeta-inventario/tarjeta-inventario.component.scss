@@ -1,0 +1,81 @@
+.inventario-card {
+  background-color: #217A43;
+  color: white;
+  border-radius: 16px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+  max-width: 420px;
+  width: calc(100% - 32px);
+  margin: 30px auto;
+  padding: 16px;
+  text-align: center;
+}
+
+ion-card-title {
+  text-align: center;
+  font-weight: bold;
+  font-size: 1.3rem;
+}
+
+.input-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.inventario-input {
+  --background: #ffffff;
+  --border-radius: 20px;
+  --padding-start: 12px;
+  --padding-end: 12px;
+  --color: #000000;
+  --placeholder-color: #777;
+  --highlight-background: #ffffff;
+  --highlight-color-focused: #ffffff;
+  font-size: 1rem;
+}
+
+.boton-mas {
+  --background: transparent;
+  --box-shadow: none;
+  min-width: auto;
+
+  img {
+    width: 36px;
+    height: 36px;
+    object-fit: contain;
+  }
+}
+
+.inventario-elementos {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.inventario-elemento {
+  background: #ffffff;
+  color: #000000;
+  border-radius: 12px;
+  padding: 10px 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: 500;
+  font-size: 1rem;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+
+  .eliminar-icono {
+    width: 24px;
+    height: 24px;
+    cursor: pointer;
+  }
+}
+
+.vacia-texto {
+  text-align: center;
+  color: #f0f0f0;
+  font-style: italic;
+  margin-top: 12px;
+}
