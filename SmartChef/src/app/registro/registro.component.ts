@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { IonicModule, AlertController } from '@ionic/angular';
 import { FormsModule } from '@angular/forms';
 import { UsuarioService } from '../servicios/usuario/usuario.service';
@@ -15,21 +15,17 @@ import { Router } from '@angular/router';
     FormsModule,
   ]
 })
-export class RegistroComponent implements OnInit {
+export class RegistroComponent  {
+  private usuarioService = inject(UsuarioService);
+  private alertController = inject(AlertController);
+  private router = inject(Router);
+
 
   username: string = '';
   email: string = '';
   password: string = '';
   confirmPassword: string = '';
   birthDate: string = '';
-
-  constructor(
-    private usuarioService: UsuarioService,
-    private alertController: AlertController,
-    private router: Router
-  ) {}
-
-  ngOnInit() {}
 
   async register() {
 
@@ -56,7 +52,7 @@ export class RegistroComponent implements OnInit {
     const nuevoUsuario: Usuario = {
       id: 0,
       nombre: this.username,
-      correoElectronico: this.email,
+      correo_electronico: this.email,
       contrasena: this.password,
     };
 

@@ -11,7 +11,7 @@ import {InventarioComponent} from "./inventario/inventario.component";
 
 export const routes: Routes = [
 
-  {path: '', redirectTo: 'inicio', pathMatch: 'full'},
+  {path: '', redirectTo: 'registro_login', pathMatch: 'full'},
 
   {path: 'registro_login', component: LoginRegistroComponent},
 

@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import {CabeceraComponent} from "../cabecera/cabecera.component";
 import {IonicModule} from "@ionic/angular";
 import {SearchBarComponent} from "../search-bar/search-bar.component";
@@ -17,11 +17,11 @@ import {FooterComponent} from "../footer/footer.component";
     FooterComponent
   ]
 })
-export class GuardadosComponent  implements OnInit {
+export class GuardadosComponent   {
 
   constructor() { }
 
-  ngOnInit() {}
+
 
   onSearch(text: string) {
     console.log('Texto de búsqueda:', text);

@@ -1,5 +1,5 @@
 // inicio.component.ts
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { IonicModule } from '@ionic/angular';
 import { TarjetaComponent } from '../tarjeta_receta/tarjeta.component';
 import { CabeceraComponent } from '../cabecera/cabecera.component';
@@ -19,11 +19,11 @@ import { SearchBarComponent } from '../search-bar/search-bar.component';  // <--
     SearchBarComponent,
   ]
 })
-export class InicioComponent implements OnInit {
+export class InicioComponent  {
 
   constructor() { }
 
-  ngOnInit() {}
+
 
   onSearch(text: string) {
     console.log('Texto de búsqueda:', text);

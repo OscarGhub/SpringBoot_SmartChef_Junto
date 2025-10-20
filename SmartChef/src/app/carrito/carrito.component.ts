@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import {CabeceraComponent} from "../cabecera/cabecera.component";
 import {FooterComponent} from "../footer/footer.component";
 import {IonicModule} from "@ionic/angular";
@@ -17,10 +17,10 @@ import {TarjetaCarritoComponent} from "../tarjeta-carrito/tarjeta-carrito.compon
     TarjetaCarritoComponent
   ]
 })
-export class CarritoComponent  implements OnInit {
+export class CarritoComponent   {
 
   constructor() { }
 
-  ngOnInit() {}
+
 
 }

@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { IonicModule } from '@ionic/angular';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router'; // Importamos Router
@@ -14,6 +14,8 @@ import { Router } from '@angular/router'; // Importamos Router
   ]
 })
 export class TarjetaPerfilComponent implements OnInit {
+  private router = inject(Router);
+
 
   nombre = 'Juan Pérez';
   fechaNacimiento = '15/10/1990';
@@ -21,8 +23,6 @@ export class TarjetaPerfilComponent implements OnInit {
 
   editarFecha = false;
   editarEmail = false;
-
-  constructor(private router: Router) { }
 
   ngOnInit() {}
 

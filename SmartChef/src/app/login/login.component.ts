@@ -1,8 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { IonicModule } from '@ionic/angular';
 import { FormsModule } from '@angular/forms';
-import { UsuarioService, LoginResponse } from '../servicios/usuario/usuario.service';
-import { UsuarioLogin } from '../servicios/usuario/usuario.model';
+import { UsuarioService } from '../servicios/usuario/usuario.service';
+import { UsuarioLogin, LoginResponse } from '../servicios/usuario/usuario.model';
 
 @Component({
   selector: 'app-login',
@@ -14,23 +14,21 @@ import { UsuarioLogin } from '../servicios/usuario/usuario.model';
     FormsModule,
   ]
 })
-export class LoginComponent implements OnInit {
+export class LoginComponent  {
+  private usuarioService = inject(UsuarioService);
+
 
   email: string = '';
   password: string = '';
   rememberMe: boolean = false;
 
-  constructor(private usuarioService: UsuarioService) { }
-
-  ngOnInit() {}
-
   login() {
     const usuario: UsuarioLogin = {
-      correoElectronico: this.email,
+      correo_electronico: this.email,
       contrasena: this.password
     };
 
-    this.usuarioService.login(usuario).subscribe(
+    this.usuarioService.loginUsuario(usuario).subscribe(
       (res: LoginResponse) => console.log('Login correcto', res),
       (err: any) => console.error('Error al iniciar sesión', err)
     );

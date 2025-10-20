@@ -1,11 +1,16 @@
 export interface Usuario {
   id?: number;
   nombre?: string;
-  correoElectronico: string;
+  correo_electronico: string;
   contrasena: string;
 }
 
 export interface UsuarioLogin {
-  correoElectronico: string;
+  correo_electronico: string;
   contrasena: string;
+}
+
+export interface LoginResponse {
+  token: string;
+  usuario?: Usuario;
 }
