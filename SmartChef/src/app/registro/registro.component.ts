@@ -31,6 +31,7 @@ export class RegistroComponent {
   confirmar_contrasena: string = '';
 
   async agregarUsuario(): Promise<void> {
+
     const errorValidacion = UsuarioHelper.validarCampos(this.nuevoUsuario, this.confirmar_contrasena);
     if (errorValidacion) {
       await this.alertService.mostrarAlerta('Error', errorValidacion);

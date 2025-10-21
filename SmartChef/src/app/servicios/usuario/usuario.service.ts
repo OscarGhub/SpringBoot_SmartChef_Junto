@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
-import { Usuario, UsuarioLogin, LoginResponse } from './usuario.model';
+import {map, Observable} from 'rxjs';
+import { Usuario } from './usuario.model';
 
 @Injectable({
   providedIn: 'root',
@@ -19,7 +19,10 @@ export class UsuarioService {
     return this.http.post<Usuario>(this.apiUrl, usuario);
   }
 
-  loginUsuario(usuario: UsuarioLogin): Observable<LoginResponse> {
-    return this.http.post<LoginResponse>(`${this.apiUrl}/login`, usuario);
+  getUsuarioPorCorreo(correo: string): Observable<Usuario | null> {
+    return this.getUsuarios().pipe(
+      map(usuarios => usuarios.find(u => u.correo_electronico === correo) || null)
+    );
   }
+
 }
