@@ -1,82 +1,84 @@
 import { Component, inject } from '@angular/core';
-import { IonicModule, AlertController } from '@ionic/angular';
+import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { UsuarioService } from '../servicios/usuario/usuario.service';
 import { Usuario } from '../servicios/usuario/usuario.model';
-import { Router } from '@angular/router';
+import { UsuarioService } from '../servicios/usuario/usuario.service';
+import { IonicModule } from '@ionic/angular';
+import { AlertService } from '../servicios/alert.service';
+import { UsuarioHelper } from '../servicios/usuario.helper';
 
 @Component({
   selector: 'app-registro',
   templateUrl: './registro.component.html',
-  styleUrls: ['./registro.component.scss'],
   standalone: true,
   imports: [
-    IonicModule,
+    CommonModule,
     FormsModule,
+    IonicModule
   ]
 })
-export class RegistroComponent  {
+export class RegistroComponent {
   private usuarioService = inject(UsuarioService);
-  private alertController = inject(AlertController);
-  private router = inject(Router);
+  private alertService = inject(AlertService);
 
+  nuevoUsuario: Usuario = {
+    nombre: '',
+    correo_electronico: '',
+    contrasena: '',
+    fecha_nacimiento: ''
+  };
 
-  username: string = '';
-  email: string = '';
-  password: string = '';
-  confirmPassword: string = '';
-  birthDate: string = '';
+  confirmar_contrasena: string = '';
 
-  async register() {
-
-    if (!this.username || !this.email || !this.password || !this.confirmPassword || !this.birthDate) {
-      const alert = await this.alertController.create({
-        header: 'Error',
-        message: 'Por favor, completa todos los campos.',
-        buttons: ['OK']
-      });
-      await alert.present();
+  async agregarUsuario(): Promise<void> {
+    const errorValidacion = UsuarioHelper.validarCampos(this.nuevoUsuario, this.confirmar_contrasena);
+    if (errorValidacion) {
+      await this.alertService.mostrarAlerta('Error', errorValidacion);
       return;
     }
 
-    if (this.password !== this.confirmPassword) {
-      const alert = await this.alertController.create({
-        header: 'Error',
-        message: 'Las contraseñas no coinciden.',
-        buttons: ['OK']
-      });
-      await alert.present();
-      return;
-    }
-
-    const nuevoUsuario: Usuario = {
-      id: 0,
-      nombre: this.username,
-      correo_electronico: this.email,
-      contrasena: this.password,
+    const usuarioConHash: Usuario = {
+      ...this.nuevoUsuario,
+      contrasena: UsuarioHelper.hashearContrasena(this.nuevoUsuario.contrasena)
     };
 
-    this.usuarioService.crearUsuario(nuevoUsuario).subscribe({
-      next: async (res) => {
-        const alert = await this.alertController.create({
-          header: 'Registro exitoso',
-          message: `Usuario ${this.username} registrado correctamente.`,
-          buttons: ['OK']
-        });
-        await alert.present();
-
-        this.router.navigate(['/login']);
+    this.usuarioService.crearUsuario(usuarioConHash).subscribe({
+      next: async (usuarioCreado) => {
+        await this.alertService.mostrarAlerta(
+          'Usuario registrado',
+          `El usuario ${usuarioCreado.nombre ?? usuarioCreado.correo_electronico} ha sido creado exitosamente.`
+        );
+        this.resetFormulario();
       },
-      error: async (err) => {
-        const alert = await this.alertController.create({
-          header: 'Error',
-          message: 'No se pudo registrar el usuario.',
-          buttons: ['OK']
-        });
-        await alert.present();
-        console.error(err);
+      error: async () => {
+        await this.alertService.mostrarAlerta('Error', 'No se pudo crear el usuario. Intenta más tarde.');
       }
     });
   }
 
+  private resetFormulario(): void {
+    this.nuevoUsuario = {
+      nombre: '',
+      correo_electronico: '',
+      contrasena: '',
+      fecha_nacimiento: ''
+    };
+    this.confirmar_contrasena = '';
+  }
+
+  getFechaMaxima(): string {
+    const hoy = new Date();
+    hoy.setFullYear(hoy.getFullYear() - 18);
+    return hoy.toISOString().split('T')[0];
+  }
+
+  getFechaFormateada(fechaISO: string): string {
+    if (!fechaISO) return '';
+    const fecha = new Date(fechaISO);
+    return fecha.toLocaleDateString('es-ES', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric'
+    });
+  }
 }

@@ -13,10 +13,10 @@
     <ion-input type="password" [(ngModel)]="password"></ion-input>
   </ion-item>
 
-  <ion-item lines="none">
+  <div class="recordar-checkbox">
     <ion-checkbox slot="start" [(ngModel)]="rememberMe"></ion-checkbox>
     <ion-label>Recordar contraseña</ion-label>
-  </ion-item>
+  </div>
 
   <ion-button expand="block" class="login-boton" (click)="login()">
     Iniciar Sesión

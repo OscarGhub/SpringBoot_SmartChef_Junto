@@ -1,19 +1,23 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { Usuario } from './usuario.model';
 import { UsuarioService } from './usuario.service';
+import { IonicModule, AlertController } from '@ionic/angular';
 
 @Component({
   selector: 'app-usuario',
   templateUrl: './registro.component.html',
+  standalone: true,
+  imports: [
+    CommonModule,
+    FormsModule,
+    IonicModule
+  ]
 })
 export class UsuarioComponent implements OnInit {
+  private usuarioService = inject(UsuarioService);
   usuarios: Usuario[] = [];
-  nuevoUsuario: Usuario = {
-    correo_electronico: '',
-    contrasena: '',
-  };
-
-  constructor(private usuarioService: UsuarioService) {}
 
   ngOnInit(): void {
     this.cargarUsuarios();
@@ -21,32 +25,8 @@ export class UsuarioComponent implements OnInit {
 
   cargarUsuarios(): void {
     this.usuarioService.getUsuarios().subscribe({
-      next: (data) => {
-        this.usuarios = data;
-      },
-      error: (err) => {
-        console.error('Error al cargar usuarios', err);
-      },
-    });
-  }
-
-  agregarUsuario(): void {
-    if (
-      !this.nuevoUsuario.correo_electronico ||
-      !this.nuevoUsuario.contrasena
-    ) {
-      alert('Correo y contraseña son obligatorios');
-      return;
-    }
-
-    this.usuarioService.crearUsuario(this.nuevoUsuario).subscribe({
-      next: (usuarioCreado) => {
-        this.usuarios.push(usuarioCreado);
-        this.nuevoUsuario = { correo_electronico: '', contrasena: '' };
-      },
-      error: (err) => {
-        console.error('Error al crear usuario', err);
-      },
+      next: (data) => this.usuarios = data,
+      error: (err) => console.error('Error al cargar usuarios', err)
     });
   }
 }

@@ -3,6 +3,7 @@ export interface Usuario {
   nombre?: string;
   correo_electronico: string;
   contrasena: string;
+  fecha_nacimiento: string;
 }
 
 export interface UsuarioLogin {
