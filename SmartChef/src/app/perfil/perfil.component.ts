@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import {CabeceraComponent} from "../cabecera/cabecera.component";
 import {FooterComponent} from "../footer/footer.component";
 import {IonicModule} from "@ionic/angular";
@@ -18,10 +18,10 @@ import {TarjetaPerfilComponent} from "../tarjeta-perfil/tarjeta-perfil.component
     TarjetaPerfilComponent,
   ]
 })
-export class PerfilComponent  implements OnInit {
+export class PerfilComponent   {
 
   constructor() { }
 
-  ngOnInit() {}
+
 
 }

@@ -1,26 +1,55 @@
-<ion-card class="perfil-card" color="light">
+<ion-card class="perfil-card" color="light" *ngIf="usuario">
   <ion-card-content class="perfil-content">
 
     <ion-avatar class="perfil-avatar">
-      <img src="https://www.gravatar.com/avatar?d=mp&s=200" alt="Avatar del usuario">
+
+      <img src="./assets/images/perfil.webp" alt="Avatar del usuario" />
     </ion-avatar>
 
     <ion-text>
-      <h2 class="perfil-nombre">Juan Pérez</h2>
+      <h2 class="perfil-nombre">{{ usuario.nombre }}</h2>
     </ion-text>
 
     <div class="perfil-datos">
       <ion-text>
-        <p><strong>Fecha de nacimiento:</strong> 15/10/1990</p>
+        <p><strong>Fecha de nacimiento:</strong>
+          <span *ngIf="!editarFecha">{{ usuario.fecha_nacimiento || 'No registrada' }}</span>
+          <ion-input
+            *ngIf="editarFecha"
+            [(ngModel)]="usuario.fecha_nacimiento"
+            type="date"
+            style="width: auto;"
+          ></ion-input>
+        </p>
       </ion-text>
-      <img src="assets/images/editar_icono.png" class="editar-icono" alt="Editar">
     </div>
 
     <div class="perfil-datos">
       <ion-text>
-        <p><strong>Email:</strong> juanperezarrobagmail.com</p>
+        <p><strong>Email:</strong>
+          <span *ngIf="!editarEmail">{{ usuario.correo_electronico || 'No registrado' }}</span>
+          <ion-input
+            *ngIf="editarEmail"
+            [(ngModel)]="usuario.correo_electronico"
+            type="email"
+            style="width: auto;"
+          ></ion-input>
+        </p>
       </ion-text>
-      <img src="assets/images/editar_icono.png" class="editar-icono" alt="Editar">
+      <img
+        src="assets/images/editar_icono.png"
+        class="editar-icono"
+        alt="Editar"
+        (click)="toggleEditar('correo_electronico')"
+        style="cursor: pointer;"
+      />
+      <ion-button
+        *ngIf="editarEmail"
+        size="small"
+        (click)="guardarCampo('correo_electronico')"
+      >
+        Guardar
+      </ion-button>
     </div>
 
     <ion-button class="perfil-boton" (click)="irAInventario()">

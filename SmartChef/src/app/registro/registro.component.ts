@@ -10,6 +10,7 @@ import { UsuarioHelper } from '../servicios/usuario.helper';
 @Component({
   selector: 'app-registro',
   templateUrl: './registro.component.html',
+  styleUrls: ['./registro.component.scss'],
   standalone: true,
   imports: [
     CommonModule,
