@@ -1,13 +1,13 @@
 import { Routes } from '@angular/router';
-import {InicioComponent} from "./inicio/inicio.component";
-import {PerfilComponent} from "./perfil/perfil.component";
-import {GuardadosComponent} from "./guardados/guardados.component";
-import {CarritoComponent} from "./carrito/carrito.component";
-import {VerRecetaComponent} from "./ver-receta/ver-receta.component";
-import {LoginComponent} from "./login/login.component";
-import {LoginRegistroComponent} from "./login-registro/login-registro.component";
-import {RegistroComponent} from "./registro/registro.component";
-import {InventarioComponent} from "./inventario/inventario.component";
+import {InicioComponent} from "./paginas/inicio/inicio.component";
+import {PerfilComponent} from "./paginas/perfil/perfil.component";
+import {GuardadosComponent} from "./paginas/guardados/guardados.component";
+import {CarritoComponent} from "./paginas/carrito/carrito.component";
+import {VerRecetaComponent} from "./paginas/ver-receta/ver-receta.component";
+import {LoginComponent} from "./paginas/login/login.component";
+import {LoginRegistroComponent} from "./paginas/login-registro/login-registro.component";
+import {RegistroComponent} from "./paginas/registro/registro.component";
+import {InventarioComponent} from "./paginas/inventario/inventario.component";
 
 export const routes: Routes = [
 
@@ -27,7 +27,7 @@ export const routes: Routes = [
 
   {path: 'carrito', component: CarritoComponent},
 
-  {path: 'receta', component: VerRecetaComponent},
+  { path: 'receta/:id', component: VerRecetaComponent },
 
   {path: 'inventario', component: InventarioComponent},
 

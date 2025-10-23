@@ -1,0 +1,21 @@
+<ion-header>
+  <app-cabecera></app-cabecera>
+</ion-header>
+
+<ion-content>
+  <ion-toolbar>
+    <app-search-bar (searchChange)="onSearch($event)"></app-search-bar>
+    <div class="titulo-img">
+      <img src="./assets/images/explorar_logo.png">
+    </div>
+
+    <ng-container *ngFor="let receta of recetasFiltradas">
+      <app-tarjeta-receta [receta]="receta"></app-tarjeta-receta>
+    </ng-container>
+
+  </ion-toolbar>
+</ion-content>
+
+<ion-footer>
+  <app-footer></app-footer>
+</ion-footer>

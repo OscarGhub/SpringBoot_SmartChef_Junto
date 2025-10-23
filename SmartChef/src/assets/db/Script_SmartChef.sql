@@ -8,8 +8,9 @@ CREATE TABLE Usuario (
     id INT AUTO_INCREMENT PRIMARY KEY,
     nombre VARCHAR(100) NOT NULL,
     correo_electronico VARCHAR(150) UNIQUE NOT NULL,
-    contrasena VARCHAR(255) NOT null,
-    fecha_nacimiento DATE
+    contrasena VARCHAR(255) NOT NULL,
+    fecha_nacimiento DATE,
+    foto_url VARCHAR(255)
 );
 
 -- ============================
@@ -35,17 +36,41 @@ CREATE TABLE Receta (
     id INT AUTO_INCREMENT PRIMARY KEY,
     titulo VARCHAR(150) NOT NULL,
     descripcion TEXT,
+    tutorial LONGTEXT,
     tiempo_preparacion INT,
     foto_url VARCHAR(255),
     num_favoritos INT DEFAULT 0
 );
 
 -- Insertar datos de Receta
-INSERT INTO Receta (titulo, descripcion, tiempo_preparacion, foto_url, num_favoritos) VALUES
-('Pollo al Horno', 'Pollo marinado al horno con especias.', 60, 'https://example.com/pollo.jpg', 10),
-('Ensalada Vegana', 'Ensalada fresca con espinacas y zanahoria.', 15, 'https://example.com/ensalada.jpg', 5),
-('Arroz con Verduras', 'Arroz salteado con verduras.', 30, 'https://example.com/arroz.jpg', 8),
-('Sopa de Tomate', 'Sopa casera con tomate y albahaca.', 25, 'https://example.com/sopa.jpg', 3);
+INSERT INTO Receta (titulo, descripcion, tutorial, tiempo_preparacion, foto_url, num_favoritos) VALUES
+('Pollo al Horno', 
+ 'Pollo marinado al horno con especias.', 
+ '1. Precalienta el horno a 180°C.\n2. Marina el pollo con especias y aceite.\n3. Coloca el pollo en una bandeja y hornea durante 60 minutos.\n4. Deja reposar 5 minutos antes de servir.',
+ 60, 
+ 'https://example.com/pollo.jpg', 
+ 10),
+
+('Ensalada Vegana', 
+ 'Ensalada fresca con espinacas y zanahoria.', 
+ '1. Lava bien las espinacas y zanahorias.\n2. Corta las zanahorias en juliana.\n3. Mezcla todos los ingredientes en un bol.\n4. Añade aderezo al gusto y sirve fría.',
+ 15, 
+ 'https://example.com/ensalada.jpg', 
+ 5),
+
+('Arroz con Verduras', 
+ 'Arroz salteado con verduras.', 
+ '1. Cocina el arroz según las instrucciones del paquete.\n2. Saltea cebolla, zanahoria y otras verduras.\n3. Añade el arroz cocido a las verduras y mezcla bien.\n4. Sazona con sal y pimienta al gusto y sirve caliente.',
+ 30, 
+ 'https://example.com/arroz.jpg', 
+ 8),
+
+('Sopa de Tomate', 
+ 'Sopa casera con tomate y albahaca.', 
+ '1. Corta los tomates y la cebolla.\n2. Sofríe la cebolla y el ajo hasta dorar.\n3. Añade los tomates y cocina hasta que estén suaves.\n4. Licúa la mezcla y cocina nuevamente.\n5. Añade albahaca fresca antes de servir.',
+ 25, 
+ 'https://example.com/sopa.jpg', 
+ 3);
 
 -- ============================
 -- Tabla: Ingrediente

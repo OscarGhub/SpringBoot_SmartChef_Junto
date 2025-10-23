@@ -1,0 +1,26 @@
+<ion-card class="receta-card" (click)="goToReceta()">
+  <div class="receta-container">
+
+    <div class="receta-imagen-container">
+      <img
+        class="imagen_receta"
+        [src]="receta.fotoUrl || '../../../assets/images/receta.png'"
+        alt="{{ receta.titulo }}"
+      />
+    </div>
+
+    <div class="receta-info">
+      <p class="receta-titulo">{{ receta.titulo }}</p>
+
+      <div class="receta-descripcion">
+        <p>{{ receta.descripcion }}</p>
+      </div>
+
+      <div class="receta-acciones">
+        <ion-button class="boton" (click)="guardarReceta(); $event.stopPropagation()">Guardar</ion-button>
+        <ion-button class="boton" (click)="anadirAlCarrito(); $event.stopPropagation()">Añadir al carrito</ion-button>
+      </div>
+    </div>
+
+  </div>
+</ion-card>
