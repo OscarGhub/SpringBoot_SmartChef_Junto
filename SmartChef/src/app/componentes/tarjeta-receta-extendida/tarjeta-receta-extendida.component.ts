@@ -12,7 +12,7 @@ import { CommonModule } from '@angular/common';
   imports: [IonicModule, RouterModule, CommonModule]
 })
 export class TarjetaRecetaExtendidaComponent {
-  @Input() receta!: Receta;
+  @Input() receta?: Receta;
 
   private router = inject(Router);
 
@@ -30,5 +30,10 @@ export class TarjetaRecetaExtendidaComponent {
 
   anadirAlCarrito() {
     console.log('Añadir al carrito:', this.receta?.id);
+  }
+
+  async onImageError(event: Event) {
+    const img = event.target as HTMLImageElement;
+    img.src = '../../../assets/images/receta.png';
   }
 }

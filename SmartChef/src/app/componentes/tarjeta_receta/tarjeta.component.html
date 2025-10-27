@@ -4,8 +4,9 @@
     <div class="receta-imagen-container">
       <img
         class="imagen_receta"
-        [src]="receta.fotoUrl || '../../../assets/images/receta.png'"
+        [src]="receta.foto_url || '../../../assets/images/receta.png'"
         [alt]="receta.titulo || 'Receta'"
+        (error)="onImageError($event)"
       />
     </div>
 

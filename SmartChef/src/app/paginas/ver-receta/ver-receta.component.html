@@ -4,7 +4,15 @@
 
 <ion-content class="ion-padding">
   <div class="center-container">
-    <app-tarjeta-receta-extendida></app-tarjeta-receta-extendida>
+
+    <app-tarjeta-receta-extendida
+      *ngIf="receta"
+      [receta]="receta">
+    </app-tarjeta-receta-extendida>
+
+    <div *ngIf="!receta" class="loading-message">
+      Cargando receta...
+    </div>
   </div>
 </ion-content>
 

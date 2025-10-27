@@ -6,6 +6,7 @@ import { TarjetaRecetaExtendidaComponent } from "../../componentes/tarjeta-recet
 import { ActivatedRoute } from '@angular/router';
 import { RecetaService } from '../../servicios/receta/receta.service';
 import { Receta } from '../../servicios/receta/receta.model';
+import {CommonModule} from "@angular/common";
 
 @Component({
   selector: 'app-ver-receta',
@@ -16,7 +17,8 @@ import { Receta } from '../../servicios/receta/receta.model';
     CabeceraComponent,
     FooterComponent,
     IonicModule,
-    TarjetaRecetaExtendidaComponent
+    TarjetaRecetaExtendidaComponent,
+    CommonModule
   ]
 })
 export class VerRecetaComponent implements OnInit {

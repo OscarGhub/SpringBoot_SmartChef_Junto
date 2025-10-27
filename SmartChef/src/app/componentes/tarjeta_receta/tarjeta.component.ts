@@ -1,5 +1,5 @@
 import { Component, Input, inject } from '@angular/core';
-import { IonicModule } from '@ionic/angular';
+import { IonicModule, AlertController } from '@ionic/angular';
 import { Router, RouterModule } from '@angular/router';
 import { Receta } from '../../servicios/receta/receta.model';
 import { CommonModule } from '@angular/common';
@@ -17,10 +17,18 @@ export class TarjetaComponent {
   private router = inject(Router);
 
   goToReceta() {
-    if (this.receta?.id) {
-      this.router.navigate(['/receta', this.receta.id]);
+    const id = this.receta.id;
+
+    if (id) {
+      console.log('Navegando a:', id);
+      this.router.navigate(['/receta', id]);
     } else {
-      console.warn('Receta o ID no definido');
+      console.warn('No se encontró ID en receta:', this.receta);
     }
+  }
+
+  async onImageError(event: Event) {
+    const img = event.target as HTMLImageElement;
+    img.src = '../../../assets/images/receta.png';
   }
 }

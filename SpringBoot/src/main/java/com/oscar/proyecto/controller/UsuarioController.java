@@ -8,7 +8,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/usuario")
-@CrossOrigin(origins = {"http://localhost:4200"})
 public class UsuarioController {
 
     private final UsuarioRepository usuarioRepo;
@@ -42,5 +41,4 @@ public class UsuarioController {
                 })
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
-
 }

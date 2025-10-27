@@ -9,7 +9,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/receta")
-@CrossOrigin(origins = {"http://localhost:4200"})
 public class RecetaController {
 
     private final RecetaRepository recetaRepo;
@@ -21,6 +20,13 @@ public class RecetaController {
     @GetMapping
     public List<Receta> getRecetas() {
         return recetaRepo.findAll();
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<Receta> getRecetaById(@PathVariable Integer id) {
+        return recetaRepo.findById(id)
+                .map(receta -> ResponseEntity.ok(receta))
+                .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @PostMapping
@@ -37,9 +43,9 @@ public class RecetaController {
                 .map(recetaExistente -> {
                     recetaExistente.setTitulo(recetaActualizada.getTitulo());
                     recetaExistente.setDescripcion(recetaActualizada.getDescripcion());
-                    recetaExistente.setTiempoPreparacion(recetaActualizada.getTiempoPreparacion());
-                    recetaExistente.setFotoUrl(recetaActualizada.getFotoUrl());
-                    recetaExistente.setNumFavoritos(recetaActualizada.getNumFavoritos());
+                    recetaExistente.setTiempo_preparacion(recetaActualizada.getTiempo_preparacion());
+                    recetaExistente.setFoto_url(recetaActualizada.getFoto_url());
+                    recetaExistente.setNum_favoritos(recetaActualizada.getNum_favoritos());
 
                     Receta recetaGuardada = recetaRepo.save(recetaExistente);
                     return ResponseEntity.ok(recetaGuardada);

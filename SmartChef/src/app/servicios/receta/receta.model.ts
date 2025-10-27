@@ -1,8 +1,9 @@
 export interface Receta {
-  id: number;
+  id?: number;
   titulo: string;
   descripcion: string;
-  tiempoPreparacion: number;
-  fotoUrl: string;
-  numFavoritos: number;
+  tutorial: string;
+  tiempo_preparacion: number;
+  foto_url: string;
+  num_favoritos: number;
 }

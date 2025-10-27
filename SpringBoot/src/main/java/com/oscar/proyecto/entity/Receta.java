@@ -1,6 +1,5 @@
 package com.oscar.proyecto.entity;
 
-import java.time.LocalDate;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -19,12 +18,22 @@ public class Receta {
     private String descripcion;
 
     @Getter @Setter
-    private Integer tiempoPreparacion;
+    private String tutorial;
 
     @Getter @Setter
-    private String fotoUrl;
+    private Integer tiempo_preparacion;
 
     @Getter @Setter
-    private Integer numFavoritos;
+    private String foto_url;
 
+    @Getter @Setter
+    private Integer num_favoritos;
+
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
 }
