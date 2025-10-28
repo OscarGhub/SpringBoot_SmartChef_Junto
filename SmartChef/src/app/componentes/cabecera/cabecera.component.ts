@@ -8,9 +8,7 @@ import { UsuarioService } from 'src/app/servicios/usuario/usuario.service';
   templateUrl: './cabecera.component.html',
   styleUrls: ['./cabecera.component.scss'],
   standalone: true,
-  imports: [
-    IonicModule
-  ]
+  imports: [IonicModule]
 })
 export class CabeceraComponent implements OnInit {
 
@@ -25,14 +23,23 @@ export class CabeceraComponent implements OnInit {
     const correo = localStorage.getItem('correo_electronico');
     if (correo) {
       this.usuarioService.getUsuarioPorCorreo(correo).subscribe(usuario => {
-        if (usuario && usuario.foto_url) {
-          this.fotoPerfilUrl = usuario.foto_url;
+        if (usuario && usuario.id) {
+          this.actualizarFotoPerfil(usuario.id);
         }
       });
     }
   }
 
+  actualizarFotoPerfil(usuarioId: number) {
+    const timestamp = new Date().getTime();
+    this.fotoPerfilUrl = `http://localhost:8080/api/usuario/${usuarioId}/foto?t=${timestamp}`;
+  }
+
   goToPerfil() {
     this.router.navigate(['/perfil']);
+  }
+
+  onImageError() {
+    this.fotoPerfilUrl = '../../../assets/images/perfil.webp';
   }
 }

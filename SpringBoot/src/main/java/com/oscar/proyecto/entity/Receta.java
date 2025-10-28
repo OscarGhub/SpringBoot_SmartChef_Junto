@@ -9,6 +9,7 @@ public class Receta {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Getter @Setter
     private Integer id;
 
     @Getter @Setter
@@ -29,11 +30,4 @@ public class Receta {
     @Getter @Setter
     private Integer num_favoritos;
 
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
 }

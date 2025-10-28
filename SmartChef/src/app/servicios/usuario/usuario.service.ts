@@ -29,4 +29,8 @@ export class UsuarioService {
     return this.http.put<Usuario>(`${this.apiUrl}/${usuario.id}`, usuario);
   }
 
+  actualizarFoto(id: number, formData: FormData): Observable<any> {
+    return this.http.put<any>(`${this.apiUrl}/${id}/foto`, formData);
+  }
+
 }

@@ -43,6 +43,7 @@ export class LoginComponent {
         if (match) {
 
           localStorage.setItem('usuario', JSON.stringify(usuario));
+          localStorage.setItem('correo_electronico', usuario.correo_electronico);
 
           await this.alertService.mostrarAlerta('Éxito', 'Has iniciado sesión correctamente.');
 

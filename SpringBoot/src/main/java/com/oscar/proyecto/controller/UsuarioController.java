@@ -2,8 +2,16 @@ package com.oscar.proyecto.controller;
 
 import com.oscar.proyecto.entity.Usuario;
 import com.oscar.proyecto.repository.UsuarioRepository;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.List;
 
 @RestController
@@ -11,6 +19,7 @@ import java.util.List;
 public class UsuarioController {
 
     private final UsuarioRepository usuarioRepo;
+    private final String CARPETA_UPLOADS = "C:/proyecto/uploads/";
 
     public UsuarioController(UsuarioRepository usuarioRepo) {
         this.usuarioRepo = usuarioRepo;
@@ -35,10 +44,50 @@ public class UsuarioController {
                 .map(usuarioExistente -> {
                     usuarioExistente.setCorreo_electronico(usuarioActualizado.getCorreo_electronico());
                     usuarioExistente.setFecha_nacimiento(usuarioActualizado.getFecha_nacimiento());
-
                     Usuario usuarioGuardado = usuarioRepo.save(usuarioExistente);
                     return ResponseEntity.ok(usuarioGuardado);
                 })
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
+
+    @PutMapping("/{id}/foto")
+    public ResponseEntity<Usuario> actualizarFoto(
+            @PathVariable Integer id,
+            @RequestParam("foto") MultipartFile archivo) {
+
+        Usuario usuario = usuarioRepo.findById(id).orElse(null);
+        if (usuario == null) return ResponseEntity.notFound().build();
+
+        try {
+            String carpeta = "C:/proyecto/uploads/";
+            Files.createDirectories(Paths.get(carpeta));
+
+            String nombreArchivo = "usuario_" + id + "_" + System.currentTimeMillis() + "_"
+                    + archivo.getOriginalFilename().replaceAll("\\s+", "_");
+            File destino = new File(carpeta + nombreArchivo);
+            archivo.transferTo(destino);
+
+            usuario.setFoto_url(nombreArchivo); // guardamos solo el nombre
+            Usuario usuarioActualizado = usuarioRepo.save(usuario);
+            return ResponseEntity.ok(usuarioActualizado);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return ResponseEntity.status(500).build();
+        }
+    }
+
+    @GetMapping("/{id}/foto")
+    public ResponseEntity<byte[]> obtenerFoto(@PathVariable Integer id) throws IOException {
+        Usuario usuario = usuarioRepo.findById(id).orElse(null);
+        if (usuario == null || usuario.getFoto_url() == null) return ResponseEntity.notFound().build();
+
+        File archivo = new File("C:/proyecto/uploads/" + usuario.getFoto_url());
+        if (!archivo.exists()) return ResponseEntity.notFound().build();
+
+        byte[] bytes = Files.readAllBytes(archivo.toPath());
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_TYPE, MediaType.IMAGE_JPEG_VALUE)
+                .body(bytes);
+    }
+
 }
