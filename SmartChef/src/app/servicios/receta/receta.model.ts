@@ -6,4 +6,5 @@ export interface Receta {
   tiempo_preparacion: number;
   foto_url: string;
   num_favoritos: number;
+  yaGuardada?: boolean;
 }

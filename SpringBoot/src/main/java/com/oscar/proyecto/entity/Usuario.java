@@ -5,28 +5,24 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+@Setter
+@Getter
 @Entity
 public class Usuario {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Getter @Setter
     private Integer id;
 
-    @Getter @Setter
     private String nombre;
 
     @Column(unique = true)
-    @Getter @Setter
     private String correo_electronico;
 
-    @Getter @Setter
     private String contrasena;
 
-    @Getter @Setter
     private LocalDate fecha_nacimiento;
 
-    @Getter @Setter
     private String foto_url;
 
 

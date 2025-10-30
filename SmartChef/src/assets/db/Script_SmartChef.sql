@@ -21,7 +21,6 @@ CREATE TABLE Preferencia (
     nombre VARCHAR(100) NOT NULL
 );
 
--- Insertar datos de Preferencia
 INSERT INTO Preferencia (nombre) VALUES
 ('Vegana'),
 ('Sin Gluten'),
@@ -38,39 +37,8 @@ CREATE TABLE Receta (
     descripcion TEXT,
     tutorial LONGTEXT,
     tiempo_preparacion INT,
-    foto_url VARCHAR(255),
-    num_favoritos INT DEFAULT 0
+    foto_url VARCHAR(255)
 );
-
--- Insertar datos de Receta
-INSERT INTO Receta (titulo, descripcion, tutorial, tiempo_preparacion, foto_url, num_favoritos) VALUES
-('Pollo al Horno', 
- 'Pollo marinado al horno con especias.', 
- '1. Precalienta el horno a 180°C.\n2. Marina el pollo con especias y aceite.\n3. Coloca el pollo en una bandeja y hornea durante 60 minutos.\n4. Deja reposar 5 minutos antes de servir.',
- 60, 
- 'https://example.com/pollo.jpg', 
- 10),
-
-('Ensalada Vegana', 
- 'Ensalada fresca con espinacas y zanahoria.', 
- '1. Lava bien las espinacas y zanahorias.\n2. Corta las zanahorias en juliana.\n3. Mezcla todos los ingredientes en un bol.\n4. Añade aderezo al gusto y sirve fría.',
- 15, 
- 'https://example.com/ensalada.jpg', 
- 5),
-
-('Arroz con Verduras', 
- 'Arroz salteado con verduras.', 
- '1. Cocina el arroz según las instrucciones del paquete.\n2. Saltea cebolla, zanahoria y otras verduras.\n3. Añade el arroz cocido a las verduras y mezcla bien.\n4. Sazona con sal y pimienta al gusto y sirve caliente.',
- 30, 
- 'https://example.com/arroz.jpg', 
- 8),
-
-('Sopa de Tomate', 
- 'Sopa casera con tomate y albahaca.', 
- '1. Corta los tomates y la cebolla.\n2. Sofríe la cebolla y el ajo hasta dorar.\n3. Añade los tomates y cocina hasta que estén suaves.\n4. Licúa la mezcla y cocina nuevamente.\n5. Añade albahaca fresca antes de servir.',
- 25, 
- 'https://example.com/sopa.jpg', 
- 3);
 
 -- ============================
 -- Tabla: Ingrediente
@@ -81,95 +49,27 @@ CREATE TABLE Ingrediente (
     unidad_medida VARCHAR(50)
 );
 
--- Insertar datos de Ingrediente
-INSERT INTO Ingrediente (nombre, unidad_medida) VALUES
-('Pollo', 'gramos'),
-('Arroz', 'gramos'),
-('Aceite de oliva', 'mililitros'),
-('Sal', 'gramos'),
-('Tomate', 'unidad'),
-('Ajo', 'dientes'),
-('Cebolla', 'unidad'),
-('Zanahoria', 'unidad'),
-('Espinaca', 'gramos'),
-('Queso', 'gramos');
-
 -- ============================
 -- Tabla: Receta_Ingrediente (N:N)
 -- ============================
 CREATE TABLE Receta_Ingrediente (
-    id_receta INT,
-    id_ingrediente INT,
+    id_receta INT NOT NULL,
+    id_ingrediente INT NOT NULL,
     cantidad DECIMAL(10,2),
     PRIMARY KEY (id_receta, id_ingrediente),
     FOREIGN KEY (id_receta) REFERENCES Receta(id) ON DELETE CASCADE,
     FOREIGN KEY (id_ingrediente) REFERENCES Ingrediente(id) ON DELETE CASCADE
 );
 
--- Insertar datos en Receta_Ingrediente
--- Pollo al Horno (id=1)
-INSERT INTO Receta_Ingrediente (id_receta, id_ingrediente, cantidad) VALUES
-(1, 1, 500),  -- Pollo
-(1, 3, 30),   -- Aceite de oliva
-(1, 4, 5),    -- Sal
-(1, 6, 2),    -- Ajo
-(1, 7, 1);    -- Cebolla
-
--- Ensalada Vegana (id=2)
-INSERT INTO Receta_Ingrediente (id_receta, id_ingrediente, cantidad) VALUES
-(2, 8, 1),    -- Zanahoria
-(2, 9, 100),  -- Espinaca
-(2, 3, 10);   -- Aceite de oliva
-
--- Arroz con Verduras (id=3)
-INSERT INTO Receta_Ingrediente (id_receta, id_ingrediente, cantidad) VALUES
-(3, 2, 200),  -- Arroz
-(3, 7, 1),    -- Cebolla
-(3, 8, 1),    -- Zanahoria
-(3, 4, 5);    -- Sal
-
--- Sopa de Tomate (id=4)
-INSERT INTO Receta_Ingrediente (id_receta, id_ingrediente, cantidad) VALUES
-(4, 5, 2),    -- Tomate
-(4, 6, 1),    -- Ajo
-(4, 7, 1),    -- Cebolla
-(4, 4, 5);    -- Sal
-
 -- ============================
 -- Tabla: Receta_Preferencia (N:N)
 -- ============================
 CREATE TABLE Receta_Preferencia (
-    id_receta INT,
-    id_preferencia INT,
+    id_receta INT NOT NULL,
+    id_preferencia INT NOT NULL,
     PRIMARY KEY (id_receta, id_preferencia),
     FOREIGN KEY (id_receta) REFERENCES Receta(id) ON DELETE CASCADE,
     FOREIGN KEY (id_preferencia) REFERENCES Preferencia(id) ON DELETE CASCADE
-);
-
--- Insertar datos en Receta_Preferencia
--- Ensalada Vegana
-INSERT INTO Receta_Preferencia (id_receta, id_preferencia) VALUES
-(2, 1),  -- Vegana
-(2, 5);  -- Sin Lactosa
-
--- Arroz con Verduras
-INSERT INTO Receta_Preferencia (id_receta, id_preferencia) VALUES
-(3, 2),  -- Sin Gluten
-(3, 5);  -- Sin Lactosa
-
--- Pollo al Horno
-INSERT INTO Receta_Preferencia (id_receta, id_preferencia) VALUES
-(1, 3);  -- Alta en Proteínas
-
--- ============================
--- Tabla: Receta_Favorito (N:N)
--- ============================
-CREATE TABLE Receta_Favorito (
-    id_usuario INT,
-    id_receta INT,
-    PRIMARY KEY (id_usuario, id_receta),
-    FOREIGN KEY (id_usuario) REFERENCES Usuario(id) ON DELETE CASCADE,
-    FOREIGN KEY (id_receta) REFERENCES Receta(id) ON DELETE CASCADE
 );
 
 -- ============================
@@ -177,7 +77,7 @@ CREATE TABLE Receta_Favorito (
 -- ============================
 CREATE TABLE Coleccion (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    id_usuario INT,
+    id_usuario INT NOT NULL,
     nombre VARCHAR(100) NOT NULL,
     FOREIGN KEY (id_usuario) REFERENCES Usuario(id) ON DELETE CASCADE
 );
@@ -186,8 +86,8 @@ CREATE TABLE Coleccion (
 -- Tabla: Coleccion_Receta (N:N)
 -- ============================
 CREATE TABLE Coleccion_Receta (
-    id_receta INT,
-    id_coleccion INT,
+    id_receta INT NOT NULL,
+    id_coleccion INT NOT NULL,
     PRIMARY KEY (id_receta, id_coleccion),
     FOREIGN KEY (id_receta) REFERENCES Receta(id) ON DELETE CASCADE,
     FOREIGN KEY (id_coleccion) REFERENCES Coleccion(id) ON DELETE CASCADE
@@ -198,8 +98,8 @@ CREATE TABLE Coleccion_Receta (
 -- ============================
 CREATE TABLE Historial_Cocinado (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    id_usuario INT,
-    id_receta INT,
+    id_usuario INT NOT NULL,
+    id_receta INT NOT NULL,
     fecha_cocinado DATE NOT NULL,
     FOREIGN KEY (id_usuario) REFERENCES Usuario(id) ON DELETE CASCADE,
     FOREIGN KEY (id_receta) REFERENCES Receta(id) ON DELETE CASCADE
@@ -210,7 +110,7 @@ CREATE TABLE Historial_Cocinado (
 -- ============================
 CREATE TABLE ListaCompra (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    id_usuario INT,
+    id_usuario INT NOT NULL,
     fecha_creacion DATE NOT NULL,
     FOREIGN KEY (id_usuario) REFERENCES Usuario(id) ON DELETE CASCADE
 );
@@ -219,8 +119,8 @@ CREATE TABLE ListaCompra (
 -- Tabla: Lista_Compra_Ingrediente (N:N)
 -- ============================
 CREATE TABLE Lista_Compra_Ingrediente (
-    id_lista INT,
-    id_ingrediente INT,
+    id_lista INT NOT NULL,
+    id_ingrediente INT NOT NULL,
     cantidad DECIMAL(10,2),
     PRIMARY KEY (id_lista, id_ingrediente),
     FOREIGN KEY (id_lista) REFERENCES ListaCompra(id) ON DELETE CASCADE,
@@ -232,7 +132,151 @@ CREATE TABLE Lista_Compra_Ingrediente (
 -- ============================
 CREATE TABLE Inventario (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    id_ingrediente INT,
+    id_ingrediente INT NOT NULL,
     cantidad DECIMAL(10,2),
     FOREIGN KEY (id_ingrediente) REFERENCES Ingrediente(id) ON DELETE CASCADE
 );
+
+-- ============================
+-- Tabla: Receta_Guardada (N:N)
+-- ============================
+CREATE TABLE Receta_Guardada (
+    id_usuario INT NOT NULL,
+    id_receta INT NOT NULL,
+    fecha_guardado TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (id_usuario, id_receta),
+    FOREIGN KEY (id_usuario) REFERENCES Usuario(id) ON DELETE CASCADE,
+    FOREIGN KEY (id_receta) REFERENCES Receta(id) ON DELETE CASCADE
+);
+
+-- ============================
+-- VISTA: Recetas con número de favoritos (dinámica)
+-- ============================
+CREATE OR REPLACE VIEW Vista_Receta_Favoritos AS
+SELECT 
+    r.id,
+    r.titulo,
+    r.descripcion,
+    r.tutorial,
+    r.tiempo_preparacion,
+    r.foto_url,
+    COUNT(rg.id_usuario) AS num_favoritos
+FROM Receta r
+LEFT JOIN Receta_Guardada rg ON r.id = rg.id_receta
+GROUP BY r.id;
+
+-- ============================
+-- DATOS: Preferencia
+-- ============================
+INSERT INTO Preferencia (nombre) VALUES
+('Vegana'),
+('Vegetariana'),
+('Sin Gluten'),
+('Alta en Proteínas'),
+('Baja en Carbohidratos'),
+('Sin Lactosa'),
+('Keto'),
+('Mediterránea');
+
+-- ============================
+-- DATOS: Receta
+-- ============================
+INSERT INTO Receta (titulo, descripcion, tutorial, tiempo_preparacion, foto_url) VALUES
+('Pollo al Horno', 'Pollo marinado con especias al horno.', '1. Marina el pollo.\n2. Hornea 60 min.\n3. Sirve.', 60, 'https://example.com/pollo.jpg'),
+('Ensalada Vegana', 'Ensalada fresca con espinacas y aguacate.', '1. Lava y corta.\n2. Mezcla y aliña.', 15, 'https://example.com/ensalada.jpg'),
+('Arroz con Verduras', 'Arroz salteado con vegetales.', '1. Cocina arroz.\n2. Sofríe verduras.\n3. Mezcla todo.', 30, 'https://example.com/arroz.jpg'),
+('Sopa de Tomate', 'Sopa casera de tomate y albahaca.', '1. Sofríe ajo.\n2. Añade tomate.\n3. Tritura y sirve.', 25, 'https://example.com/sopa.jpg'),
+('Tacos de Pollo', 'Tacos con pollo, verduras y salsa.', '1. Cocina pollo.\n2. Prepara tacos.\n3. Añade salsa.', 20, 'https://example.com/tacos.jpg'),
+('Smoothie Verde', 'Bebida saludable con espinaca y plátano.', '1. Mezcla todo en licuadora.', 5, 'https://example.com/smoothie.jpg'),
+('Pasta Carbonara', 'Clásica pasta italiana con crema y bacon.', '1. Cocina pasta.\n2. Mezcla con salsa.', 25, 'https://example.com/pasta.jpg'),
+('Gazpacho Andaluz', 'Sopa fría española de tomate y pepino.', '1. Tritura ingredientes.\n2. Sirve frío.', 10, 'https://example.com/gazpacho.jpg'),
+('Panqueques de Avena', 'Panqueques saludables sin azúcar.', '1. Mezcla avena y huevo.\n2. Cocina en sartén.', 15, 'https://example.com/panqueques.jpg'),
+('Curry de Garbanzos', 'Plato vegano con garbanzos y especias.', '1. Sofríe cebolla y ajo.\n2. Añade garbanzos.\n3. Cocina con curry.', 35, 'https://example.com/curry.jpg'),
+('Pizza Margarita', 'Pizza italiana con tomate, queso y albahaca.', '1. Prepara masa.\n2. Hornea con ingredientes.', 40, 'https://example.com/pizza.jpg'),
+('Lentejas Estofadas', 'Plato tradicional de lentejas con verduras.', '1. Sofríe ajo y cebolla.\n2. Cocina lentejas.\n3. Sirve caliente.', 50, 'https://example.com/lentejas.jpg'),
+('Batido de Fresas', 'Batido natural con fresas y yogur.', '1. Mezcla todo en licuadora.', 5, 'https://example.com/batido.jpg'),
+('Tortilla de Patatas', 'Clásica tortilla española con patata y cebolla.', '1. Fríe patatas.\n2. Añade huevo.\n3. Cocina en sartén.', 25, 'https://example.com/tortilla.jpg'),
+('Quinoa con Verduras', 'Plato saludable de quinoa salteada.', '1. Cocina quinoa.\n2. Sofríe verduras.\n3. Mezcla.', 20, 'https://example.com/quinoa.jpg');
+
+-- ============================
+-- DATOS: Ingrediente
+-- ============================
+INSERT INTO Ingrediente (nombre, unidad_medida) VALUES
+('Pollo', 'gramos'),
+('Arroz', 'gramos'),
+('Aceite de oliva', 'mililitros'),
+('Sal', 'gramos'),
+('Tomate', 'unidad'),
+('Ajo', 'dientes'),
+('Cebolla', 'unidad'),
+('Zanahoria', 'unidad'),
+('Espinaca', 'gramos'),
+('Queso', 'gramos'),
+('Pan', 'unidad'),
+('Pasta', 'gramos'),
+('Leche', 'mililitros'),
+('Huevo', 'unidad'),
+('Avena', 'gramos'),
+('Plátano', 'unidad'),
+('Fresas', 'gramos'),
+('Garbanzos', 'gramos'),
+('Lentejas', 'gramos'),
+('Pimiento', 'unidad'),
+('Pepino', 'unidad'),
+('Quinoa', 'gramos'),
+('Albahaca', 'hojas');
+
+-- ============================
+-- DATOS: Receta_Ingrediente
+-- ============================
+INSERT INTO Receta_Ingrediente (id_receta, id_ingrediente, cantidad) VALUES
+-- Pollo al Horno
+(1, 1, 500), (1, 3, 20), (1, 4, 5), (1, 6, 2),
+-- Ensalada Vegana
+(2, 8, 1), (2, 9, 100), (2, 16, 1), (2, 3, 10),
+-- Arroz con Verduras
+(3, 2, 200), (3, 7, 1), (3, 8, 1), (3, 4, 5),
+-- Sopa de Tomate
+(4, 5, 3), (4, 6, 1), (4, 7, 1), (4, 23, 5),
+-- Tacos de Pollo
+(5, 1, 200), (5, 7, 1), (5, 20, 1), (5, 11, 2),
+-- Smoothie Verde
+(6, 9, 50), (6, 16, 1), (6, 13, 200),
+-- Pasta Carbonara
+(7, 12, 150), (7, 10, 50), (7, 14, 1), (7, 3, 10),
+-- Gazpacho
+(8, 5, 4), (8, 21, 1), (8, 20, 1), (8, 4, 3),
+-- Panqueques de Avena
+(9, 15, 80), (9, 14, 1), (9, 13, 100),
+-- Curry de Garbanzos
+(10, 18, 200), (10, 7, 1), (10, 6, 2), (10, 8, 1),
+-- Pizza Margarita
+(11, 11, 1), (11, 5, 2), (11, 10, 50), (11, 23, 3),
+-- Lentejas Estofadas
+(12, 19, 200), (12, 7, 1), (12, 8, 1), (12, 4, 3),
+-- Batido de Fresas
+(13, 17, 100), (13, 13, 150), (13, 16, 1),
+-- Tortilla de Patatas
+(14, 14, 2), (14, 7, 1), (14, 4, 3),
+-- Quinoa con Verduras
+(15, 22, 100), (15, 8, 1), (15, 7, 1), (15, 3, 10);
+
+-- ============================
+-- DATOS: Receta_Preferencia
+-- ============================
+INSERT INTO Receta_Preferencia (id_receta, id_preferencia) VALUES
+(1, 3),  -- Pollo al Horno - Alta en proteínas
+(2, 1), (2, 5),  -- Ensalada Vegana - Vegana, Sin lactosa
+(3, 2), (3, 5),  -- Arroz con Verduras - Sin Gluten, Sin Lactosa
+(4, 1), (4, 2), (4, 5),  -- Sopa de Tomate
+(5, 4),  -- Tacos de Pollo - Alta en proteínas
+(6, 1), (6, 5),  -- Smoothie Verde - Vegana
+(7, 8),  -- Pasta Carbonara - Mediterránea
+(8, 1), (8, 8),  -- Gazpacho - Vegana, Mediterránea
+(9, 5), (9, 2),  -- Panqueques de Avena - Sin Lactosa
+(10, 1), (10, 2), (10, 5),  -- Curry Vegano
+(11, 8), (11, 5),  -- Pizza Margarita
+(12, 2),  -- Lentejas Estofadas
+(13, 5),  -- Batido de Fresas - Sin Lactosa
+(14, 8),  -- Tortilla - Mediterránea
+(15, 1), (15, 5);  -- Quinoa - Vegana, Sin Lactosa

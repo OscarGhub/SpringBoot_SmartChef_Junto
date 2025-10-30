@@ -14,10 +14,19 @@
       <p><strong>Tiempo de preparación:</strong> {{ receta.tiempo_preparacion }} min</p>
       <div class="receta-descripcion">{{ receta.descripcion }}</div>
       <div class="receta-tutorial">{{ receta.tutorial }}</div>
-      <p><strong>Favoritos:</strong> {{ receta.num_favoritos }}</p>
+      <p><strong>Guardados:</strong> {{ receta.num_favoritos }}</p>
+
       <div class="receta-acciones">
-        <ion-button class="boton" (click)="guardarReceta(); $event.stopPropagation()">Guardar</ion-button>
-        <ion-button class="boton" (click)="anadirAlCarrito(); $event.stopPropagation()">Añadir al carrito</ion-button>
+        <ion-button
+          class="boton"
+          [color]="receta.yaGuardada ? 'success' : '#217A43'"
+          (click)="toggleFavorito(); $event.stopPropagation()">
+          {{ receta.yaGuardada ? 'Guardado' : 'Guardar' }}
+        </ion-button>
+
+        <ion-button class="boton" (click)="anadirAlCarrito(); $event.stopPropagation()">
+          Añadir al carrito
+        </ion-button>
       </div>
     </div>
   </div>

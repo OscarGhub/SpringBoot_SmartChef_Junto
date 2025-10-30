@@ -29,4 +29,16 @@ export class RecetaService {
     return this.http.get<Receta[]>(`${this.apiUrl}/filtrar`, { params });
   }
 
+  guardarReceta(idReceta: number, idUsuario: number): Observable<Receta> {
+    return this.http.post<Receta>(`${this.apiUrl}/${idReceta}/guardar/${idUsuario}`, {});
+  }
+
+  quitarRecetaGuardada(idReceta: number, idUsuario: number): Observable<Receta> {
+    return this.http.delete<Receta>(`${this.apiUrl}/${idReceta}/guardar/${idUsuario}`);
+  }
+
+  recetaYaGuardada(idReceta: number, idUsuario: number): Observable<boolean> {
+    return this.http.get<boolean>(`${this.apiUrl}/${idReceta}/ya-guardada/${idUsuario}`);
+  }
+
 }

@@ -1,5 +1,6 @@
 package com.oscar.proyecto.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -31,7 +32,7 @@ public class Receta {
     private String foto_url;
 
     @Setter
-    private Integer num_favoritos;
+    private Long num_favoritos = 0L;
 
     @ManyToMany
     @JoinTable(
@@ -41,5 +42,9 @@ public class Receta {
     )
     @JsonManagedReference
     private Set<Preferencia> preferencias;
+
+    @OneToMany(mappedBy = "receta")
+    @JsonIgnore
+    private Set<RecetaGuardada> guardados;
 
 }
