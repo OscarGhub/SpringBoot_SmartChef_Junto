@@ -8,6 +8,7 @@ import { RecetaService } from '../../servicios/receta/receta.service';
 import { Receta } from '../../servicios/receta/receta.model';
 import { CommonModule } from '@angular/common';
 import {Preferencia} from "../../servicios/preferencia/preferencia.model";
+import { PreferenciaService } from '../../servicios/preferencia/preferencia.service';
 
 @Component({
   selector: 'app-inicio',
@@ -25,6 +26,7 @@ import {Preferencia} from "../../servicios/preferencia/preferencia.model";
 })
 export class InicioComponent implements OnInit {
   private recetaService = inject(RecetaService);
+  private preferenciaService = inject(PreferenciaService);
 
   recetas: Receta[] = [];
   recetasFiltradas: Receta[] = [];
@@ -38,7 +40,14 @@ export class InicioComponent implements OnInit {
       },
       error: (err) => console.error('Error al cargar recetas', err)
     });
-    this.recetaService.getRecetas().subscribe(data => this.recetas = data);
+
+    this.preferenciaService.getPreferencias().subscribe({
+      next: (data) => {
+        this.preferencias = data;
+        console.log('Preferencias cargadas:', this.preferencias);
+      },
+      error: (err) => console.error('Error al cargar preferencias', err)
+    });
   }
 
   onSearch(text: string) {
@@ -49,12 +58,12 @@ export class InicioComponent implements OnInit {
     );
   }
 
-  filtrar(preferenciaId: number): void {
-    this.recetaService.filtrarPorPreferencia(preferenciaId)
-      .subscribe(data => this.recetas = data);
+  filtrar(preferenciaIds: number[]): void {
+    this.recetaService.filtrarPorPreferencias(preferenciaIds)
+      .subscribe({
+        next: data => this.recetasFiltradas = data,
+        error: err => console.error('Error al filtrar recetas', err)
+      });
   }
 
-  mostrarTodas(): void {
-    this.recetaService.getRecetas().subscribe(data => this.recetas = data);
-  }
 }

@@ -3,17 +3,29 @@
 </ion-header>
 
 <ion-content>
-  <app-search-bar (searchChange)="onSearch($event)"></app-search-bar>
 
-  <div class="titulo-img">
-    <img src="./assets/images/explorar_logo.png">
+  <div class="box-pref-sb">
+
+    <ion-select
+      class="select-preferencias"
+      placeholder="Filtro"
+      selectedText="Filtro"
+      [multiple]="true"
+      interface="popover"
+      okText="Aceptar"
+      cancelText="Cancelar"
+      (ionChange)="filtrar($event.detail.value)">
+      <ion-select-option *ngFor="let p of preferencias" [value]="p.id">
+        {{ p.nombre }}
+      </ion-select-option>
+    </ion-select>
+
+    <app-search-bar (searchChange)="onSearch($event)"></app-search-bar>
+
   </div>
 
-  <div class="filtros">
-    <ion-button (click)="mostrarTodas()">Todas</ion-button>
-    <ion-button *ngFor="let p of preferencias" (click)="filtrar(p.id)">
-      {{ p.nombre }}
-    </ion-button>
+  <div class="titulo-img">
+    <img src="./assets/images/explorar_logo.png" alt="Explorar">
   </div>
 
   <div class="tarjetas">
@@ -21,6 +33,7 @@
       <app-tarjeta-receta [receta]="receta"></app-tarjeta-receta>
     </ng-container>
   </div>
+
 </ion-content>
 
 <ion-footer>

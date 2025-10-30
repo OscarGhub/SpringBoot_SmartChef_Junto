@@ -55,8 +55,11 @@ public class RecetaController {
     }
 
     @GetMapping("/filtrar")
-    public List<Receta> filtrarPorPreferencia(@RequestParam Integer preferenciaId) {
-        return recetaRepo.findByPreferenciaId(preferenciaId);
+    public List<Receta> filtrarPorPreferencias(@RequestParam List<Integer> preferencias) {
+        if (preferencias == null || preferencias.isEmpty()) {
+            return recetaRepo.findAll();
+        }
+        return recetaRepo.findByPreferenciasIn(preferencias);
     }
 
 }

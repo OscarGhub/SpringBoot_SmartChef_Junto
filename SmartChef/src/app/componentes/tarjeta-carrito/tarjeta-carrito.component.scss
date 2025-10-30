@@ -1,45 +1,55 @@
 .producto-card {
   background-color: #217A43;
-  padding: 16px;
   color: white;
   border-radius: 12px;
+  padding: 16px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-  transition: box-shadow 0.3s ease;
-  width: calc(100% - 32px);
   max-width: 400px;
+  width: calc(100% - 32px);
   margin: 20px auto;
   border: none;
 }
 
+.producto-container {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
 .producto-info {
   flex: 1;
-  margin-left: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  color: white;
 }
 
 .producto-nombre {
   font-weight: bold;
   font-size: 1.2rem;
-  margin-bottom: 4px;
+  color: white;
 }
 
-.producto-descripcion p {
+.producto-descripcion {
   font-size: 0.9rem;
-  margin: 4px 0;
+  color: white;
 }
 
 .producto-acciones {
-  margin-top: 50px;
   display: flex;
   gap: 8px;
-  margin-left: 50%;
+  margin-top: 12px;
 }
 
 .boton {
-  --background: #ffffff;
-  --color: #000000;
-  border-radius: 8px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-  font-weight: 600;
-  height: 50px;
-  width: 190px;
+  --background: #217A43;
+  --border-radius: 20px;
+  --box-shadow: 0 6px 12px rgba(0, 0, 0, 0.35);
+  font-weight: bold;
+  font-size: 0.95rem;
+  text-align: center;
+}
+
+.boton-texto{
+  color: white;
 }

@@ -1,5 +1,5 @@
 import { Injectable, inject } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Receta } from './receta.model';
 import { Observable } from 'rxjs';
 
@@ -18,8 +18,15 @@ export class RecetaService {
     return this.http.get<Receta>(`${this.apiUrl}/${id}`);
   }
 
-  filtrarPorPreferencia(preferenciaId: number): Observable<Receta[]> {
-    return this.http.get<Receta[]>(`${this.apiUrl}/filtrar?preferenciaId=${preferenciaId}`);
+  filtrarPorPreferencias(preferenciaIds: number[]): Observable<Receta[]> {
+    if (!preferenciaIds || preferenciaIds.length === 0) {
+      return this.getRecetas();
+    }
+
+    let params = new HttpParams();
+    preferenciaIds.forEach(id => params = params.append('preferencias', id.toString()));
+
+    return this.http.get<Receta[]>(`${this.apiUrl}/filtrar`, { params });
   }
 
 }
