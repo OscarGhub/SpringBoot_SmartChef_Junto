@@ -7,6 +7,7 @@ import { SearchBarComponent } from '../../componentes/search-bar/search-bar.comp
 import { RecetaService } from '../../servicios/receta/receta.service';
 import { Receta } from '../../servicios/receta/receta.model';
 import { CommonModule } from '@angular/common';
+import {Preferencia} from "../../servicios/preferencia/preferencia.model";
 
 @Component({
   selector: 'app-inicio',
@@ -27,6 +28,7 @@ export class InicioComponent implements OnInit {
 
   recetas: Receta[] = [];
   recetasFiltradas: Receta[] = [];
+  preferencias: Preferencia[] = [];
 
   ngOnInit() {
     this.recetaService.getRecetas().subscribe({
@@ -36,6 +38,7 @@ export class InicioComponent implements OnInit {
       },
       error: (err) => console.error('Error al cargar recetas', err)
     });
+    this.recetaService.getRecetas().subscribe(data => this.recetas = data);
   }
 
   onSearch(text: string) {
@@ -44,5 +47,14 @@ export class InicioComponent implements OnInit {
       r.titulo.toLowerCase().includes(texto) ||
       r.descripcion.toLowerCase().includes(texto)
     );
+  }
+
+  filtrar(preferenciaId: number): void {
+    this.recetaService.filtrarPorPreferencia(preferenciaId)
+      .subscribe(data => this.recetas = data);
+  }
+
+  mostrarTodas(): void {
+    this.recetaService.getRecetas().subscribe(data => this.recetas = data);
   }
 }

@@ -3,17 +3,24 @@
 </ion-header>
 
 <ion-content>
-  <ion-toolbar>
-    <app-search-bar (searchChange)="onSearch($event)"></app-search-bar>
-    <div class="titulo-img">
-      <img src="./assets/images/explorar_logo.png">
-    </div>
+  <app-search-bar (searchChange)="onSearch($event)"></app-search-bar>
 
+  <div class="titulo-img">
+    <img src="./assets/images/explorar_logo.png">
+  </div>
+
+  <div class="filtros">
+    <ion-button (click)="mostrarTodas()">Todas</ion-button>
+    <ion-button *ngFor="let p of preferencias" (click)="filtrar(p.id)">
+      {{ p.nombre }}
+    </ion-button>
+  </div>
+
+  <div class="tarjetas">
     <ng-container *ngFor="let receta of recetasFiltradas">
       <app-tarjeta-receta [receta]="receta"></app-tarjeta-receta>
     </ng-container>
-
-  </ion-toolbar>
+  </div>
 </ion-content>
 
 <ion-footer>

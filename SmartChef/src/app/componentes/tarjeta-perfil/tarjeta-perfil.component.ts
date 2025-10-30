@@ -26,7 +26,16 @@ export class TarjetaPerfilComponent implements OnInit {
 
   ngOnInit() {
     const data = localStorage.getItem('usuario');
-    if (data) this.usuario = JSON.parse(data);
+    if (data) {
+      this.usuario = JSON.parse(data);
+      if (this.usuario.foto_url) {
+        this.usuario.foto_url = this.getFotoUrl(this.usuario.id);
+      }
+    }
+  }
+
+  private getFotoUrl(usuarioId: number): string {
+    return `http://localhost:8080/api/usuario/${usuarioId}/foto?t=${new Date().getTime()}`;
   }
 
   toggleEditar(campo: 'fecha_nacimiento' | 'correo_electronico') {
@@ -42,9 +51,14 @@ export class TarjetaPerfilComponent implements OnInit {
     try {
       const usuarioActualizado = await this.usuarioService.actualizarUsuario(this.usuario).toPromise();
       this.usuario = usuarioActualizado;
-      localStorage.setItem('usuario', JSON.stringify(usuarioActualizado));
+      if (this.usuario.foto_url) {
+        this.usuario.foto_url = this.getFotoUrl(this.usuario.id);
+      }
+      localStorage.setItem('usuario', JSON.stringify(this.usuario));
+
       if (campo === 'fecha_nacimiento') this.editarFecha = false;
       if (campo === 'correo_electronico') this.editarEmail = false;
+
       await this.alertService.mostrarAlerta('Éxito', 'Datos actualizados correctamente');
     } catch {
       await this.alertService.mostrarAlerta('Error', 'No se pudo actualizar. Intenta más tarde.');
@@ -65,10 +79,9 @@ export class TarjetaPerfilComponent implements OnInit {
 
     try {
       const usuarioActualizado = await this.usuarioService.actualizarFoto(this.usuario.id, formData).toPromise();
-      const timestamp = new Date().getTime();
       this.usuario = {
         ...usuarioActualizado,
-        foto_url: `http://localhost:8080/api/usuario/${this.usuario.id}/foto?t=${timestamp}`
+        foto_url: this.getFotoUrl(this.usuario.id)
       };
       localStorage.setItem('usuario', JSON.stringify(this.usuario));
       await this.alertService.mostrarAlerta('Éxito', 'Foto actualizada correctamente');

@@ -18,4 +18,8 @@ export class RecetaService {
     return this.http.get<Receta>(`${this.apiUrl}/${id}`);
   }
 
+  filtrarPorPreferencia(preferenciaId: number): Observable<Receta[]> {
+    return this.http.get<Receta[]>(`${this.apiUrl}/filtrar?preferenciaId=${preferenciaId}`);
+  }
+
 }

@@ -67,7 +67,7 @@ public class UsuarioController {
             File destino = new File(carpeta + nombreArchivo);
             archivo.transferTo(destino);
 
-            usuario.setFoto_url(nombreArchivo); // guardamos solo el nombre
+            usuario.setFoto_url("/uploads/" + nombreArchivo);
             Usuario usuarioActualizado = usuarioRepo.save(usuario);
             return ResponseEntity.ok(usuarioActualizado);
         } catch (IOException e) {
@@ -81,7 +81,13 @@ public class UsuarioController {
         Usuario usuario = usuarioRepo.findById(id).orElse(null);
         if (usuario == null || usuario.getFoto_url() == null) return ResponseEntity.notFound().build();
 
-        File archivo = new File("C:/proyecto/uploads/" + usuario.getFoto_url());
+        String path = usuario.getFoto_url();
+        if (path.startsWith("/uploads/")) {
+            path = path.replaceFirst("/uploads/", "");
+        }
+
+        File archivo = new File("C:/proyecto/uploads/" + path);
+
         if (!archivo.exists()) return ResponseEntity.notFound().build();
 
         byte[] bytes = Files.readAllBytes(archivo.toPath());

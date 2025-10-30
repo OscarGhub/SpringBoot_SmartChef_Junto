@@ -2,6 +2,7 @@ package com.oscar.proyecto.controller;
 
 import com.oscar.proyecto.entity.Receta;
 import com.oscar.proyecto.repository.RecetaRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -52,4 +53,10 @@ public class RecetaController {
                 })
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
+
+    @GetMapping("/filtrar")
+    public List<Receta> filtrarPorPreferencia(@RequestParam Integer preferenciaId) {
+        return recetaRepo.findByPreferenciaId(preferenciaId);
+    }
+
 }
