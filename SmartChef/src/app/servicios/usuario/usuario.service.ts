@@ -1,6 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import {map, Observable} from 'rxjs';
+import { map, Observable, of } from 'rxjs';
 import { Usuario } from './usuario.model';
 
 @Injectable({
@@ -31,6 +31,12 @@ export class UsuarioService {
 
   actualizarFoto(id: number, formData: FormData): Observable<any> {
     return this.http.put<any>(`${this.apiUrl}/${id}/foto`, formData);
+  }
+
+  obtenerUsuarioActual(): Observable<Usuario | null> {
+    const correo = localStorage.getItem('correo_electronico');
+    if (!correo) return of(null);
+    return this.getUsuarioPorCorreo(correo);
   }
 
 }

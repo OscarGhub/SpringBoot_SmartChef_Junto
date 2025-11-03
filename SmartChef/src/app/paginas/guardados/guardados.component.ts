@@ -1,9 +1,14 @@
-import { Component } from '@angular/core';
-import {CabeceraComponent} from "../../componentes/cabecera/cabecera.component";
-import {IonicModule} from "@ionic/angular";
-import {SearchBarComponent} from "../../componentes/search-bar/search-bar.component";
+import { Component, OnInit, inject } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { IonicModule } from '@ionic/angular';
+import { CabeceraComponent } from '../../componentes/cabecera/cabecera.component';
+import { FooterComponent } from '../../componentes/footer/footer.component';
+import { RecetaService } from '../../servicios/receta/receta.service';
+import { UsuarioService } from '../../servicios/usuario/usuario.service';
+import {
+  TarjetaRecetaExtendidaComponent
+} from "../../componentes/tarjeta-receta-extendida/tarjeta-receta-extendida.component";
 import {TarjetaComponent} from "../../componentes/tarjeta_receta/tarjeta.component";
-import {FooterComponent} from "../../componentes/footer/footer.component";
 
 @Component({
   selector: 'app-guardados',
@@ -11,21 +16,71 @@ import {FooterComponent} from "../../componentes/footer/footer.component";
   styleUrls: ['./guardados.component.scss'],
   standalone: true,
   imports: [
+    CommonModule,
     IonicModule,
     CabeceraComponent,
-    TarjetaComponent,
     FooterComponent,
+    TarjetaRecetaExtendidaComponent,
     TarjetaComponent
   ]
 })
-export class GuardadosComponent   {
+export class GuardadosComponent implements OnInit {
+  recetasGuardadas: any[] = [];
+  usuarioActual: any = null;
+  cargando: boolean = false;
 
-  constructor() { }
+  private recetaService = inject(RecetaService);
+  private usuarioService = inject(UsuarioService);
 
-
-
-  onSearch(text: string) {
-    console.log('Texto de búsqueda:', text);
+  ngOnInit() {
+    this.cargarRecetasGuardadas();
   }
 
+  ionViewWillEnter() {
+    this.cargarRecetasGuardadas();
+  }
+
+  cargarRecetasGuardadas() {
+    this.cargando = true;
+    this.recetasGuardadas = [];
+
+    const correo = localStorage.getItem('correo_electronico');
+    if (!correo) {
+      console.warn('No hay correo guardado en localStorage.');
+      this.cargando = false;
+      return;
+    }
+
+    console.log('Correo encontrado en localStorage:', correo);
+
+    this.usuarioService.getUsuarioPorCorreo(correo).subscribe({
+      next: (usuario) => {
+        console.log('Usuario actual obtenido:', usuario);
+
+        if (!usuario || usuario.id === undefined) {
+          console.warn('Usuario no encontrado o sin ID válido.');
+          this.cargando = false;
+          return;
+        }
+
+        this.usuarioActual = usuario;
+
+        this.recetaService.getRecetasGuardadas(usuario.id).subscribe({
+          next: (recetas) => {
+            console.log('Recetas guardadas recibidas:', recetas);
+            this.recetasGuardadas = recetas;
+            this.cargando = false;
+          },
+          error: (err) => {
+            console.error('Error al obtener recetas guardadas:', err);
+            this.cargando = false;
+          }
+        });
+      },
+      error: (err) => {
+        console.error('Error al obtener usuario actual:', err);
+        this.cargando = false;
+      }
+    });
+  }
 }

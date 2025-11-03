@@ -47,4 +47,8 @@ public class Receta {
     @JsonIgnore
     private Set<RecetaGuardada> guardados;
 
+    @Transient
+    @Getter @Setter
+    private boolean guardada = false;
+
 }

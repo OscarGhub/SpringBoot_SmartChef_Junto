@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, Output, EventEmitter } from '@angular/core';
 import { IonicModule } from '@ionic/angular';
 import { Router } from '@angular/router';
 
@@ -13,11 +13,14 @@ export class FooterComponent {
 
   private router = inject(Router);
 
+  @Output() recargarGuardados = new EventEmitter<void>();
+
   goToExplorar() {
     this.router.navigate(['/inicio']);
   }
 
   goToGuardar() {
+    this.recargarGuardados.emit();
     this.router.navigate(['/guardados']);
   }
 

@@ -145,4 +145,21 @@ public class RecetaController {
         return ResponseEntity.ok(existe);
     }
 
+    @GetMapping("/guardadas/{idUsuario}")
+    public ResponseEntity<List<Receta>> getRecetasGuardadasPorUsuario(@PathVariable Integer idUsuario) {
+        Usuario usuario = usuarioRepo.findById(idUsuario).orElse(null);
+        if (usuario == null) return ResponseEntity.notFound().build();
+
+        List<Receta> recetasGuardadas = recetaGuardadaRepo.findAllByIdUsuario(idUsuario)
+                .stream()
+                .map(rg -> {
+                    Receta r = rg.getReceta();
+                    r.setGuardada(true);
+                    return r;
+                })
+                .toList();
+
+        return ResponseEntity.ok(recetasGuardadas);
+    }
+
 }

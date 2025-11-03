@@ -1,4 +1,4 @@
-import { Component, Input, inject, OnInit } from '@angular/core';
+import { Component, Input, inject, Output, EventEmitter, OnInit } from '@angular/core';
 import { IonicModule } from '@ionic/angular';
 import { Router, RouterModule } from '@angular/router';
 import { Receta } from '../../servicios/receta/receta.model';
@@ -16,6 +16,7 @@ import { firstValueFrom } from 'rxjs';
 })
 export class TarjetaRecetaExtendidaComponent implements OnInit {
   @Input() receta?: Receta;
+  @Output() cambioFavorito = new EventEmitter<void>();
 
   private router = inject(Router);
   private recetaService = inject(RecetaService);
@@ -55,14 +56,12 @@ export class TarjetaRecetaExtendidaComponent implements OnInit {
 
   async toggleFavorito() {
     if (!this.receta) return;
+    const correo = localStorage.getItem('correo_electronico');
+    if (!correo) return;
+    const usuario = await firstValueFrom(this.usuarioService.getUsuarioPorCorreo(correo));
+    if (!usuario || usuario.id === undefined) return;
 
     try {
-      const correo = localStorage.getItem('correo_electronico');
-      if (!correo) return;
-
-      const usuario = await firstValueFrom(this.usuarioService.getUsuarioPorCorreo(correo));
-      if (!usuario || usuario.id === undefined) return;
-
       if (this.receta.yaGuardada) {
         const updatedReceta = await firstValueFrom(
           this.recetaService.quitarRecetaGuardada(this.receta.id!, usuario.id)
@@ -77,8 +76,10 @@ export class TarjetaRecetaExtendidaComponent implements OnInit {
         this.receta.yaGuardada = true;
       }
 
+      this.cambioFavorito.emit();
     } catch (error) {
       console.error('Error al actualizar favoritos:', error);
     }
   }
+
 }

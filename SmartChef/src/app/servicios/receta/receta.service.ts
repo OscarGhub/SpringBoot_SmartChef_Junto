@@ -41,4 +41,8 @@ export class RecetaService {
     return this.http.get<boolean>(`${this.apiUrl}/${idReceta}/ya-guardada/${idUsuario}`);
   }
 
+  getRecetasGuardadas(idUsuario: number): Observable<Receta[]> {
+    return this.http.get<Receta[]>(`${this.apiUrl}/guardadas/${idUsuario}`);
+  }
+
 }
