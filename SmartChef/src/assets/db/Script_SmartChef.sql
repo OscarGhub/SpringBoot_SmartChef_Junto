@@ -46,7 +46,8 @@ CREATE TABLE Receta (
 CREATE TABLE Ingrediente (
     id INT AUTO_INCREMENT PRIMARY KEY,
     nombre VARCHAR(100) NOT NULL,
-    unidad_medida VARCHAR(50)
+    unidad_medida VARCHAR(50),
+    imagen_url VARCHAR(255)
 );
 
 -- ============================
@@ -201,30 +202,31 @@ INSERT INTO Receta (titulo, descripcion, tutorial, tiempo_preparacion, foto_url)
 -- ============================
 -- DATOS: Ingrediente
 -- ============================
-INSERT INTO Ingrediente (nombre, unidad_medida) VALUES
-('Pollo', 'gramos'),
-('Arroz', 'gramos'),
-('Aceite de oliva', 'mililitros'),
-('Sal', 'gramos'),
-('Tomate', 'unidad'),
-('Ajo', 'dientes'),
-('Cebolla', 'unidad'),
-('Zanahoria', 'unidad'),
-('Espinaca', 'gramos'),
-('Queso', 'gramos'),
-('Pan', 'unidad'),
-('Pasta', 'gramos'),
-('Leche', 'mililitros'),
-('Huevo', 'unidad'),
-('Avena', 'gramos'),
-('Plátano', 'unidad'),
-('Fresas', 'gramos'),
-('Garbanzos', 'gramos'),
-('Lentejas', 'gramos'),
-('Pimiento', 'unidad'),
-('Pepino', 'unidad'),
-('Quinoa', 'gramos'),
-('Albahaca', 'hojas');
+INSERT INTO Ingrediente (nombre, unidad_medida, imagen_url) VALUES
+('Pollo', 'gramos', 'https://png.pngtree.com/png-vector/20250321/ourmid/pngtree-fresh-raw-chicken-leg-piece-with-skin-png-image_15816101.png'),
+('Arroz', 'gramos', 'https://png.pngtree.com/png-clipart/20240327/original/pngtree-traditional-cooked-white-rice-in-brazilian-food-png-image_14691888.png'),
+('Aceite de oliva', 'mililitros', 'https://rafaelsalgado.com/wp-content/uploads/2018/04/garrita.png'),
+('Sal', 'gramos', 'https://www.pngarts.com/files/4/Salt-PNG-Image-Background.png'),
+('Tomate', 'unidad', 'https://png.pngtree.com/png-clipart/20210530/original/pngtree-tomatoes-tomatoes-vegetables-png-image_6370280.jpg'),
+('Ajo', 'dientes', 'https://png.pngtree.com/png-vector/20250105/ourmid/pngtree-garlic-logo-png-image_15053088.png'),
+('Cebolla', 'unidad', 'https://png.pngtree.com/png-vector/20240928/ourmid/pngtree-red-onion-png-image_13646454.png'),
+('Zanahoria', 'unidad', 'https://png.pngtree.com/png-vector/20240203/ourmid/pngtree-fresh-orange-carrot-png-image_11501567.png'),
+('Espinaca', 'gramos', 'https://png.pngtree.com/png-vector/20240517/ourmid/pngtree-spinach-vegetable-png-image_12549834.png'),
+('Queso', 'gramos', 'https://png.pngtree.com/png-clipart/20231115/original/pngtree-cheddar-cheese-png-image_13537960.png'),
+('Pan', 'unidad', 'https://png.pngtree.com/png-vector/20240126/ourmid/pngtree-sliced-bread-png-image_11429225.png'),
+('Pasta', 'gramos', 'https://png.pngtree.com/png-vector/20231204/ourmid/pngtree-raw-spaghetti-pasta-png-image_11352820.png'),
+('Leche', 'mililitros', 'https://png.pngtree.com/png-clipart/20230817/original/pngtree-glass-of-milk-isolated-png-image_9159652.png'),
+('Huevo', 'unidad', 'https://png.pngtree.com/png-vector/20231227/ourmid/pngtree-raw-eggs-png-image_11383935.png'),
+('Avena', 'gramos', 'https://png.pngtree.com/png-clipart/20230818/original/pngtree-oat-flakes-in-bowl-png-image_9163065.png'),
+('Plátano', 'unidad', 'https://png.pngtree.com/png-vector/20231221/ourmid/pngtree-fresh-banana-png-image_11377204.png'),
+('Fresas', 'gramos', 'https://png.pngtree.com/png-vector/20231124/ourmid/pngtree-fresh-strawberry-png-image_13545019.png'),
+('Garbanzos', 'gramos', 'https://png.pngtree.com/png-vector/20230817/original/pngtree-dried-chickpeas-in-bowl-png-image_9160303.png'),
+('Lentejas', 'gramos', 'https://png.pngtree.com/png-vector/20230818/original/pngtree-green-lentils-in-bowl-png-image_9163028.png'),
+('Pimiento', 'unidad', 'https://png.pngtree.com/png-vector/20231121/ourmid/pngtree-fresh-red-bell-pepper-png-image_13543118.png'),
+('Pepino', 'unidad', 'https://png.pngtree.com/png-vector/20240131/ourmid/pngtree-cucumber-vegetable-png-image_11441856.png'),
+('Quinoa', 'gramos', 'https://png.pngtree.com/png-vector/20230818/original/pngtree-quinoa-seeds-in-wooden-bowl-png-image_9163029.png'),
+('Albahaca', 'hojas', 'https://png.pngtree.com/png-clipart/20231115/original/pngtree-basil-leaves-png-image_13537727.png');
+
 
 -- ============================
 -- DATOS: Receta_Ingrediente

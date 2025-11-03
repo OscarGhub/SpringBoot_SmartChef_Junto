@@ -5,6 +5,7 @@ import { Receta } from '../../servicios/receta/receta.model';
 import { CommonModule } from '@angular/common';
 import { RecetaService } from '../../servicios/receta/receta.service';
 import { UsuarioService } from '../../servicios/usuario/usuario.service';
+import { CarritoService } from '../../servicios/carrito/carrito.service';
 import { firstValueFrom } from 'rxjs';
 
 @Component({
@@ -21,6 +22,7 @@ export class TarjetaRecetaExtendidaComponent implements OnInit {
   private router = inject(Router);
   private recetaService = inject(RecetaService);
   private usuarioService = inject(UsuarioService);
+  private carritoService = inject(CarritoService);
 
   ngOnInit() {
     this.marcarYaGuardada();
@@ -45,8 +47,37 @@ export class TarjetaRecetaExtendidaComponent implements OnInit {
     }
   }
 
-  anadirAlCarrito() {
-    console.log('Añadir al carrito:', this.receta?.id);
+  async anadirAlCarrito() {
+    if (!this.receta) return;
+
+    const correo = localStorage.getItem('correo_electronico');
+    if (!correo) return;
+
+    const usuario = await firstValueFrom(this.usuarioService.getUsuarioPorCorreo(correo));
+    if (!usuario || usuario.id === undefined) return;
+
+    try {
+      let idLista: number;
+
+      const listaGuardada = localStorage.getItem('id_lista');
+      if (listaGuardada) {
+        idLista = Number(listaGuardada);
+      } else {
+        const lista: any = await firstValueFrom(this.carritoService.crearListaCompra(usuario.id));
+        idLista = lista.id_lista;
+        localStorage.setItem('id_lista', idLista.toString());
+      }
+
+      console.log('Añadiendo al carrito', {
+        url: `${this.carritoService['apiUrl']}/listacompra/${idLista}/receta`,
+        body: { id_receta: this.receta.id }
+      });
+
+      await firstValueFrom(this.carritoService.anadirRecetaAlCarrito(idLista, this.receta.id!));
+      console.log('Receta añadida al carrito');
+    } catch (err) {
+      console.error('Error al añadir al carrito', err);
+    }
   }
 
   async onImageError(event: Event) {
@@ -56,8 +87,10 @@ export class TarjetaRecetaExtendidaComponent implements OnInit {
 
   async toggleFavorito() {
     if (!this.receta) return;
+
     const correo = localStorage.getItem('correo_electronico');
     if (!correo) return;
+
     const usuario = await firstValueFrom(this.usuarioService.getUsuarioPorCorreo(correo));
     if (!usuario || usuario.id === undefined) return;
 
@@ -81,5 +114,4 @@ export class TarjetaRecetaExtendidaComponent implements OnInit {
       console.error('Error al actualizar favoritos:', error);
     }
   }
-
 }
