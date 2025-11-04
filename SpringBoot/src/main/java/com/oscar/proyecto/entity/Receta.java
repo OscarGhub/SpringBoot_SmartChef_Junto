@@ -51,4 +51,15 @@ public class Receta {
     @Getter @Setter
     private boolean guardada = false;
 
+    @ManyToOne
+    @JoinColumn(name = "id_lista")
+    @JsonIgnore
+    private ListaCompra listaCompra;
+
+    public void setIdLista(Integer idLista) {
+        if (idLista != null) {
+            this.listaCompra = new ListaCompra();
+            this.listaCompra.setId(idLista);
+        }
+    }
 }
