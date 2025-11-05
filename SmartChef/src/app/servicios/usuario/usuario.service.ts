@@ -29,4 +29,9 @@ export class UsuarioService {
   actualizarFoto(id: number, formData: FormData): Observable<any> {
     return this.http.put<any>(`${this.apiUrl}/${id}/foto`, formData);
   }
+
+  actualizarCorreo(id: number, correoElectronico: string): Observable<Usuario> {
+    return this.http.put<Usuario>(`${this.apiUrl}/${id}`, { correoElectronico });
+  }
+
 }

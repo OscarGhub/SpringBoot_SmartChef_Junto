@@ -15,6 +15,7 @@ import java.nio.file.Paths;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @RestController
@@ -39,14 +40,18 @@ public class UsuarioController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Usuario> actualizarUsuario(
+    public ResponseEntity<Usuario> actualizarCorreo(
             @PathVariable Integer id,
-            @RequestBody Usuario usuarioActualizado) {
+            @RequestBody Map<String, String> body) {
+
+        String nuevoCorreo = body.get("correoElectronico");
+        if (nuevoCorreo == null || nuevoCorreo.isBlank()) {
+            return ResponseEntity.badRequest().build();
+        }
 
         return usuarioRepo.findById(id)
                 .map(usuarioExistente -> {
-                    usuarioExistente.setCorreoElectronico(usuarioActualizado.getCorreoElectronico());
-                    usuarioExistente.setFechaNacimiento(usuarioActualizado.getFechaNacimiento());
+                    usuarioExistente.setCorreoElectronico(nuevoCorreo);
                     Usuario usuarioGuardado = usuarioRepo.save(usuarioExistente);
                     return ResponseEntity.ok(usuarioGuardado);
                 })

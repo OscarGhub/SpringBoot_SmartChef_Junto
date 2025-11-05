@@ -52,14 +52,20 @@ export class TarjetaPerfilComponent implements OnInit {
     if (!this.usuario?.id) return;
 
     try {
-      const payload: any = {
-        fecha_nacimiento: this.usuario.fechaNacimiento,
-        correo_electronico: this.usuario.correoElectronico
-      };
+      let usuarioActualizado;
 
-      const usuarioActualizado = await firstValueFrom(
-        this.usuarioService.actualizarUsuario(this.usuario.id, payload)
-      );
+      if (campo === 'correoElectronico') {
+        usuarioActualizado = await firstValueFrom(
+          this.usuarioService.actualizarCorreo(this.usuario.id, this.usuario.correoElectronico)
+        );
+        this.editarEmail = false;
+      } else if (campo === 'fechaNacimiento') {
+        const payload = { fecha_nacimiento: this.usuario.fechaNacimiento };
+        usuarioActualizado = await firstValueFrom(
+          this.usuarioService.actualizarUsuario(this.usuario.id, payload)
+        );
+        this.editarFecha = false;
+      }
 
       this.usuario = {
         ...usuarioActualizado,
@@ -67,9 +73,6 @@ export class TarjetaPerfilComponent implements OnInit {
       };
 
       localStorage.setItem('usuario', JSON.stringify(this.usuario));
-
-      if (campo === 'fechaNacimiento') this.editarFecha = false;
-      if (campo === 'correoElectronico') this.editarEmail = false;
 
       await this.alertService.mostrarAlerta('Éxito', 'Datos actualizados correctamente');
     } catch (error) {
