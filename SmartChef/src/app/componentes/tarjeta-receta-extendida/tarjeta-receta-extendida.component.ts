@@ -1,8 +1,8 @@
 import { Component, Input, inject, Output, EventEmitter, OnInit } from '@angular/core';
 import { IonicModule } from '@ionic/angular';
 import { Router, RouterModule } from '@angular/router';
-import { Receta } from '../../servicios/receta/receta.model';
 import { CommonModule } from '@angular/common';
+import { Receta } from '../../servicios/receta/receta.model';
 import { RecetaService } from '../../servicios/receta/receta.service';
 import { UsuarioService } from '../../servicios/usuario/usuario.service';
 import { CarritoService } from '../../servicios/carrito/carrito.service';
@@ -30,15 +30,15 @@ export class TarjetaRecetaExtendidaComponent implements OnInit {
 
   private async marcarYaGuardada() {
     if (!this.receta) return;
-
     const usuarioData = localStorage.getItem('usuario');
     if (!usuarioData) return;
-
     const usuario = JSON.parse(usuarioData);
     if (!usuario?.id) return;
 
     try {
-      const yaGuardada = await firstValueFrom(this.recetaService.recetaYaGuardada(this.receta.id!, usuario.id));
+      const yaGuardada = await firstValueFrom(
+        this.recetaService.recetaYaGuardada(this.receta.id!, usuario.id)
+      );
       this.receta.yaGuardada = yaGuardada;
     } catch (err) {
       console.error('Error comprobando si la receta ya está guardada', err);
@@ -50,13 +50,15 @@ export class TarjetaRecetaExtendidaComponent implements OnInit {
   }
 
   async anadirAlCarrito() {
-    if (!this.receta) return;
+    if (!this.receta?.id) return;
 
     const usuarioData = localStorage.getItem('usuario');
     if (!usuarioData) return;
 
     const usuario = JSON.parse(usuarioData);
     if (!usuario?.id) return;
+
+    const idUsuario: number = usuario.id;
 
     try {
       let idLista: number;
@@ -66,14 +68,15 @@ export class TarjetaRecetaExtendidaComponent implements OnInit {
         idLista = Number(listaGuardada);
       } else {
         const lista: any = await firstValueFrom(this.carritoService.crearListaCompra(usuario.id));
-        idLista = lista.id_lista;
+        idLista = lista.id;
         localStorage.setItem('id_lista', idLista.toString());
       }
 
-      await firstValueFrom(this.carritoService.anadirRecetaAlCarrito(idLista, this.receta.id!));
-      console.log('Receta añadida al carrito');
+      await firstValueFrom(this.carritoService.anadirRecetaAlCarrito(idLista, this.receta.id));
+
+      console.log('Receta añadida al carrito con todos sus ingredientes');
     } catch (err) {
-      console.error('Error al añadir al carrito', err);
+      console.error('Error al añadir la receta al carrito:', err);
     }
   }
 
@@ -88,7 +91,6 @@ export class TarjetaRecetaExtendidaComponent implements OnInit {
 
     const usuarioData = localStorage.getItem('usuario');
     if (!usuarioData) return;
-
     const usuario = JSON.parse(usuarioData);
     if (!usuario?.id) return;
 
