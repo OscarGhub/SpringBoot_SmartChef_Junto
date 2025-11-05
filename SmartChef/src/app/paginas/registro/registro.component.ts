@@ -24,9 +24,9 @@ export class RegistroComponent {
 
   nuevoUsuario: Usuario = {
     nombre: '',
-    correo_electronico: '',
+    correoElectronico: '',
     contrasena: '',
-    fecha_nacimiento: ''
+    fechaNacimiento: '',
   };
 
   confirmar_contrasena: string = '';
@@ -48,7 +48,7 @@ export class RegistroComponent {
       next: async (usuarioCreado) => {
         await this.alertService.mostrarAlerta(
           'Usuario registrado',
-          `El usuario ${usuarioCreado.nombre ?? usuarioCreado.correo_electronico} ha sido creado exitosamente.`
+          `El usuario ${usuarioCreado.nombre ?? usuarioCreado.correoElectronico} ha sido creado exitosamente.`
         );
         this.resetFormulario();
       },
@@ -61,9 +61,9 @@ export class RegistroComponent {
   private resetFormulario(): void {
     this.nuevoUsuario = {
       nombre: '',
-      correo_electronico: '',
+      correoElectronico: '',
       contrasena: '',
-      fecha_nacimiento: ''
+      fechaNacimiento: ''
     };
     this.confirmar_contrasena = '';
   }

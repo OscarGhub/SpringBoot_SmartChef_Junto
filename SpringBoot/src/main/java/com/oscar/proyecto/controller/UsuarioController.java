@@ -12,7 +12,10 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/usuario")
@@ -42,8 +45,8 @@ public class UsuarioController {
 
         return usuarioRepo.findById(id)
                 .map(usuarioExistente -> {
-                    usuarioExistente.setCorreo_electronico(usuarioActualizado.getCorreo_electronico());
-                    usuarioExistente.setFecha_nacimiento(usuarioActualizado.getFecha_nacimiento());
+                    usuarioExistente.setCorreoElectronico(usuarioActualizado.getCorreoElectronico());
+                    usuarioExistente.setFechaNacimiento(usuarioActualizado.getFechaNacimiento());
                     Usuario usuarioGuardado = usuarioRepo.save(usuarioExistente);
                     return ResponseEntity.ok(usuarioGuardado);
                 })
@@ -59,15 +62,14 @@ public class UsuarioController {
         if (usuario == null) return ResponseEntity.notFound().build();
 
         try {
-            String carpeta = "C:/proyecto/uploads/";
-            Files.createDirectories(Paths.get(carpeta));
+            Files.createDirectories(Paths.get(CARPETA_UPLOADS));
 
             String nombreArchivo = "usuario_" + id + "_" + System.currentTimeMillis() + "_"
                     + archivo.getOriginalFilename().replaceAll("\\s+", "_");
-            File destino = new File(carpeta + nombreArchivo);
+            File destino = new File(CARPETA_UPLOADS + nombreArchivo);
             archivo.transferTo(destino);
 
-            usuario.setFoto_url("/uploads/" + nombreArchivo);
+            usuario.setFotoUrl("/uploads/" + nombreArchivo);
             Usuario usuarioActualizado = usuarioRepo.save(usuario);
             return ResponseEntity.ok(usuarioActualizado);
         } catch (IOException e) {
@@ -79,14 +81,14 @@ public class UsuarioController {
     @GetMapping("/{id}/foto")
     public ResponseEntity<byte[]> obtenerFoto(@PathVariable Integer id) throws IOException {
         Usuario usuario = usuarioRepo.findById(id).orElse(null);
-        if (usuario == null || usuario.getFoto_url() == null) return ResponseEntity.notFound().build();
+        if (usuario == null || usuario.getFotoUrl() == null) return ResponseEntity.notFound().build();
 
-        String path = usuario.getFoto_url();
+        String path = usuario.getFotoUrl();
         if (path.startsWith("/uploads/")) {
             path = path.replaceFirst("/uploads/", "");
         }
 
-        File archivo = new File("C:/proyecto/uploads/" + path);
+        File archivo = new File(CARPETA_UPLOADS + path);
 
         if (!archivo.exists()) return ResponseEntity.notFound().build();
 
@@ -94,6 +96,23 @@ public class UsuarioController {
         return ResponseEntity.ok()
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.IMAGE_JPEG_VALUE)
                 .body(bytes);
+    }
+
+    @GetMapping("/correo/{correo}")
+    public ResponseEntity<Usuario> obtenerPorCorreo(@PathVariable String correo) {
+        try {
+            String correoDecodificado = URLDecoder.decode(correo, StandardCharsets.UTF_8);
+            Optional<Usuario> usuarioOpt = usuarioRepo.findByCorreoElectronico(correoDecodificado);
+
+            if (usuarioOpt.isEmpty()) {
+                return ResponseEntity.notFound().build();
+            }
+
+            return ResponseEntity.ok(usuarioOpt.get());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(500).build();
+        }
     }
 
 }

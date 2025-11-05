@@ -29,8 +29,8 @@ describe('UsuarioService', () => {
   it('should fetch usuarios', () => {
     const dummyUsuarios: Usuario[] = [
       {
-        id: 1, nombre: 'Test User', correo_electronico: 'test@example.com', contrasena: '1234',
-        fecha_nacimiento: ""
+        id: 1, nombre: 'Test User', correoElectronico: 'test@example.com', contrasena: '1234',
+        fechaNacimiento: ""
       },
     ];
 

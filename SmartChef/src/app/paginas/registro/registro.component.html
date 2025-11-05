@@ -11,7 +11,7 @@
 
   <ion-item>
     <ion-label position="floating" for="correo_electronico">Email</ion-label>
-    <ion-input id="correo_electronico" type="email" [(ngModel)]="nuevoUsuario.correo_electronico"></ion-input>
+    <ion-input id="correo_electronico" type="email" [(ngModel)]="nuevoUsuario.correoElectronico"></ion-input>
   </ion-item>
 
   <ion-item>
@@ -31,13 +31,13 @@
       id="fecha_nacimiento"
       presentation="date"
       locale="es-ES"
-      [(ngModel)]="nuevoUsuario.fecha_nacimiento"
+      [(ngModel)]="nuevoUsuario.fechaNacimiento"
       [max]="getFechaMaxima()">
     </ion-datetime>
   </ion-item>
 
-  <ion-text color="medium" *ngIf="nuevoUsuario.fecha_nacimiento">
-    <p style="margin-left: 16px;">Fecha seleccionada: {{ getFechaFormateada(nuevoUsuario.fecha_nacimiento) }}</p>
+  <ion-text color="medium" *ngIf="nuevoUsuario.fechaNacimiento">
+    <p style="margin-left: 16px;">Fecha seleccionada: {{ getFechaFormateada(nuevoUsuario.fechaNacimiento) }}</p>
   </ion-text>
 
   <ion-button expand="block" class="registro-boton" (click)="agregarUsuario()">

@@ -7,7 +7,6 @@ import { Usuario } from './usuario.model';
   providedIn: 'root',
 })
 export class UsuarioService {
-
   private http = inject(HttpClient);
   private apiUrl = 'http://localhost:8080/api/usuario';
 
@@ -20,23 +19,14 @@ export class UsuarioService {
   }
 
   getUsuarioPorCorreo(correo: string): Observable<Usuario | null> {
-    return this.getUsuarios().pipe(
-      map(usuarios => usuarios.find(u => u.correo_electronico === correo) || null)
-    );
+    return this.http.get<Usuario>(`${this.apiUrl}/correo/${correo}`);
   }
 
-  actualizarUsuario(usuario: Usuario): Observable<Usuario> {
-    return this.http.put<Usuario>(`${this.apiUrl}/${usuario.id}`, usuario);
+  actualizarUsuario(id: number, payload: any) {
+    return this.http.put<Usuario>(`http://localhost:8080/api/usuario/${id}`, payload);
   }
 
   actualizarFoto(id: number, formData: FormData): Observable<any> {
     return this.http.put<any>(`${this.apiUrl}/${id}/foto`, formData);
   }
-
-  obtenerUsuarioActual(): Observable<Usuario | null> {
-    const correo = localStorage.getItem('correo_electronico');
-    if (!correo) return of(null);
-    return this.getUsuarioPorCorreo(correo);
-  }
-
 }

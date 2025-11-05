@@ -20,7 +20,6 @@ import {TarjetaComponent} from "../../componentes/tarjeta_receta/tarjeta.compone
     IonicModule,
     CabeceraComponent,
     FooterComponent,
-    TarjetaRecetaExtendidaComponent,
     TarjetaComponent
   ]
 })
@@ -44,7 +43,7 @@ export class GuardadosComponent implements OnInit {
     this.cargando = true;
     this.recetasGuardadas = [];
 
-    const correo = localStorage.getItem('correo_electronico');
+    const correo = localStorage.getItem('correoElectronico');
     if (!correo) {
       console.warn('No hay correo guardado en localStorage.');
       this.cargando = false;
@@ -55,8 +54,6 @@ export class GuardadosComponent implements OnInit {
 
     this.usuarioService.getUsuarioPorCorreo(correo).subscribe({
       next: (usuario) => {
-        console.log('Usuario actual obtenido:', usuario);
-
         if (!usuario || usuario.id === undefined) {
           console.warn('Usuario no encontrado o sin ID válido.');
           this.cargando = false;
@@ -67,7 +64,6 @@ export class GuardadosComponent implements OnInit {
 
         this.recetaService.getRecetasGuardadas(usuario.id).subscribe({
           next: (recetas) => {
-            console.log('Recetas guardadas recibidas:', recetas);
             this.recetasGuardadas = recetas;
             this.cargando = false;
           },
@@ -83,4 +79,5 @@ export class GuardadosComponent implements OnInit {
       }
     });
   }
+
 }

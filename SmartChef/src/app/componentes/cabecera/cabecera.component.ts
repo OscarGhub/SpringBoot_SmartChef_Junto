@@ -16,18 +16,40 @@ export class CabeceraComponent implements OnInit {
   private usuarioService = inject(UsuarioService);
 
   fotoPerfilUrl: string = '../../../assets/images/perfil.webp';
+  correoValido: boolean = false;
 
   constructor() { }
 
   ngOnInit() {
-    const correo = localStorage.getItem('correo_electronico');
-    if (correo) {
-      this.usuarioService.getUsuarioPorCorreo(correo).subscribe(usuario => {
-        if (usuario && usuario.id) {
-          this.actualizarFotoPerfil(usuario.id);
-        }
+    const correo = localStorage.getItem('correoElectronico');
+
+    if (correo && this.validarCorreo(correo)) {
+      this.usuarioService.getUsuarioPorCorreo(correo).subscribe({
+        next: usuario => {
+          if (usuario && usuario.id) {
+            this.correoValido = true;
+            this.actualizarFotoPerfil(usuario.id);
+          } else {
+            this.resetearSesion();
+          }
+        },
+        error: () => this.resetearSesion()
       });
+    } else {
+      this.resetearSesion();
     }
+  }
+
+  private resetearSesion() {
+    console.warn('Correo inválido o usuario no encontrado. Redirigiendo a login.');
+    this.correoValido = false;
+    localStorage.removeItem('correoElectronico');
+    this.router.navigate(['/login']);
+  }
+
+  validarCorreo(correo: string): boolean {
+    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return regex.test(correo);
   }
 
   actualizarFotoPerfil(usuarioId: number) {
@@ -36,7 +58,12 @@ export class CabeceraComponent implements OnInit {
   }
 
   goToPerfil() {
-    this.router.navigate(['/perfil']);
+    if (this.correoValido) {
+      this.router.navigate(['/perfil']);
+    } else {
+      console.warn('No se puede ir al perfil: usuario no válido');
+      this.router.navigate(['/login']);
+    }
   }
 
   onImageError() {

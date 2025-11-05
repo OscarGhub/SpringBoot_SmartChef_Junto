@@ -29,15 +29,28 @@ INSERT INTO Preferencia (nombre) VALUES
 ('Sin Lactosa');
 
 -- ============================
+-- Tabla: ListaCompra
+-- ============================
+CREATE TABLE Lista_Compra (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    id_usuario INT NOT NULL,
+    fecha_creacion DATE NOT NULL,
+    FOREIGN KEY (id_usuario) REFERENCES Usuario(id) ON DELETE CASCADE
+);
+
+-- ============================
 -- Tabla: Receta
 -- ============================
 CREATE TABLE Receta (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    titulo VARCHAR(150) NOT NULL,
+    titulo VARCHAR(255) NOT NULL,
     descripcion TEXT,
-    tutorial LONGTEXT,
+    tutorial VARCHAR(255),
     tiempo_preparacion INT,
-    foto_url VARCHAR(255)
+    foto_url VARCHAR(255),
+    num_favoritos BIGINT DEFAULT 0,
+    id_lista INT,
+    CONSTRAINT fk_receta_lista FOREIGN KEY (id_lista) REFERENCES Lista_Compra(id)
 );
 
 -- ============================
@@ -107,16 +120,6 @@ CREATE TABLE Historial_Cocinado (
 );
 
 -- ============================
--- Tabla: ListaCompra
--- ============================
-CREATE TABLE ListaCompra (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    id_usuario INT NOT NULL,
-    fecha_creacion DATE NOT NULL,
-    FOREIGN KEY (id_usuario) REFERENCES Usuario(id) ON DELETE CASCADE
-);
-
--- ============================
 -- Tabla: Lista_Compra_Ingrediente (N:N)
 -- ============================
 CREATE TABLE Lista_Compra_Ingrediente (
@@ -124,7 +127,7 @@ CREATE TABLE Lista_Compra_Ingrediente (
     id_ingrediente INT NOT NULL,
     cantidad DECIMAL(10,2),
     PRIMARY KEY (id_lista, id_ingrediente),
-    FOREIGN KEY (id_lista) REFERENCES ListaCompra(id) ON DELETE CASCADE,
+    FOREIGN KEY (id_lista) REFERENCES Lista_Compra(id) ON DELETE CASCADE,
     FOREIGN KEY (id_ingrediente) REFERENCES Ingrediente(id) ON DELETE CASCADE
 );
 

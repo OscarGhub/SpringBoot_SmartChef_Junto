@@ -3,6 +3,7 @@ import { IonicModule } from '@ionic/angular';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import { firstValueFrom } from 'rxjs';
 import { AlertService } from '../../servicios/alert.service';
 import { UsuarioService } from '../../servicios/usuario/usuario.service';
 
@@ -28,8 +29,8 @@ export class TarjetaPerfilComponent implements OnInit {
     const data = localStorage.getItem('usuario');
     if (data) {
       this.usuario = JSON.parse(data);
-      if (this.usuario.foto_url) {
-        this.usuario.foto_url = this.getFotoUrl(this.usuario.id);
+      if (this.usuario?.id && this.usuario.fotoUrl) {
+        this.usuario.fotoUrl = this.getFotoUrl(this.usuario.id);
       }
     }
   }
@@ -38,29 +39,41 @@ export class TarjetaPerfilComponent implements OnInit {
     return `http://localhost:8080/api/usuario/${usuarioId}/foto?t=${new Date().getTime()}`;
   }
 
-  toggleEditar(campo: 'fecha_nacimiento' | 'correo_electronico') {
-    if (campo === 'fecha_nacimiento') this.editarFecha = !this.editarFecha;
-    if (campo === 'correo_electronico') this.editarEmail = !this.editarEmail;
+  toggleEditar(campo: 'fechaNacimiento' | 'correoElectronico') {
+    if (campo === 'fechaNacimiento') this.editarFecha = !this.editarFecha;
+    if (campo === 'correoElectronico') this.editarEmail = !this.editarEmail;
   }
 
   irAInventario() {
     this.router.navigate(['/inventario']);
   }
 
-  async guardarCampo(campo: 'fecha_nacimiento' | 'correo_electronico') {
+  async guardarCampo(campo: 'fechaNacimiento' | 'correoElectronico') {
+    if (!this.usuario?.id) return;
+
     try {
-      const usuarioActualizado = await this.usuarioService.actualizarUsuario(this.usuario).toPromise();
-      this.usuario = usuarioActualizado;
-      if (this.usuario.foto_url) {
-        this.usuario.foto_url = this.getFotoUrl(this.usuario.id);
-      }
+      const payload: any = {
+        fecha_nacimiento: this.usuario.fechaNacimiento,
+        correo_electronico: this.usuario.correoElectronico
+      };
+
+      const usuarioActualizado = await firstValueFrom(
+        this.usuarioService.actualizarUsuario(this.usuario.id, payload)
+      );
+
+      this.usuario = {
+        ...usuarioActualizado,
+        fotoUrl: this.usuario.id ? this.getFotoUrl(this.usuario.id) : this.usuario.fotoUrl
+      };
+
       localStorage.setItem('usuario', JSON.stringify(this.usuario));
 
-      if (campo === 'fecha_nacimiento') this.editarFecha = false;
-      if (campo === 'correo_electronico') this.editarEmail = false;
+      if (campo === 'fechaNacimiento') this.editarFecha = false;
+      if (campo === 'correoElectronico') this.editarEmail = false;
 
       await this.alertService.mostrarAlerta('Éxito', 'Datos actualizados correctamente');
-    } catch {
+    } catch (error) {
+      console.error('Error al actualizar usuario:', error);
       await this.alertService.mostrarAlerta('Error', 'No se pudo actualizar. Intenta más tarde.');
     }
   }
@@ -70,6 +83,8 @@ export class TarjetaPerfilComponent implements OnInit {
   }
 
   async cambiarFoto(event: Event) {
+    if (!this.usuario?.id) return;
+
     const input = event.target as HTMLInputElement;
     if (!input.files || input.files.length === 0) return;
 
@@ -78,14 +93,19 @@ export class TarjetaPerfilComponent implements OnInit {
     formData.append('foto', archivo);
 
     try {
-      const usuarioActualizado = await this.usuarioService.actualizarFoto(this.usuario.id, formData).toPromise();
+      const usuarioActualizado = await firstValueFrom(
+        this.usuarioService.actualizarFoto(this.usuario.id, formData)
+      );
+
       this.usuario = {
         ...usuarioActualizado,
-        foto_url: this.getFotoUrl(this.usuario.id)
+        fotoUrl: this.getFotoUrl(this.usuario.id)
       };
+
       localStorage.setItem('usuario', JSON.stringify(this.usuario));
       await this.alertService.mostrarAlerta('Éxito', 'Foto actualizada correctamente');
-    } catch {
+    } catch (error) {
+      console.error('Error al actualizar foto:', error);
       await this.alertService.mostrarAlerta('Error', 'No se pudo actualizar la foto.');
     } finally {
       input.value = '';

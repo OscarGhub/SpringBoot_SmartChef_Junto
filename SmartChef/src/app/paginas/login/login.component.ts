@@ -11,27 +11,26 @@ import { Router } from '@angular/router';
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.scss'],
   standalone: true,
-  imports: [
-    IonicModule,
-    FormsModule,
-  ]
+  imports: [IonicModule, FormsModule],
 })
-
 export class LoginComponent {
   private usuarioService = inject(UsuarioService);
   private alertService = inject(AlertService);
   private router = inject(Router);
 
-  correo_electronico: string = '';
+  correoElectronico: string = '';
   contrasena: string = '';
 
   async login(): Promise<void> {
-    if (!this.correo_electronico.trim() || !this.contrasena.trim()) {
-      await this.alertService.mostrarAlerta('Campos incompletos', 'Por favor ingresa correo y contraseña.');
+    if (!this.correoElectronico.trim() || !this.contrasena.trim()) {
+      await this.alertService.mostrarAlerta(
+        'Campos incompletos',
+        'Por favor ingresa correo y contraseña.'
+      );
       return;
     }
 
-    this.usuarioService.getUsuarioPorCorreo(this.correo_electronico).subscribe({
+    this.usuarioService.getUsuarioPorCorreo(this.correoElectronico).subscribe({
       next: async (usuario) => {
         if (!usuario) {
           await this.alertService.mostrarAlerta('Error', 'Usuario no encontrado.');
@@ -41,12 +40,10 @@ export class LoginComponent {
         const match = bcrypt.compareSync(this.contrasena, usuario.contrasena);
 
         if (match) {
-
           localStorage.setItem('usuario', JSON.stringify(usuario));
-          localStorage.setItem('correo_electronico', usuario.correo_electronico);
+          localStorage.setItem('correoElectronico', usuario.correoElectronico);
 
           await this.alertService.mostrarAlerta('Éxito', 'Has iniciado sesión correctamente.');
-
           this.router.navigate(['/inicio']);
         } else {
           await this.alertService.mostrarAlerta('Error', 'Contraseña incorrecta.');
@@ -54,8 +51,7 @@ export class LoginComponent {
       },
       error: async () => {
         await this.alertService.mostrarAlerta('Error', 'No se pudo iniciar sesión. Intenta más tarde.');
-      }
+      },
     });
   }
-
 }

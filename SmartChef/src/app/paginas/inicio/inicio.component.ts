@@ -24,6 +24,7 @@ import { PreferenciaService } from '../../servicios/preferencia/preferencia.serv
     CommonModule,
   ]
 })
+
 export class InicioComponent implements OnInit {
   private recetaService = inject(RecetaService);
   private preferenciaService = inject(PreferenciaService);
@@ -31,6 +32,8 @@ export class InicioComponent implements OnInit {
   recetas: Receta[] = [];
   recetasFiltradas: Receta[] = [];
   preferencias: Preferencia[] = [];
+  preferenciasSeleccionadas: number[] = [];
+  textoBusqueda: string = '';
 
   ngOnInit() {
     this.recetaService.getRecetas().subscribe({
@@ -42,28 +45,39 @@ export class InicioComponent implements OnInit {
     });
 
     this.preferenciaService.getPreferencias().subscribe({
-      next: (data) => {
-        this.preferencias = data;
-        console.log('Preferencias cargadas:', this.preferencias);
-      },
+      next: (data) => this.preferencias = data,
       error: (err) => console.error('Error al cargar preferencias', err)
     });
   }
 
   onSearch(text: string) {
-    const texto = text.toLowerCase();
-    this.recetasFiltradas = this.recetas.filter(r =>
-      r.titulo.toLowerCase().includes(texto) ||
-      r.descripcion.toLowerCase().includes(texto)
-    );
+    this.textoBusqueda = text.toLowerCase();
+    this.aplicarFiltros();
   }
 
   filtrar(preferenciaIds: number[]): void {
-    this.recetaService.filtrarPorPreferencias(preferenciaIds)
-      .subscribe({
-        next: data => this.recetasFiltradas = data,
-        error: err => console.error('Error al filtrar recetas', err)
-      });
+    this.preferenciasSeleccionadas = preferenciaIds;
+
+    this.recetaService.filtrarPorPreferencias(preferenciaIds).subscribe({
+      next: (data) => {
+        this.recetasFiltradas = data;
+      },
+      error: (err) => console.error('Error al filtrar recetas', err)
+    });
+  }
+
+  private aplicarFiltros(): void {
+    this.recetasFiltradas = this.recetas.filter(r => {
+      const coincidePreferencia =
+        this.preferenciasSeleccionadas.length === 0 ||
+        r.preferencias.some(p => p.id !== undefined && this.preferenciasSeleccionadas.includes(p.id));
+
+      const coincideTexto =
+        r.titulo.toLowerCase().includes(this.textoBusqueda) ||
+        r.descripcion.toLowerCase().includes(this.textoBusqueda);
+
+      return coincidePreferencia && coincideTexto;
+    });
   }
 
 }

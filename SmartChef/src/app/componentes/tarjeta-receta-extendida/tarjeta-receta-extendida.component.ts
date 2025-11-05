@@ -31,35 +31,37 @@ export class TarjetaRecetaExtendidaComponent implements OnInit {
   private async marcarYaGuardada() {
     if (!this.receta) return;
 
-    const correo = localStorage.getItem('correo_electronico');
-    if (!correo) return;
+    const usuarioData = localStorage.getItem('usuario');
+    if (!usuarioData) return;
 
-    const usuario = await firstValueFrom(this.usuarioService.getUsuarioPorCorreo(correo));
-    if (!usuario || usuario.id === undefined) return;
+    const usuario = JSON.parse(usuarioData);
+    if (!usuario?.id) return;
 
-    this.recetaService.recetaYaGuardada(this.receta.id!, usuario.id)
-      .subscribe(ya => this.receta!.yaGuardada = ya);
+    try {
+      const yaGuardada = await firstValueFrom(this.recetaService.recetaYaGuardada(this.receta.id!, usuario.id));
+      this.receta.yaGuardada = yaGuardada;
+    } catch (err) {
+      console.error('Error comprobando si la receta ya está guardada', err);
+    }
   }
 
   goToReceta() {
-    if (this.receta?.id) {
-      this.router.navigate(['/receta', this.receta.id]);
-    }
+    if (this.receta?.id) this.router.navigate(['/receta', this.receta.id]);
   }
 
   async anadirAlCarrito() {
     if (!this.receta) return;
 
-    const correo = localStorage.getItem('correo_electronico');
-    if (!correo) return;
+    const usuarioData = localStorage.getItem('usuario');
+    if (!usuarioData) return;
 
-    const usuario = await firstValueFrom(this.usuarioService.getUsuarioPorCorreo(correo));
-    if (!usuario || usuario.id === undefined) return;
+    const usuario = JSON.parse(usuarioData);
+    if (!usuario?.id) return;
 
     try {
       let idLista: number;
-
       const listaGuardada = localStorage.getItem('id_lista');
+
       if (listaGuardada) {
         idLista = Number(listaGuardada);
       } else {
@@ -68,11 +70,6 @@ export class TarjetaRecetaExtendidaComponent implements OnInit {
         localStorage.setItem('id_lista', idLista.toString());
       }
 
-      console.log('Añadiendo al carrito', {
-        url: `${this.carritoService['apiUrl']}/listacompra/${idLista}/receta`,
-        body: { id_receta: this.receta.id }
-      });
-
       await firstValueFrom(this.carritoService.anadirRecetaAlCarrito(idLista, this.receta.id!));
       console.log('Receta añadida al carrito');
     } catch (err) {
@@ -80,38 +77,39 @@ export class TarjetaRecetaExtendidaComponent implements OnInit {
     }
   }
 
-  async onImageError(event: Event) {
+  onImageError(event: Event) {
     const img = event.target as HTMLImageElement;
     img.src = '../../../assets/images/receta.png';
   }
 
-  async toggleFavorito() {
+  async toggleFavorito(event: Event) {
+    event.stopPropagation();
     if (!this.receta) return;
 
-    const correo = localStorage.getItem('correo_electronico');
-    if (!correo) return;
+    const usuarioData = localStorage.getItem('usuario');
+    if (!usuarioData) return;
 
-    const usuario = await firstValueFrom(this.usuarioService.getUsuarioPorCorreo(correo));
-    if (!usuario || usuario.id === undefined) return;
+    const usuario = JSON.parse(usuarioData);
+    if (!usuario?.id) return;
+
+    const idUsuario = usuario.id;
 
     try {
-      if (this.receta.yaGuardada) {
-        const updatedReceta = await firstValueFrom(
-          this.recetaService.quitarRecetaGuardada(this.receta.id!, usuario.id)
+      if (!this.receta.yaGuardada) {
+        const recetaActualizada = await firstValueFrom(
+          this.recetaService.guardarReceta(this.receta.id!, idUsuario)
         );
-        this.receta.num_favoritos = updatedReceta.num_favoritos;
-        this.receta.yaGuardada = false;
-      } else {
-        const updatedReceta = await firstValueFrom(
-          this.recetaService.guardarReceta(this.receta.id!, usuario.id)
-        );
-        this.receta.num_favoritos = updatedReceta.num_favoritos;
         this.receta.yaGuardada = true;
+        this.receta.numFavoritos = recetaActualizada.numFavoritos;
+      } else {
+        const recetaActualizada = await firstValueFrom(
+          this.recetaService.quitarRecetaGuardada(this.receta.id!, idUsuario)
+        );
+        this.receta.yaGuardada = false;
+        this.receta.numFavoritos = recetaActualizada.numFavoritos;
       }
-
-      this.cambioFavorito.emit();
-    } catch (error) {
-      console.error('Error al actualizar favoritos:', error);
+    } catch (err) {
+      console.error('Error al guardar/quitar receta', err);
     }
   }
 }

@@ -3,7 +3,7 @@
     <div class="receta-imagen-container">
       <img
         class="imagen_receta"
-        [src]="receta.foto_url || '../../../assets/images/receta.png'"
+        [src]="receta.fotoUrl || '../../../assets/images/receta.png'"
         [alt]="receta.titulo || 'Receta'"
         (error)="onImageError($event)"
       />
@@ -11,16 +11,17 @@
 
     <div class="receta-info">
       <p class="receta-titulo">{{ receta.titulo }}</p>
-      <p><strong>Tiempo de preparación:</strong> {{ receta.tiempo_preparacion }} min</p>
+      <p><strong>Tiempo de preparación:</strong> {{ receta.tiempoPreparacion }} min</p>
       <div class="receta-descripcion">{{ receta.descripcion }}</div>
       <div class="receta-tutorial">{{ receta.tutorial }}</div>
-      <p><strong>Guardados:</strong> {{ receta.num_favoritos }}</p>
+      <p><strong>Guardados:</strong> {{ receta.numFavoritos }}</p>
 
       <div class="receta-acciones">
+
         <ion-button
           class="boton"
           [color]="receta.yaGuardada ? 'success' : '#217A43'"
-          (click)="toggleFavorito(); $event.stopPropagation()">
+          (click)="toggleFavorito($event)">
           {{ receta.yaGuardada ? 'Guardado' : 'Guardar' }}
         </ion-button>
 

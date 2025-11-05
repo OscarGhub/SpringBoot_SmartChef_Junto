@@ -1,8 +1,8 @@
 export interface Usuario {
   id?: number;
-  nombre?: string;
-  correo_electronico: string;
+  nombre: string;
+  correoElectronico: string;
   contrasena: string;
-  fecha_nacimiento: string;
-  foto_url?: string;
+  fechaNacimiento: string;
+  fotoUrl?: string;
 }

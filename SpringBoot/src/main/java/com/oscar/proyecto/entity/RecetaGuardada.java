@@ -1,11 +1,14 @@
 package com.oscar.proyecto.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
-@Setter
+import java.time.LocalDateTime;
+
 @Getter
+@Setter
 @Entity
 @Table(name = "receta_guardada")
 public class RecetaGuardada {
@@ -15,12 +18,17 @@ public class RecetaGuardada {
 
     @ManyToOne
     @MapsId("id_receta")
-    @JoinColumn(name = "id_receta")
+    @JoinColumn(name = "id_receta", nullable = false)
     private Receta receta;
 
-     @ManyToOne
-     @MapsId("id_usuario")
-     @JoinColumn(name = "id_usuario")
-     private Usuario usuario;
+    @ManyToOne
+    @MapsId("id_usuario")
+    @JoinColumn(name = "id_usuario", nullable = false)
+    @JsonIgnore
+    private Usuario usuario;
 
+    @Column(name = "fecha_guardado", nullable = false)
+    private LocalDateTime fechaGuardado = LocalDateTime.now();
+
+    public RecetaGuardada() {}
 }

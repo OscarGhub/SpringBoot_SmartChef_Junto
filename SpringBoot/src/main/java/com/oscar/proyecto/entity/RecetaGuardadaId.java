@@ -1,5 +1,6 @@
 package com.oscar.proyecto.entity;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import lombok.Getter;
 import lombok.Setter;
@@ -7,13 +8,23 @@ import lombok.Setter;
 import java.io.Serializable;
 import java.util.Objects;
 
-@Setter
 @Getter
+@Setter
 @Embeddable
 public class RecetaGuardadaId implements Serializable {
 
+    @Column(name = "id_usuario")
     private Integer id_usuario;
+
+    @Column(name = "id_receta")
     private Integer id_receta;
+
+    public RecetaGuardadaId() {}
+
+    public RecetaGuardadaId(Integer id_usuario, Integer id_receta) {
+        this.id_usuario = id_usuario;
+        this.id_receta = id_receta;
+    }
 
     @Override
     public boolean equals(Object o) {

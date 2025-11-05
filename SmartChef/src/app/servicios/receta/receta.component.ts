@@ -15,7 +15,10 @@ import { Receta } from './receta.model';
 })
 export class RecetaComponent implements OnInit {
   private recetaService = inject(RecetaService);
+
   recetas: Receta[] = [];
+  recetasFiltradas: Receta[] = [];
+  preferenciasSeleccionadas: number[] = [];
 
   ngOnInit(): void {
     this.cargarRecetas();
@@ -23,7 +26,10 @@ export class RecetaComponent implements OnInit {
 
   cargarRecetas(): void {
     this.recetaService.getRecetas().subscribe({
-      next: (data) => this.recetas = data,
+      next: (data) => {
+        this.recetas = data;
+        this.recetasFiltradas = [...data];
+      },
       error: (err) => console.error('Error al cargar recetas', err)
     });
   }

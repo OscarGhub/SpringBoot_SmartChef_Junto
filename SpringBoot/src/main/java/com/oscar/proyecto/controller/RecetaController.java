@@ -8,10 +8,10 @@ import com.oscar.proyecto.repository.RecetaRepository;
 import com.oscar.proyecto.repository.RecetaGuardadaRepository;
 import com.oscar.proyecto.repository.UsuarioRepository;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/receta")
@@ -31,10 +31,7 @@ public class RecetaController {
 
     @GetMapping
     public ResponseEntity<List<Receta>> getRecetas() {
-        List<Receta> recetas = recetaRepo.findAll();
-        return ResponseEntity.ok()
-                .header("Content-Type", "application/json")
-                .body(recetas);
+        return ResponseEntity.ok(recetaRepo.findAll());
     }
 
     @GetMapping("/{id}")
@@ -50,10 +47,7 @@ public class RecetaController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Receta> actualizarReceta(
-            @PathVariable Integer id,
-            @RequestBody Receta recetaActualizada) {
-
+    public ResponseEntity<Receta> actualizarReceta(@PathVariable Integer id, @RequestBody Receta recetaActualizada) {
         return recetaRepo.findById(id)
                 .map(recetaExistente -> {
                     recetaExistente.setTitulo(recetaActualizada.getTitulo());
@@ -61,65 +55,42 @@ public class RecetaController {
                     recetaExistente.setTutorial(recetaActualizada.getTutorial());
                     recetaExistente.setTiempo_preparacion(recetaActualizada.getTiempo_preparacion());
                     recetaExistente.setFoto_url(recetaActualizada.getFoto_url());
-                    recetaExistente.setNum_favoritos(recetaActualizada.getNum_favoritos());
                     return ResponseEntity.ok(recetaRepo.save(recetaExistente));
                 })
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
-    @GetMapping("/filtrar")
-    public List<Receta> filtrarPorPreferencias(@RequestParam(required = false) List<Integer> preferencias) {
-        if (preferencias == null || preferencias.isEmpty()) {
-            return recetaRepo.findAll();
-        }
-        return recetaRepo.findByPreferenciasIn(preferencias);
-    }
-
-    @GetMapping("/favoritos")
-    public List<Receta> getRecetasConFavoritos() {
-        return recetaRepo.findAllWithNumFavoritos().stream()
-                .map(obj -> {
-                    Receta receta = (Receta) obj[0];
-                    receta.setNum_favoritos((Long) obj[1]);
-                    return receta;
-                })
-                .collect(Collectors.toList());
-    }
-
     @PostMapping("/{id}/guardar/{idUsuario}")
+    @Transactional
     public ResponseEntity<Receta> guardarReceta(@PathVariable Integer id, @PathVariable Integer idUsuario) {
         Receta receta = recetaRepo.findById(id).orElse(null);
-        if (receta == null) return ResponseEntity.notFound().build();
-
         Usuario usuario = usuarioRepo.findById(idUsuario).orElse(null);
-        if (usuario == null) return ResponseEntity.notFound().build();
+        if (receta == null || usuario == null) return ResponseEntity.notFound().build();
 
         RecetaGuardadaId rgId = new RecetaGuardadaId();
         rgId.setId_receta(id);
         rgId.setId_usuario(idUsuario);
 
-        boolean yaGuardado = recetaGuardadaRepo.existsById(rgId);
-        if (!yaGuardado) {
+        if (!recetaGuardadaRepo.existsById(rgId)) {
             RecetaGuardada rg = new RecetaGuardada();
             rg.setId(rgId);
             rg.setReceta(receta);
             rg.setUsuario(usuario);
             recetaGuardadaRepo.save(rg);
 
-            receta.setNum_favoritos((receta.getNum_favoritos() == null ? 0 : receta.getNum_favoritos()) + 1);
-            recetaRepo.save(receta);
+            recetaRepo.incrementarNumFavoritos(id);
+            receta.setNumFavoritos((receta.getNumFavoritos() == null ? 0 : receta.getNumFavoritos() + 1));
         }
 
         return ResponseEntity.ok(receta);
     }
 
     @DeleteMapping("/{id}/guardar/{idUsuario}")
+    @Transactional
     public ResponseEntity<Receta> quitarRecetaGuardada(@PathVariable Integer id, @PathVariable Integer idUsuario) {
         Receta receta = recetaRepo.findById(id).orElse(null);
-        if (receta == null) return ResponseEntity.notFound().build();
-
         Usuario usuario = usuarioRepo.findById(idUsuario).orElse(null);
-        if (usuario == null) return ResponseEntity.notFound().build();
+        if (receta == null || usuario == null) return ResponseEntity.notFound().build();
 
         RecetaGuardadaId rgId = new RecetaGuardadaId();
         rgId.setId_receta(id);
@@ -128,8 +99,8 @@ public class RecetaController {
         if (recetaGuardadaRepo.existsById(rgId)) {
             recetaGuardadaRepo.deleteById(rgId);
 
-            receta.setNum_favoritos((receta.getNum_favoritos() == null ? 0 : receta.getNum_favoritos()) - 1);
-            recetaRepo.save(receta);
+            recetaRepo.decrementarNumFavoritos(id);
+            receta.setNumFavoritos(Math.max((receta.getNumFavoritos() == null ? 0 : receta.getNumFavoritos() - 1), 0));
         }
 
         return ResponseEntity.ok(receta);
@@ -137,11 +108,7 @@ public class RecetaController {
 
     @GetMapping("/{id}/ya-guardada/{idUsuario}")
     public ResponseEntity<Boolean> recetaYaGuardada(@PathVariable Integer id, @PathVariable Integer idUsuario) {
-        RecetaGuardadaId rgId = new RecetaGuardadaId();
-        rgId.setId_receta(id);
-        rgId.setId_usuario(idUsuario);
-
-        boolean existe = recetaGuardadaRepo.existsById(rgId);
+        boolean existe = recetaGuardadaRepo.existsById(new RecetaGuardadaId(id, idUsuario));
         return ResponseEntity.ok(existe);
     }
 
@@ -160,6 +127,19 @@ public class RecetaController {
                 .toList();
 
         return ResponseEntity.ok(recetasGuardadas);
+    }
+
+    @PostMapping("/recetas/filtro")
+    public ResponseEntity<List<Receta>> filtrarRecetasPorPreferencias(@RequestBody(required = false) List<Integer> preferencias) {
+        List<Receta> recetas;
+
+        if (preferencias == null || preferencias.isEmpty()) {
+            recetas = recetaRepo.findAll();
+        } else {
+            recetas = recetaRepo.findByPreferenciasIn(preferencias);
+        }
+
+        return ResponseEntity.ok(recetas);
     }
 
 }

@@ -19,14 +19,8 @@ export class RecetaService {
   }
 
   filtrarPorPreferencias(preferenciaIds: number[]): Observable<Receta[]> {
-    if (!preferenciaIds || preferenciaIds.length === 0) {
-      return this.getRecetas();
-    }
-
-    let params = new HttpParams();
-    preferenciaIds.forEach(id => params = params.append('preferencias', id.toString()));
-
-    return this.http.get<Receta[]>(`${this.apiUrl}/filtrar`, { params });
+    const body = preferenciaIds.length ? preferenciaIds : [];
+    return this.http.post<Receta[]>('http://localhost:8080/api/receta/recetas/filtro', body);
   }
 
   guardarReceta(idReceta: number, idUsuario: number): Observable<Receta> {

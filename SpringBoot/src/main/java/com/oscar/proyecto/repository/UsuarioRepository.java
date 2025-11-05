@@ -2,5 +2,11 @@ package com.oscar.proyecto.repository;
 
 import com.oscar.proyecto.entity.Usuario;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
-public interface UsuarioRepository extends JpaRepository<Usuario, Integer> {}
+import java.util.Optional;
+
+@Repository
+public interface UsuarioRepository extends JpaRepository<Usuario, Integer> {
+    Optional<Usuario> findByCorreoElectronico(String correoElectronico);
+}
