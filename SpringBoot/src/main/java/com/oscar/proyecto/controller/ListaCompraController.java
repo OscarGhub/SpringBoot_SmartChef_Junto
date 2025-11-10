@@ -104,10 +104,14 @@ public class ListaCompraController {
             @PathVariable Integer idLista,
             @PathVariable Integer idReceta) {
 
+        System.out.println("Añadiendo receta " + idReceta + " a lista " + idLista);
+
         ListaCompra listaCompra = listaCompraRepository.findById(idLista)
                 .orElseThrow(() -> new RuntimeException("Lista de compra no encontrada"));
 
         List<RecetaIngrediente> ingredientesReceta = recetaIngredienteRepository.findByRecetaId(idReceta);
+
+        System.out.println("Ingredientes encontrados: " + ingredientesReceta.size());
 
         for (RecetaIngrediente ri : ingredientesReceta) {
             ListaCompraIngredienteId id = new ListaCompraIngredienteId(listaCompra.getId(), ri.getIngrediente().getId());

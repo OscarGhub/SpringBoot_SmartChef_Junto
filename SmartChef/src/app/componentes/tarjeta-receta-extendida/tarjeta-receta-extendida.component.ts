@@ -58,6 +58,10 @@ export class TarjetaRecetaExtendidaComponent implements OnInit {
     const usuario = JSON.parse(usuarioData);
     if (!usuario?.id) return;
 
+    console.log('Receta ID:', this.receta.id);
+    console.log('Usuario:', usuario);
+    console.log('Lista guardada en localStorage:', localStorage.getItem('id_lista'));
+
     const idUsuario: number = usuario.id;
 
     try {
