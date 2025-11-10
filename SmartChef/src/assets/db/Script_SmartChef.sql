@@ -21,13 +21,6 @@ CREATE TABLE Preferencia (
     nombre VARCHAR(100) NOT NULL
 );
 
-INSERT INTO Preferencia (nombre) VALUES
-('Vegana'),
-('Sin Gluten'),
-('Alta en Proteínas'),
-('Baja en Carbohidratos'),
-('Sin Lactosa');
-
 -- ============================
 -- Tabla: ListaCompra
 -- ============================
@@ -48,9 +41,7 @@ CREATE TABLE Receta (
     tutorial VARCHAR(255),
     tiempo_preparacion INT,
     foto_url VARCHAR(255),
-    num_favoritos BIGINT DEFAULT 0,
-    id_lista INT,
-    CONSTRAINT fk_receta_lista FOREIGN KEY (id_lista) REFERENCES Lista_Compra(id)
+    num_favoritos BIGINT DEFAULT 0
 );
 
 -- ============================
