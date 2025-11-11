@@ -1,5 +1,5 @@
 import { Injectable, inject } from '@angular/core';
-import { HttpClient, HttpParams } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { Receta } from './receta.model';
 import { Observable } from 'rxjs';
 
@@ -20,7 +20,7 @@ export class RecetaService {
 
   filtrarPorPreferencias(preferenciaIds: number[]): Observable<Receta[]> {
     const body = preferenciaIds.length ? preferenciaIds : [];
-    return this.http.post<Receta[]>('http://localhost:8080/api/receta/recetas/filtro', body);
+    return this.http.post<Receta[]>(`${this.apiUrl}/recetas/filtro`, body);
   }
 
   guardarReceta(idReceta: number, idUsuario: number): Observable<Receta> {
@@ -38,5 +38,4 @@ export class RecetaService {
   getRecetasGuardadas(idUsuario: number): Observable<Receta[]> {
     return this.http.get<Receta[]>(`${this.apiUrl}/guardadas/${idUsuario}`);
   }
-
 }

@@ -25,7 +25,12 @@
           {{ receta.yaGuardada ? 'Guardado' : 'Guardar' }}
         </ion-button>
 
-        <ion-button (click)="anadirAlCarrito()">Añadir al carrito</ion-button>
+        <ion-button
+          class="boton"
+          [color]="receta.enCarrito ? 'warning' : '#217A43'"
+          (click)="toggleCarrito($event, receta)">
+          {{ receta.enCarrito ? 'En carrito' : 'Añadir al carrito' }}
+        </ion-button>
 
       </div>
     </div>

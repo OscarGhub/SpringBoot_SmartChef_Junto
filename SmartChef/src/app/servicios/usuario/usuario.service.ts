@@ -1,6 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { map, Observable, of } from 'rxjs';
+import { Observable } from 'rxjs';
 import { Usuario } from './usuario.model';
 
 @Injectable({
@@ -22,8 +22,8 @@ export class UsuarioService {
     return this.http.get<Usuario>(`${this.apiUrl}/correo/${correo}`);
   }
 
-  actualizarUsuario(id: number, payload: any) {
-    return this.http.put<Usuario>(`http://localhost:8080/api/usuario/${id}`, payload);
+  actualizarUsuario(id: number, payload: any): Observable<Usuario> {
+    return this.http.put<Usuario>(`${this.apiUrl}/${id}`, payload);
   }
 
   actualizarFoto(id: number, formData: FormData): Observable<any> {
@@ -33,5 +33,4 @@ export class UsuarioService {
   actualizarCorreo(id: number, correoElectronico: string): Observable<Usuario> {
     return this.http.put<Usuario>(`${this.apiUrl}/${id}`, { correoElectronico });
   }
-
 }

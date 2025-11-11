@@ -23,6 +23,7 @@ public interface RecetaRepository extends JpaRepository<Receta, Integer> {
     @Query("UPDATE Receta r SET r.numFavoritos = r.numFavoritos - 1 WHERE r.id = :id AND r.numFavoritos > 0")
     void decrementarNumFavoritos(@Param("id") Integer id);
 
-    @Query("SELECT r FROM Receta r JOIN r.preferencias p WHERE p.id IN :preferenciaIds")
+    @Query("SELECT DISTINCT r FROM Receta r JOIN r.preferencias p WHERE p.id IN :preferenciaIds")
     List<Receta> findByPreferenciasIn(@Param("preferenciaIds") List<Integer> preferenciaIds);
+
 }

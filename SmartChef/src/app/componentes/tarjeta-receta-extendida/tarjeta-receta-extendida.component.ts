@@ -4,7 +4,6 @@ import { Router, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { Receta } from '../../servicios/receta/receta.model';
 import { RecetaService } from '../../servicios/receta/receta.service';
-import { UsuarioService } from '../../servicios/usuario/usuario.service';
 import { CarritoService } from '../../servicios/carrito/carrito.service';
 import { firstValueFrom } from 'rxjs';
 
@@ -16,28 +15,38 @@ import { firstValueFrom } from 'rxjs';
   imports: [IonicModule, RouterModule, CommonModule]
 })
 export class TarjetaRecetaExtendidaComponent implements OnInit {
-  @Input() receta?: Receta;
+  @Input() receta?: Receta & { enCarrito?: boolean };
   @Output() cambioFavorito = new EventEmitter<void>();
 
   private router = inject(Router);
   private recetaService = inject(RecetaService);
-  private usuarioService = inject(UsuarioService);
   private carritoService = inject(CarritoService);
 
+  private usuario?: { id: number };
+
   ngOnInit() {
+    this.usuario = this.getUsuario();
+    if (!this.usuario || !this.receta) return;
+
     this.marcarYaGuardada();
+    this.marcarEnCarrito();
+  }
+
+  private getUsuario() {
+    const usuarioData = localStorage.getItem('usuario');
+    if (!usuarioData) return undefined;
+    try {
+      return JSON.parse(usuarioData);
+    } catch {
+      return undefined;
+    }
   }
 
   private async marcarYaGuardada() {
-    if (!this.receta) return;
-    const usuarioData = localStorage.getItem('usuario');
-    if (!usuarioData) return;
-    const usuario = JSON.parse(usuarioData);
-    if (!usuario?.id) return;
-
+    if (!this.receta || !this.usuario) return;
     try {
       const yaGuardada = await firstValueFrom(
-        this.recetaService.recetaYaGuardada(this.receta.id!, usuario.id)
+        this.recetaService.recetaYaGuardada(this.receta.id!, this.usuario.id)
       );
       this.receta.yaGuardada = yaGuardada;
     } catch (err) {
@@ -45,77 +54,79 @@ export class TarjetaRecetaExtendidaComponent implements OnInit {
     }
   }
 
-  goToReceta() {
-    if (this.receta?.id) this.router.navigate(['/receta', this.receta.id]);
-  }
-
-  async anadirAlCarrito() {
-    if (!this.receta?.id) return;
-
-    const usuarioData = localStorage.getItem('usuario');
-    if (!usuarioData) return;
-
-    const usuario = JSON.parse(usuarioData);
-    if (!usuario?.id) return;
-
-    console.log('Receta ID:', this.receta.id);
-    console.log('Usuario:', usuario);
-    console.log('Lista guardada en localStorage:', localStorage.getItem('id_lista'));
-
-    const idUsuario: number = usuario.id;
+  private async marcarEnCarrito() {
+    if (!this.receta || !this.usuario) return;
 
     try {
-      let idLista: number;
-      const listaGuardada = localStorage.getItem('id_lista');
+      const listaId = await this.obtenerListaCompra(this.usuario.id);
+      const ingredientes = await firstValueFrom(this.carritoService.getIngredientes(listaId));
 
-      if (listaGuardada) {
-        idLista = Number(listaGuardada);
-      } else {
-        const lista: any = await firstValueFrom(this.carritoService.crearListaCompra(usuario.id));
-        idLista = lista.id;
-        localStorage.setItem('id_lista', idLista.toString());
-      }
+      this.receta.enCarrito = ingredientes.some(ing => ing.recetaId === this.receta!.id);
 
-      await firstValueFrom(this.carritoService.anadirRecetaAlCarrito(idLista, this.receta.id));
-
-      console.log('Receta añadida al carrito con todos sus ingredientes');
     } catch (err) {
-      console.error('Error al añadir la receta al carrito:', err);
+      console.error('Error comprobando si la receta está en el carrito', err);
+      this.receta.enCarrito = false;
     }
   }
 
-  onImageError(event: Event) {
-    const img = event.target as HTMLImageElement;
-    img.src = '../../../assets/images/receta.png';
+  private async obtenerListaCompra(idUsuario: number): Promise<number> {
+    const listaGuardada = localStorage.getItem('id_lista');
+    if (listaGuardada) return Number(listaGuardada);
+
+    const lista = await firstValueFrom(this.carritoService.crearListaCompra(idUsuario));
+    localStorage.setItem('id_lista', lista.id);
+    return lista.id;
+  }
+
+  async toggleCarrito(event: Event, receta: Receta) {
+    event.stopPropagation();
+    if (!receta || !this.usuario) return;
+
+    const idUsuario = this.usuario.id;
+
+    try {
+      if (receta.enCarrito) {
+        await firstValueFrom(this.carritoService.eliminarRecetaDelCarrito(idUsuario, receta.id!));
+        receta.enCarrito = false;
+      } else {
+        await firstValueFrom(this.carritoService.anadirRecetaAlCarrito(idUsuario, receta.id!));
+        receta.enCarrito = true;
+      }
+    } catch (err) {
+      console.error('Error al actualizar la receta en el carrito', err);
+    }
   }
 
   async toggleFavorito(event: Event) {
     event.stopPropagation();
-    if (!this.receta) return;
-
-    const usuarioData = localStorage.getItem('usuario');
-    if (!usuarioData) return;
-    const usuario = JSON.parse(usuarioData);
-    if (!usuario?.id) return;
-
-    const idUsuario = usuario.id;
+    if (!this.receta || !this.usuario) return;
 
     try {
       if (!this.receta.yaGuardada) {
         const recetaActualizada = await firstValueFrom(
-          this.recetaService.guardarReceta(this.receta.id!, idUsuario)
+          this.recetaService.guardarReceta(this.receta.id!, this.usuario.id)
         );
         this.receta.yaGuardada = true;
         this.receta.numFavoritos = recetaActualizada.numFavoritos;
       } else {
         const recetaActualizada = await firstValueFrom(
-          this.recetaService.quitarRecetaGuardada(this.receta.id!, idUsuario)
+          this.recetaService.quitarRecetaGuardada(this.receta.id!, this.usuario.id)
         );
         this.receta.yaGuardada = false;
         this.receta.numFavoritos = recetaActualizada.numFavoritos;
       }
+      this.cambioFavorito.emit();
     } catch (err) {
       console.error('Error al guardar/quitar receta', err);
     }
+  }
+
+  goToReceta() {
+    if (this.receta?.id) this.router.navigate(['/receta', this.receta.id]);
+  }
+
+  onImageError(event: Event) {
+    const img = event.target as HTMLImageElement;
+    img.src = '../../../assets/images/receta.png';
   }
 }

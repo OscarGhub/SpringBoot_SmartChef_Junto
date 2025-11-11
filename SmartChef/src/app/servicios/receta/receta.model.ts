@@ -10,4 +10,5 @@ export interface Receta {
   numFavoritos: number;
   preferencias: Preferencia[];
   yaGuardada?: boolean;
+  enCarrito?: boolean;
 }

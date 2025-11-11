@@ -1,5 +1,6 @@
 package com.oscar.proyecto.controller;
 
+import com.oscar.proyecto.dto.IngredientesConRecetaDTO;
 import com.oscar.proyecto.entity.*;
 import com.oscar.proyecto.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/carrito")
@@ -37,11 +39,9 @@ public class ListaCompraController {
         }
 
         ListaCompra listaCompra = new ListaCompra();
-
         Usuario usuario = new Usuario();
         usuario.setId(idUsuario);
         listaCompra.setUsuario(usuario);
-
         listaCompra.setFecha_creacion(LocalDate.now());
 
         ListaCompra nuevaLista = listaCompraRepository.save(listaCompra);
@@ -61,7 +61,6 @@ public class ListaCompraController {
                 .orElseThrow(() -> new RuntimeException("Ingrediente no encontrado"));
 
         ListaCompraIngredienteId id = new ListaCompraIngredienteId(idLista, idIngrediente);
-
         ListaCompraIngrediente listaIngrediente = listaCompraIngredienteRepository.findById(id)
                 .orElse(new ListaCompraIngrediente());
 
@@ -91,35 +90,66 @@ public class ListaCompraController {
     }
 
     @GetMapping("/listacompra/{idLista}/ingredientes")
-    public ResponseEntity<List<ListaCompraIngrediente>> obtenerIngredientes(@PathVariable Integer idLista) {
+    public ResponseEntity<List<IngredientesConRecetaDTO>> obtenerIngredientes(@PathVariable Integer idLista) {
         ListaCompra listaCompra = listaCompraRepository.findById(idLista)
                 .orElseThrow(() -> new RuntimeException("Lista de compra no encontrada"));
 
         List<ListaCompraIngrediente> ingredientes = listaCompraIngredienteRepository.findByListaCompra(listaCompra);
-        return ResponseEntity.ok(ingredientes);
+
+        List<Integer> idsIngredientes = ingredientes.stream()
+                .map(li -> li.getIngrediente().getId())
+                .collect(Collectors.toList());
+
+        List<RecetaIngrediente> recetaIngredientes = recetaIngredienteRepository.findByIngredienteIdIn(idsIngredientes);
+
+        List<IngredientesConRecetaDTO> dtoList = ingredientes.stream().map(li -> {
+            RecetaIngrediente ri = recetaIngredientes.stream()
+                    .filter(r -> r.getIngrediente().getId().equals(li.getIngrediente().getId()))
+                    .findFirst()
+                    .orElse(null);
+
+            Integer idReceta = ri != null ? ri.getReceta().getId() : null;
+            String nombreReceta = ri != null ? ri.getReceta().getTitulo() : null;
+
+            return new IngredientesConRecetaDTO(
+                    li.getIngrediente().getId(),
+                    li.getIngrediente().getNombre(),
+                    li.getCantidad(),
+                    idReceta,
+                    nombreReceta
+            );
+        }).collect(Collectors.toList());
+
+        return ResponseEntity.ok(dtoList);
     }
 
-    @PostMapping("/listacompra/{idLista}/receta/{idReceta}")
+    @PostMapping("/listacompra/usuario/{idUsuario}/receta/{idReceta}")
     public ResponseEntity<String> anadirRecetaAlCarrito(
-            @PathVariable Integer idLista,
+            @PathVariable Integer idUsuario,
             @PathVariable Integer idReceta) {
 
-        System.out.println("Añadiendo receta " + idReceta + " a lista " + idLista);
-
-        ListaCompra listaCompra = listaCompraRepository.findById(idLista)
-                .orElseThrow(() -> new RuntimeException("Lista de compra no encontrada"));
+        ListaCompra listaCompra = listaCompraRepository.findByUsuarioId(idUsuario)
+                .orElseGet(() -> {
+                    ListaCompra nuevaLista = new ListaCompra();
+                    Usuario usuario = new Usuario();
+                    usuario.setId(idUsuario);
+                    nuevaLista.setUsuario(usuario);
+                    nuevaLista.setFecha_creacion(LocalDate.now());
+                    return listaCompraRepository.save(nuevaLista);
+                });
 
         List<RecetaIngrediente> ingredientesReceta = recetaIngredienteRepository.findByRecetaId(idReceta);
 
-        System.out.println("Ingredientes encontrados: " + ingredientesReceta.size());
-
         for (RecetaIngrediente ri : ingredientesReceta) {
-            ListaCompraIngredienteId id = new ListaCompraIngredienteId(listaCompra.getId(), ri.getIngrediente().getId());
+            ListaCompraIngredienteId listaIngredienteId = new ListaCompraIngredienteId(
+                    listaCompra.getId(),
+                    ri.getIngrediente().getId()
+            );
 
-            ListaCompraIngrediente listaIngrediente = listaCompraIngredienteRepository.findById(id)
+            ListaCompraIngrediente listaIngrediente = listaCompraIngredienteRepository.findById(listaIngredienteId)
                     .orElse(new ListaCompraIngrediente());
 
-            listaIngrediente.setId(id);
+            listaIngrediente.setId(listaIngredienteId);
             listaIngrediente.setListaCompra(listaCompra);
             listaIngrediente.setIngrediente(ri.getIngrediente());
             listaIngrediente.setCantidad(ri.getCantidad());
@@ -129,4 +159,29 @@ public class ListaCompraController {
 
         return ResponseEntity.ok("Ingredientes de la receta añadidos al carrito");
     }
+
+    @DeleteMapping("/listacompra/usuario/{idUsuario}/receta/{idReceta}")
+    public ResponseEntity<String> eliminarRecetaDelCarrito(
+            @PathVariable Integer idUsuario,
+            @PathVariable Integer idReceta) {
+
+        ListaCompra listaCompra = listaCompraRepository.findByUsuarioId(idUsuario)
+                .orElseThrow(() -> new RuntimeException("Lista de compra no encontrada"));
+
+        List<RecetaIngrediente> ingredientesReceta = recetaIngredienteRepository.findByRecetaId(idReceta);
+
+        for (RecetaIngrediente ri : ingredientesReceta) {
+            ListaCompraIngredienteId listaIngredienteId = new ListaCompraIngredienteId(
+                    listaCompra.getId(),
+                    ri.getIngrediente().getId()
+            );
+
+            if (listaCompraIngredienteRepository.existsById(listaIngredienteId)) {
+                listaCompraIngredienteRepository.deleteById(listaIngredienteId);
+            }
+        }
+
+        return ResponseEntity.ok("Ingredientes de la receta eliminados del carrito");
+    }
+
 }

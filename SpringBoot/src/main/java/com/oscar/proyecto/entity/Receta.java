@@ -2,6 +2,7 @@ package com.oscar.proyecto.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -25,14 +26,18 @@ public class Receta {
     @Column(columnDefinition = "LONGTEXT")
     private String tutorial;
 
-    private Integer tiempo_preparacion;
+    @Column(name = "tiempo_preparacion")
+    @JsonProperty("tiempoPreparacion")
+    private Integer tiempoPreparacion;
 
-    private String foto_url;
+    @Column(name = "foto_url")
+    @JsonProperty("fotoUrl")
+    private String fotoUrl;
 
     @Column(name = "num_favoritos")
     private Long numFavoritos = 0L;
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
             name = "receta_preferencia",
             joinColumns = @JoinColumn(name = "id_receta"),

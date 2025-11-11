@@ -8,7 +8,12 @@ export interface Ingrediente {
 }
 
 export interface ListaCompraIngrediente {
+  recetaId: number | undefined;
   idLista: number;
   ingrediente: Ingrediente;
   cantidad: number;
+  receta?: {
+    id: number;
+    nombre: string;
+  };
 }

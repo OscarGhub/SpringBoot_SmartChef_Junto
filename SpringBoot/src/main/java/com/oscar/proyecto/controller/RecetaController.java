@@ -53,8 +53,8 @@ public class RecetaController {
                     recetaExistente.setTitulo(recetaActualizada.getTitulo());
                     recetaExistente.setDescripcion(recetaActualizada.getDescripcion());
                     recetaExistente.setTutorial(recetaActualizada.getTutorial());
-                    recetaExistente.setTiempo_preparacion(recetaActualizada.getTiempo_preparacion());
-                    recetaExistente.setFoto_url(recetaActualizada.getFoto_url());
+                    recetaExistente.setTiempoPreparacion(recetaActualizada.getTiempoPreparacion());
+                    recetaExistente.setFotoUrl(recetaActualizada.getFotoUrl());
                     return ResponseEntity.ok(recetaRepo.save(recetaExistente));
                 })
                 .orElseGet(() -> ResponseEntity.notFound().build());
