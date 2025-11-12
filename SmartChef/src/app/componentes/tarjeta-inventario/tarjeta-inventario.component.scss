@@ -23,18 +23,6 @@ ion-card-title {
   margin-bottom: 16px;
 }
 
-.inventario-input {
-  --background: #ffffff;
-  --border-radius: 20px;
-  --padding-start: 12px;
-  --padding-end: 12px;
-  --color: #000000;
-  --placeholder-color: #777;
-  --highlight-background: #ffffff;
-  --highlight-color-focused: #ffffff;
-  font-size: 1rem;
-}
-
 .boton-mas {
   --background: transparent;
   --box-shadow: none;
@@ -73,7 +61,7 @@ ion-card-title {
   }
 }
 
-.vacia-texto {
+.texto-vacio {
   text-align: center;
   color: #f0f0f0;
   font-style: italic;

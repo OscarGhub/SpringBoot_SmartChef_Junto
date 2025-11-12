@@ -27,4 +27,8 @@ export class FooterComponent {
   goToCarrito() {
     this.router.navigate(['/carrito']);
   }
+
+  goToColeccion() {
+    this.router.navigate(['/coleccion']);
+  }
 }

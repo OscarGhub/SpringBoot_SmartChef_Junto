@@ -127,8 +127,10 @@ CREATE TABLE Lista_Compra_Ingrediente (
 -- ============================
 CREATE TABLE Inventario (
     id INT AUTO_INCREMENT PRIMARY KEY,
+    id_usuario INT NOT NULL,
     id_ingrediente INT NOT NULL,
     cantidad DECIMAL(10,2),
+    FOREIGN KEY (id_usuario) REFERENCES Usuario(id) ON DELETE CASCADE,
     FOREIGN KEY (id_ingrediente) REFERENCES Ingrediente(id) ON DELETE CASCADE
 );
 

@@ -1,0 +1,17 @@
+<ion-card class="coleccion-card" *ngIf="coleccion">
+  <div class="coleccion-container">
+
+    <div class="coleccion-info">
+      <p class="coleccion-nombre">{{ coleccion.nombre }}</p>
+
+      <div class="coleccion-acciones">
+        <ion-button
+          class="boton"
+          (click)="goToColeccion(); $event.stopPropagation()"
+        >
+          Ver coleccion
+        </ion-button>
+      </div>
+    </div>
+  </div>
+</ion-card>

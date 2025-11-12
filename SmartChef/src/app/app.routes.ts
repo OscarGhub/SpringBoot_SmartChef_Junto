@@ -8,6 +8,7 @@ import {LoginComponent} from "./paginas/login/login.component";
 import {LoginRegistroComponent} from "./paginas/login-registro/login-registro.component";
 import {RegistroComponent} from "./paginas/registro/registro.component";
 import {InventarioComponent} from "./paginas/inventario/inventario.component";
+import {ColeccionComponent} from "./paginas/coleccion/coleccion.component";
 
 export const routes: Routes = [
 
@@ -30,5 +31,7 @@ export const routes: Routes = [
   { path: 'receta/:id', component: VerRecetaComponent },
 
   {path: 'inventario', component: InventarioComponent},
+
+  {path: 'coleccion', component: ColeccionComponent},
 
 ];
