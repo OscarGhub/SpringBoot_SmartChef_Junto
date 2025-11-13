@@ -7,8 +7,11 @@ import { SearchBarComponent } from '../../componentes/search-bar/search-bar.comp
 import { RecetaService } from '../../servicios/receta/receta.service';
 import { Receta } from '../../servicios/receta/receta.model';
 import { CommonModule } from '@angular/common';
-import {Preferencia} from "../../servicios/preferencia/preferencia.model";
+import { Preferencia } from "../../servicios/preferencia/preferencia.model";
 import { PreferenciaService } from '../../servicios/preferencia/preferencia.service';
+import { InventarioService } from '../../servicios/inventario/inventario.service';
+import { InventarioItem } from '../../servicios/inventario/inventario.model';
+import { UsuarioService } from '../../servicios/usuario/usuario.service';
 
 @Component({
   selector: 'app-inicio',
@@ -24,10 +27,11 @@ import { PreferenciaService } from '../../servicios/preferencia/preferencia.serv
     CommonModule,
   ]
 })
-
 export class InicioComponent implements OnInit {
   private recetaService = inject(RecetaService);
   private preferenciaService = inject(PreferenciaService);
+  private inventarioService = inject(InventarioService);
+  private usuarioService = inject(UsuarioService);
 
   recetas: Receta[] = [];
   recetasFiltradas: Receta[] = [];
@@ -35,7 +39,49 @@ export class InicioComponent implements OnInit {
   preferenciasSeleccionadas: number[] = [];
   textoBusqueda: string = '';
 
+  inventario?: InventarioItem;
+  usuarioId: number | null = null;
+
   ngOnInit() {
+    const usuario = this.usuarioService.obtenerUsuario();
+    this.usuarioId = usuario?.id ?? null;
+
+    if (this.usuarioId) {
+      this.cargarInventario(this.usuarioId);
+    }
+
+    this.cargarRecetas();
+    this.cargarPreferencias();
+  }
+
+  private cargarInventario(usuarioId: number) {
+    this.inventarioService.getInventarioPorUsuario(usuarioId).subscribe({
+      next: (data) => {
+        if (data.length > 0) {
+          this.inventario = data[0];
+        } else {
+          this.crearInventario(usuarioId);
+        }
+      },
+      error: (err) => console.error('Error al cargar inventario', err)
+    });
+  }
+
+  private crearInventario(usuarioId: number) {
+    this.inventarioService.crearItem({
+      id: 0,
+      idUsuario: usuarioId,
+      fecha_creacion: new Date().toISOString()
+    }).subscribe({
+      next: (nuevoInventario) => {
+        this.inventario = nuevoInventario;
+        console.log('Inventario creado automáticamente', nuevoInventario);
+      },
+      error: (err) => console.error('Error al crear inventario', err)
+    });
+  }
+
+  private cargarRecetas() {
     this.recetaService.getRecetas().subscribe({
       next: (data) => {
         this.recetas = data;
@@ -43,7 +89,9 @@ export class InicioComponent implements OnInit {
       },
       error: (err) => console.error('Error al cargar recetas', err)
     });
+  }
 
+  private cargarPreferencias() {
     this.preferenciaService.getPreferencias().subscribe({
       next: (data) => this.preferencias = data,
       error: (err) => console.error('Error al cargar preferencias', err)
@@ -79,5 +127,4 @@ export class InicioComponent implements OnInit {
       return coincidePreferencia && coincideTexto;
     });
   }
-
 }

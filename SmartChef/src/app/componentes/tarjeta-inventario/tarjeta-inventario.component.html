@@ -17,10 +17,12 @@
         <span>
           {{ item.descripcion || item.idIngrediente }} - {{ item.cantidad }}
         </span>
-        <img src="../../../assets/images/boton_eliminar.png"
-             class="eliminar-icono"
-             alt="Eliminar"
-             (click)="eliminarItemBackend(item)" />
+        <img
+          src="../../../assets/images/boton_eliminar.png"
+          class="eliminar-icono"
+          alt="Eliminar"
+          (click)="eliminarItemBackend(item)"
+        />
       </div>
     </div>
 
@@ -42,7 +44,10 @@
 
   <ion-content>
     <ion-list>
-      <ion-item *ngFor="let ingrediente of ingredientesDisponibles" (click)="agregarItemBackend(ingrediente.id)">
+      <ion-item
+        *ngFor="let ingrediente of ingredientesDisponibles"
+        (click)="agregarItemBackend(ingrediente.id)"
+      >
         <span>{{ ingrediente.nombre }} ({{ ingrediente.unidadMedida || 'unidad' }})</span>
       </ion-item>
     </ion-list>

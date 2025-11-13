@@ -3,25 +3,20 @@ package com.oscar.proyecto.entity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
-import java.math.BigDecimal;
+
+import java.util.List;
 
 @Getter
 @Setter
 @Entity
 public class Inventario {
-
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
     @ManyToOne
-    @JoinColumn(name = "id_usuario", nullable = false)
+    @JoinColumn(name="id_usuario")
     private Usuario usuario;
 
-    @ManyToOne
-    @JoinColumn(name = "id_ingrediente", nullable = false)
-    private Ingrediente ingrediente;
-
-    @Column(precision = 10, scale = 2, nullable = false)
-    private BigDecimal cantidad;
+    @OneToMany(mappedBy="inventario")
+    private List<InventarioIngrediente> inventarioIngredientes;
 }

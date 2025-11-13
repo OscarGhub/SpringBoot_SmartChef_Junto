@@ -68,15 +68,15 @@ export class TarjetaInventarioComponent implements OnInit {
 
     if (this.items.some(i => i.idIngrediente === idIngrediente)) return;
 
-    const nuevoItem: InventarioItem = {
-      id: 0, // el backend debe asignar el ID real
+    const fechaActual = new Date().toISOString();
+
+    const payload = {
+      id: 0,
       idUsuario: this.usuarioId,
-      idIngrediente,
-      descripcion: '',
-      cantidad
+      fecha_creacion: fechaActual
     };
 
-    this.inventarioService.crearItem(nuevoItem).subscribe({
+    this.inventarioService.crearItem(payload).subscribe({
       next: () => this.cargarInventarioBackend(),
       error: (err) => console.error('Error agregando item al inventario', err)
     });

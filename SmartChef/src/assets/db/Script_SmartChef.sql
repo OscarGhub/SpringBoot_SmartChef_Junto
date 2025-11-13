@@ -22,7 +22,7 @@ CREATE TABLE Preferencia (
 );
 
 -- ============================
--- Tabla: ListaCompra
+-- Tabla: Lista_Compra
 -- ============================
 CREATE TABLE Lista_Compra (
     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -128,9 +128,20 @@ CREATE TABLE Lista_Compra_Ingrediente (
 CREATE TABLE Inventario (
     id INT AUTO_INCREMENT PRIMARY KEY,
     id_usuario INT NOT NULL,
+    fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (id_usuario) REFERENCES Usuario(id) ON DELETE CASCADE
+);
+
+-- ============================
+-- Tabla: Inventario_Ingrediente (N:N)
+-- ============================
+
+CREATE TABLE Inventario_Ingrediente (
+    id_inventario INT NOT NULL,
     id_ingrediente INT NOT NULL,
     cantidad DECIMAL(10,2),
-    FOREIGN KEY (id_usuario) REFERENCES Usuario(id) ON DELETE CASCADE,
+    PRIMARY KEY (id_inventario, id_ingrediente),
+    FOREIGN KEY (id_inventario) REFERENCES Inventario(id) ON DELETE CASCADE,
     FOREIGN KEY (id_ingrediente) REFERENCES Ingrediente(id) ON DELETE CASCADE
 );
 
@@ -147,23 +158,7 @@ CREATE TABLE Receta_Guardada (
 );
 
 -- ============================
--- VISTA: Recetas con número de favoritos (dinámica)
--- ============================
-CREATE OR REPLACE VIEW Vista_Receta_Favoritos AS
-SELECT 
-    r.id,
-    r.titulo,
-    r.descripcion,
-    r.tutorial,
-    r.tiempo_preparacion,
-    r.foto_url,
-    COUNT(rg.id_usuario) AS num_favoritos
-FROM Receta r
-LEFT JOIN Receta_Guardada rg ON r.id = rg.id_receta
-GROUP BY r.id;
-
--- ============================
--- DATOS: Preferencia
+-- Datos de Preferencia
 -- ============================
 INSERT INTO Preferencia (nombre) VALUES
 ('Vegana'),
@@ -176,7 +171,7 @@ INSERT INTO Preferencia (nombre) VALUES
 ('Mediterránea');
 
 -- ============================
--- DATOS: Receta
+-- Datos de Receta
 -- ============================
 INSERT INTO Receta (titulo, descripcion, tutorial, tiempo_preparacion, foto_url) VALUES
 ('Pollo al Horno', 'Pollo marinado con especias al horno.', '1. Marina el pollo.\n2. Hornea 60 min.\n3. Sirve.', 60, 'https://example.com/pollo.jpg'),
@@ -196,7 +191,7 @@ INSERT INTO Receta (titulo, descripcion, tutorial, tiempo_preparacion, foto_url)
 ('Quinoa con Verduras', 'Plato saludable de quinoa salteada.', '1. Cocina quinoa.\n2. Sofríe verduras.\n3. Mezcla.', 20, 'https://example.com/quinoa.jpg');
 
 -- ============================
--- DATOS: Ingrediente
+-- Datos de Ingrediente
 -- ============================
 INSERT INTO Ingrediente (nombre, unidad_medida, imagen_url) VALUES
 ('Pollo', 'gramos', 'https://png.pngtree.com/png-vector/20250321/ourmid/pngtree-fresh-raw-chicken-leg-piece-with-skin-png-image_15816101.png'),
@@ -205,7 +200,7 @@ INSERT INTO Ingrediente (nombre, unidad_medida, imagen_url) VALUES
 ('Sal', 'gramos', 'https://www.pngarts.com/files/4/Salt-PNG-Image-Background.png'),
 ('Tomate', 'unidad', 'https://png.pngtree.com/png-clipart/20210530/original/pngtree-tomatoes-tomatoes-vegetables-png-image_6370280.jpg'),
 ('Ajo', 'dientes', 'https://png.pngtree.com/png-vector/20250105/ourmid/pngtree-garlic-logo-png-image_15053088.png'),
-('Cebolla', 'unidad', 'https://png.pngtree.com/png-vector/20240928/ourmid/pngtree-red-onion-png-image_13646454.png'),
+('Cebolla', 'unidad', 'https://png.pngtree.com/png-vector/20240928/original/pngtree-red-onion-png-image_13646454.png'),
 ('Zanahoria', 'unidad', 'https://png.pngtree.com/png-vector/20240203/ourmid/pngtree-fresh-orange-carrot-png-image_11501567.png'),
 ('Espinaca', 'gramos', 'https://png.pngtree.com/png-vector/20240517/ourmid/pngtree-spinach-vegetable-png-image_12549834.png'),
 ('Queso', 'gramos', 'https://png.pngtree.com/png-clipart/20231115/original/pngtree-cheddar-cheese-png-image_13537960.png'),
@@ -223,9 +218,8 @@ INSERT INTO Ingrediente (nombre, unidad_medida, imagen_url) VALUES
 ('Quinoa', 'gramos', 'https://png.pngtree.com/png-vector/20230818/original/pngtree-quinoa-seeds-in-wooden-bowl-png-image_9163029.png'),
 ('Albahaca', 'hojas', 'https://png.pngtree.com/png-clipart/20231115/original/pngtree-basil-leaves-png-image_13537727.png');
 
-
 -- ============================
--- DATOS: Receta_Ingrediente
+-- Datos de Receta_Ingrediente
 -- ============================
 INSERT INTO Receta_Ingrediente (id_receta, id_ingrediente, cantidad) VALUES
 -- Pollo al Horno
@@ -260,21 +254,21 @@ INSERT INTO Receta_Ingrediente (id_receta, id_ingrediente, cantidad) VALUES
 (15, 22, 100), (15, 8, 1), (15, 7, 1), (15, 3, 10);
 
 -- ============================
--- DATOS: Receta_Preferencia
+-- Datos de Receta_Preferencia
 -- ============================
 INSERT INTO Receta_Preferencia (id_receta, id_preferencia) VALUES
-(1, 3),  -- Pollo al Horno - Alta en proteínas
-(2, 1), (2, 5),  -- Ensalada Vegana - Vegana, Sin lactosa
-(3, 2), (3, 5),  -- Arroz con Verduras - Sin Gluten, Sin Lactosa
-(4, 1), (4, 2), (4, 5),  -- Sopa de Tomate
-(5, 4),  -- Tacos de Pollo - Alta en proteínas
-(6, 1), (6, 5),  -- Smoothie Verde - Vegana
-(7, 8),  -- Pasta Carbonara - Mediterránea
-(8, 1), (8, 8),  -- Gazpacho - Vegana, Mediterránea
-(9, 5), (9, 2),  -- Panqueques de Avena - Sin Lactosa
-(10, 1), (10, 2), (10, 5),  -- Curry Vegano
-(11, 8), (11, 5),  -- Pizza Margarita
-(12, 2),  -- Lentejas Estofadas
-(13, 5),  -- Batido de Fresas - Sin Lactosa
-(14, 8),  -- Tortilla - Mediterránea
-(15, 1), (15, 5);  -- Quinoa - Vegana, Sin Lactosa
+(1, 4),                -- Pollo al Horno - Alta en Proteínas
+(2, 1), (2, 6),        -- Ensalada Vegana - Vegana, Sin Lactosa
+(3, 3), (3, 6),        -- Arroz con Verduras - Sin Gluten, Sin Lactosa
+(4, 1), (4, 2), (4, 6),-- Sopa de Tomate - Vegana, Vegetariana, Sin Lactosa
+(5, 4),                -- Tacos de Pollo - Alta en Proteínas
+(6, 1), (6, 6),        -- Smoothie Verde - Vegana, Sin Lactosa
+(7, 8),                -- Pasta Carbonara - Mediterránea
+(8, 1), (8, 8),        -- Gazpacho - Vegana, Mediterránea
+(9, 2), (9, 6),        -- Panqueques de Avena - Vegetariana, Sin Lactosa
+(10, 1), (10, 2), (10, 6), -- Curry de Garbanzos - Vegana, Vegetariana, Sin Lactosa
+(11, 8), (11, 6),      -- Pizza Margarita - Mediterránea, Sin Lactosa
+(12, 2),               -- Lentejas Estofadas - Vegetariana
+(13, 6),               -- Batido de Fresas - Sin Lactosa
+(14, 8),               -- Tortilla de Patatas - Mediterránea
+(15, 1), (15, 6);      -- Quinoa con Verduras - Vegana, Sin Lactosa
