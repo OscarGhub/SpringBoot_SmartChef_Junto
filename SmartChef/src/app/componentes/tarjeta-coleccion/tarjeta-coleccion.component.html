@@ -1,6 +1,5 @@
 <ion-card class="coleccion-card" *ngIf="coleccion">
   <div class="coleccion-container">
-
     <div class="coleccion-info">
       <p class="coleccion-nombre">{{ coleccion.nombre }}</p>
 
@@ -8,10 +7,39 @@
         <ion-button
           class="boton"
           (click)="goToColeccion(); $event.stopPropagation()"
+          expand="block"
+          color="primary"
         >
-          Ver coleccion
+          Ver colección
         </ion-button>
       </div>
     </div>
   </div>
 </ion-card>
+
+<ion-button expand="full" color="secondary" (click)="abrirModalCrearColeccion()">
+  Crear Nueva Colección
+</ion-button>
+
+<ion-modal [isOpen]="mostrarModalCrearColeccion" (didDismiss)="cerrarModalCrearColeccion()">
+  <ion-header>
+    <ion-toolbar color="primary">
+      <ion-title>Crear Colección</ion-title>
+      <ion-buttons slot="end">
+        <ion-button (click)="cerrarModalCrearColeccion()">Cerrar</ion-button>
+      </ion-buttons>
+    </ion-toolbar>
+  </ion-header>
+
+  <ion-content>
+    <ion-list>
+      <ion-item>
+        <ion-label position="stacked">Nombre de la Colección</ion-label>
+        <ion-input [(ngModel)]="nombreColeccion" placeholder="Ingrese el nombre" required></ion-input>
+      </ion-item>
+    </ion-list>
+    <ion-button expand="full" color="primary" (click)="crearColeccion()">
+      Crear
+    </ion-button>
+  </ion-content>
+</ion-modal>

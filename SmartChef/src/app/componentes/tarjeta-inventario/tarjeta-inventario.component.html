@@ -1,37 +1,3 @@
-<ion-card class="inventario-card">
-  <ion-card-content>
-    <div class="input-container">
-      <ion-input
-        placeholder="Agregar ingrediente..."
-        class="inventario-input"
-        [readonly]="true"
-        (click)="abrirSelector()"
-      ></ion-input>
-      <ion-button class="boton-mas" (click)="abrirSelector()">
-        <img src="../../../assets/images/boton_mas.png" alt="Agregar" />
-      </ion-button>
-    </div>
-
-    <div class="inventario-elementos" *ngIf="items.length > 0">
-      <div class="inventario-elemento" *ngFor="let item of items">
-        <span>
-          {{ item.descripcion || item.idIngrediente }} - {{ item.cantidad }}
-        </span>
-        <img
-          src="../../../assets/images/boton_eliminar.png"
-          class="eliminar-icono"
-          alt="Eliminar"
-          (click)="eliminarItemBackend(item)"
-        />
-      </div>
-    </div>
-
-    <p *ngIf="items.length === 0" class="texto-vacio">
-      Tu inventario está vacío.
-    </p>
-  </ion-card-content>
-</ion-card>
-
 <ion-modal [isOpen]="mostrarSelector" (didDismiss)="cerrarSelector()">
   <ion-header>
     <ion-toolbar color="primary">
@@ -48,7 +14,13 @@
         *ngFor="let ingrediente of ingredientesDisponibles"
         (click)="agregarItemBackend(ingrediente.id)"
       >
-        <span>{{ ingrediente.nombre }} ({{ ingrediente.unidadMedida || 'unidad' }})</span>
+        <ion-avatar slot="start">
+          <img [src]="ingrediente.imagenUrl" alt="{{ ingrediente.nombre }}" />
+        </ion-avatar>
+        <ion-label>
+          <h2>{{ ingrediente.nombre }}</h2>
+          <p>{{ ingrediente.unidadMedida }}</p>
+        </ion-label>
       </ion-item>
     </ion-list>
   </ion-content>

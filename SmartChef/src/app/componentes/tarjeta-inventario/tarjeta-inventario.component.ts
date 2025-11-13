@@ -35,7 +35,10 @@ export class TarjetaInventarioComponent implements OnInit {
     if (!this.usuarioId) return;
 
     this.inventarioService.getInventarioPorUsuario(this.usuarioId).subscribe({
-      next: (data) => this.items = data,
+      next: (data) => {
+        console.log('Inventario recibido del backend:', data);
+        this.items = data;
+      },
       error: (err) => {
         if (err.status === 404) {
           console.log('No hay inventario para este usuario. Inicializando vacío.');
@@ -50,13 +53,12 @@ export class TarjetaInventarioComponent implements OnInit {
 
   private cargarIngredientesDisponibles() {
     this.ingredienteService.getIngredientes().subscribe({
-      next: (data) => this.ingredientesDisponibles = data,
+      next: (data) => {
+        this.ingredientesDisponibles = data;
+        console.log('Ingredientes disponibles (desde backend):', data);
+      },
       error: () => this.ingredientesDisponibles = []
     });
-  }
-
-  abrirSelector() {
-    this.mostrarSelector = true;
   }
 
   cerrarSelector() {
@@ -73,6 +75,8 @@ export class TarjetaInventarioComponent implements OnInit {
     const payload = {
       id: 0,
       idUsuario: this.usuarioId,
+      idIngrediente: idIngrediente,
+      cantidad: cantidad,
       fecha_creacion: fechaActual
     };
 
