@@ -1,23 +1,22 @@
 package com.oscar.proyecto.controller;
 
-import com.oscar.proyecto.entity.Preferencia;
-import com.oscar.proyecto.repository.PreferenciaRepository;
+import com.oscar.proyecto.dto.Preferencia.PreferenciaDTO;
+import com.oscar.proyecto.service.PreferenciaService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/preferencias")
+@RequiredArgsConstructor
+@CrossOrigin(origins = "http://localhost:4200")
 public class PreferenciaController {
 
-    private final PreferenciaRepository repo;
-
-    public PreferenciaController(PreferenciaRepository repo) {
-        this.repo = repo;
-    }
+    private final PreferenciaService service;
 
     @GetMapping
-    public List<Preferencia> getPreferencias() {
-        return repo.findAll();
+    public List<PreferenciaDTO> getPreferencias() {
+        return service.getAllPreferencias();
     }
 }

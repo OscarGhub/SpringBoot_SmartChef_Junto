@@ -1,5 +1,3 @@
-import * as bcrypt from 'bcryptjs';
-
 export class UsuarioHelper {
   static validarCampos(usuario: any, confirmar_contrasena: string): string | null {
     if (
@@ -17,10 +15,5 @@ export class UsuarioHelper {
     }
 
     return null;
-  }
-
-  static hashearContrasena(contrasena: string): string {
-    const salt = bcrypt.genSaltSync(10);
-    return bcrypt.hashSync(contrasena, salt);
   }
 }

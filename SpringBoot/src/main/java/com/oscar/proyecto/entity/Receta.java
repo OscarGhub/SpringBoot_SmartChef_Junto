@@ -35,7 +35,7 @@ public class Receta {
     private String fotoUrl;
 
     @Column(name = "num_favoritos")
-    private Long numFavoritos = 0L;
+    private Integer numFavoritos = 0;
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(

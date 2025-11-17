@@ -1,145 +1,66 @@
 package com.oscar.proyecto.controller;
 
-import com.oscar.proyecto.entity.Receta;
-import com.oscar.proyecto.entity.RecetaGuardada;
-import com.oscar.proyecto.entity.RecetaGuardadaId;
-import com.oscar.proyecto.entity.Usuario;
-import com.oscar.proyecto.repository.RecetaRepository;
-import com.oscar.proyecto.repository.RecetaGuardadaRepository;
-import com.oscar.proyecto.repository.UsuarioRepository;
+import com.oscar.proyecto.dto.Receta.RecetaRequestDTO;
+import com.oscar.proyecto.dto.Receta.RecetaResponseDTO;
+import com.oscar.proyecto.service.RecetaService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/receta")
+@RequiredArgsConstructor
+@CrossOrigin(origins = "http://localhost:4200")
 public class RecetaController {
 
-    private final RecetaRepository recetaRepo;
-    private final RecetaGuardadaRepository recetaGuardadaRepo;
-    private final UsuarioRepository usuarioRepo;
-
-    public RecetaController(RecetaRepository recetaRepo,
-                            RecetaGuardadaRepository recetaGuardadaRepo,
-                            UsuarioRepository usuarioRepo) {
-        this.recetaRepo = recetaRepo;
-        this.recetaGuardadaRepo = recetaGuardadaRepo;
-        this.usuarioRepo = usuarioRepo;
-    }
+    private final RecetaService service;
 
     @GetMapping
-    public ResponseEntity<List<Receta>> getRecetas() {
-        return ResponseEntity.ok(recetaRepo.findAll());
+    public List<RecetaResponseDTO> getRecetas() {
+        return service.getAllRecetas();
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Receta> getRecetaById(@PathVariable Integer id) {
-        return recetaRepo.findById(id)
-                .map(ResponseEntity::ok)
-                .orElseGet(() -> ResponseEntity.notFound().build());
+    public ResponseEntity<RecetaResponseDTO> getRecetaById(@PathVariable Integer id) {
+        RecetaResponseDTO dto = service.getRecetaById(id);
+        return dto != null ? ResponseEntity.ok(dto) : ResponseEntity.notFound().build();
     }
 
     @PostMapping
-    public Receta crearReceta(@RequestBody Receta receta) {
-        return recetaRepo.save(receta);
+    public RecetaResponseDTO crearReceta(@RequestBody RecetaRequestDTO dto) {
+        return service.crearReceta(dto);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Receta> actualizarReceta(@PathVariable Integer id, @RequestBody Receta recetaActualizada) {
-        return recetaRepo.findById(id)
-                .map(recetaExistente -> {
-                    recetaExistente.setTitulo(recetaActualizada.getTitulo());
-                    recetaExistente.setDescripcion(recetaActualizada.getDescripcion());
-                    recetaExistente.setTutorial(recetaActualizada.getTutorial());
-                    recetaExistente.setTiempoPreparacion(recetaActualizada.getTiempoPreparacion());
-                    recetaExistente.setFotoUrl(recetaActualizada.getFotoUrl());
-                    return ResponseEntity.ok(recetaRepo.save(recetaExistente));
-                })
-                .orElseGet(() -> ResponseEntity.notFound().build());
+    public ResponseEntity<RecetaResponseDTO> actualizarReceta(@PathVariable Integer id, @RequestBody RecetaRequestDTO dto) {
+        RecetaResponseDTO actualizado = service.actualizarReceta(id, dto);
+        return actualizado != null ? ResponseEntity.ok(actualizado) : ResponseEntity.notFound().build();
     }
 
     @PostMapping("/{id}/guardar/{idUsuario}")
-    @Transactional
-    public ResponseEntity<Receta> guardarReceta(@PathVariable Integer id, @PathVariable Integer idUsuario) {
-        Receta receta = recetaRepo.findById(id).orElse(null);
-        Usuario usuario = usuarioRepo.findById(idUsuario).orElse(null);
-        if (receta == null || usuario == null) return ResponseEntity.notFound().build();
-
-        RecetaGuardadaId rgId = new RecetaGuardadaId();
-        rgId.setId_receta(id);
-        rgId.setId_usuario(idUsuario);
-
-        if (!recetaGuardadaRepo.existsById(rgId)) {
-            RecetaGuardada rg = new RecetaGuardada();
-            rg.setId(rgId);
-            rg.setReceta(receta);
-            rg.setUsuario(usuario);
-            recetaGuardadaRepo.save(rg);
-
-            recetaRepo.incrementarNumFavoritos(id);
-            receta.setNumFavoritos((receta.getNumFavoritos() == null ? 0 : receta.getNumFavoritos() + 1));
-        }
-
-        return ResponseEntity.ok(receta);
+    public RecetaResponseDTO guardarReceta(@PathVariable Integer id, @PathVariable Integer idUsuario) {
+        return service.guardarReceta(id, idUsuario);
     }
 
     @DeleteMapping("/{id}/guardar/{idUsuario}")
-    @Transactional
-    public ResponseEntity<Receta> quitarRecetaGuardada(@PathVariable Integer id, @PathVariable Integer idUsuario) {
-        Receta receta = recetaRepo.findById(id).orElse(null);
-        Usuario usuario = usuarioRepo.findById(idUsuario).orElse(null);
-        if (receta == null || usuario == null) return ResponseEntity.notFound().build();
-
-        RecetaGuardadaId rgId = new RecetaGuardadaId();
-        rgId.setId_receta(id);
-        rgId.setId_usuario(idUsuario);
-
-        if (recetaGuardadaRepo.existsById(rgId)) {
-            recetaGuardadaRepo.deleteById(rgId);
-
-            recetaRepo.decrementarNumFavoritos(id);
-            receta.setNumFavoritos(Math.max((receta.getNumFavoritos() == null ? 0 : receta.getNumFavoritos() - 1), 0));
-        }
-
-        return ResponseEntity.ok(receta);
+    public RecetaResponseDTO quitarRecetaGuardada(@PathVariable Integer id, @PathVariable Integer idUsuario) {
+        return service.quitarRecetaGuardada(id, idUsuario);
     }
 
     @GetMapping("/{id}/ya-guardada/{idUsuario}")
-    public ResponseEntity<Boolean> recetaYaGuardada(@PathVariable Integer id, @PathVariable Integer idUsuario) {
-        boolean existe = recetaGuardadaRepo.existsById(new RecetaGuardadaId(id, idUsuario));
-        return ResponseEntity.ok(existe);
+    public boolean recetaYaGuardada(@PathVariable Integer id, @PathVariable Integer idUsuario) {
+        return service.recetaYaGuardada(id, idUsuario);
     }
 
     @GetMapping("/guardadas/{idUsuario}")
-    public ResponseEntity<List<Receta>> getRecetasGuardadasPorUsuario(@PathVariable Integer idUsuario) {
-        Usuario usuario = usuarioRepo.findById(idUsuario).orElse(null);
-        if (usuario == null) return ResponseEntity.notFound().build();
-
-        List<Receta> recetasGuardadas = recetaGuardadaRepo.findAllByIdUsuario(idUsuario)
-                .stream()
-                .map(rg -> {
-                    Receta r = rg.getReceta();
-                    r.setGuardada(true);
-                    return r;
-                })
-                .toList();
-
-        return ResponseEntity.ok(recetasGuardadas);
+    public List<RecetaResponseDTO> getRecetasGuardadasPorUsuario(@PathVariable Integer idUsuario) {
+        return service.getRecetasGuardadasPorUsuario(idUsuario);
     }
 
     @PostMapping("/recetas/filtro")
-    public ResponseEntity<List<Receta>> filtrarRecetasPorPreferencias(@RequestBody(required = false) List<Integer> preferencias) {
-        List<Receta> recetas;
-
-        if (preferencias == null || preferencias.isEmpty()) {
-            recetas = recetaRepo.findAll();
-        } else {
-            recetas = recetaRepo.findByPreferenciasIn(preferencias);
-        }
-
-        return ResponseEntity.ok(recetas);
+    public List<RecetaResponseDTO> filtrarRecetas(@RequestBody(required = false) List<Integer> preferencias) {
+        return service.filtrarRecetasPorPreferencias(preferencias);
     }
-
 }

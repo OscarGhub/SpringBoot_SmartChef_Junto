@@ -1,4 +1,4 @@
-package com.oscar.proyecto.dto;
+package com.oscar.proyecto.dto.IngredientesConReceta;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

@@ -32,19 +32,13 @@ export class RegistroComponent {
   confirmar_contrasena: string = '';
 
   async agregarUsuario(): Promise<void> {
-
     const errorValidacion = UsuarioHelper.validarCampos(this.nuevoUsuario, this.confirmar_contrasena);
     if (errorValidacion) {
       await this.alertService.mostrarAlerta('Error', errorValidacion);
       return;
     }
 
-    const usuarioConHash: Usuario = {
-      ...this.nuevoUsuario,
-      contrasena: UsuarioHelper.hashearContrasena(this.nuevoUsuario.contrasena)
-    };
-
-    this.usuarioService.crearUsuario(usuarioConHash).subscribe({
+    this.usuarioService.crearUsuario(this.nuevoUsuario, this.confirmar_contrasena).subscribe({
       next: async (usuarioCreado) => {
         await this.alertService.mostrarAlerta(
           'Usuario registrado',
@@ -52,8 +46,8 @@ export class RegistroComponent {
         );
         this.resetFormulario();
       },
-      error: async () => {
-        await this.alertService.mostrarAlerta('Error', 'No se pudo crear el usuario. Intenta más tarde.');
+      error: async (err) => {
+        await this.alertService.mostrarAlerta('Error', err.message || 'No se pudo crear el usuario. Intenta más tarde.');
       }
     });
   }

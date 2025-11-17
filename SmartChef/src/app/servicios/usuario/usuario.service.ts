@@ -1,6 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, of } from 'rxjs';
+import { Observable, of, throwError } from 'rxjs';
 import { Usuario } from './usuario.model';
 import { tap, catchError } from 'rxjs/operators';
 
@@ -13,43 +13,56 @@ export class UsuarioService {
   private usuarioKey = 'usuarioActual';
 
   getUsuarios(): Observable<Usuario[]> {
-    return this.http.get<Usuario[]>(this.apiUrl);
+    return this.http.get<Usuario[]>(this.apiUrl)
+      .pipe(catchError(this.manejarError<Usuario[]>('Error al obtener usuarios')));
   }
 
-  crearUsuario(usuario: Usuario): Observable<Usuario> {
-    return this.http.post<Usuario>(this.apiUrl, usuario).pipe(
-      tap(u => this.guardarUsuario(u))
-    );
-  }
+  crearUsuario(usuario: Usuario, confirmarContrasena: string): Observable<Usuario> {
 
-  getUsuarioPorCorreo(correo: string): Observable<Usuario | null> {
-    return this.http.get<Usuario>(`${this.apiUrl}/correo/${correo}`).pipe(
+    const payload = {
+      ...usuario,
+      confirmarContrasena
+    };
+
+    return this.http.post<Usuario>(this.apiUrl, payload).pipe(
       tap(u => this.guardarUsuario(u)),
       catchError(err => {
-        console.error('Usuario no encontrado', err);
-        return of(null);
+        console.error('Error al crear usuario', err);
+        return throwError(() => new Error(err.error?.message || 'Error al crear usuario'));
       })
     );
   }
 
+  getUsuarioPorCorreo(correo: string): Observable<Usuario | null> {
+    return this.http.get<Usuario>(`${this.apiUrl}/correo/${correo}`)
+      .pipe(
+        tap(u => this.guardarUsuario(u)),
+        catchError(err => {
+          console.error('Usuario no encontrado', err);
+          return of(null);
+        })
+      );
+  }
+
+  actualizarCorreo(id: number, nuevoCorreo: string): Observable<Usuario> {
+    return this.http.put<Usuario>(`${this.apiUrl}/${id}/correo`, { correoElectronico: nuevoCorreo })
+      .pipe(
+        tap(u => this.guardarUsuario(u)),
+        catchError(this.manejarError<Usuario>('Error al actualizar correo'))
+      );
+  }
+
   actualizarUsuario(id: number, payload: any): Observable<Usuario> {
-    return this.http.put<Usuario>(`${this.apiUrl}/${id}`, payload).pipe(
-      tap(u => this.guardarUsuario(u))
-    );
+    return this.http.put<Usuario>(`${this.apiUrl}/${id}`, payload)
+      .pipe(
+        tap(u => this.guardarUsuario(u)),
+        catchError(this.manejarError<Usuario>('Error al actualizar usuario'))
+      );
   }
 
   actualizarFoto(id: number, formData: FormData): Observable<any> {
-    return this.http.put<any>(`${this.apiUrl}/${id}/foto`, formData);
-  }
-
-  actualizarCorreo(id: number, correoElectronico: string): Observable<Usuario> {
-    return this.http.put<Usuario>(`${this.apiUrl}/${id}`, { correoElectronico }).pipe(
-      tap(u => this.guardarUsuario(u))
-    );
-  }
-
-  guardarUsuario(usuario: Usuario) {
-    localStorage.setItem(this.usuarioKey, JSON.stringify(usuario));
+    return this.http.put<any>(`${this.apiUrl}/${id}/foto`, formData)
+      .pipe(catchError(this.manejarError<any>('Error al actualizar foto')));
   }
 
   obtenerUsuario(): Usuario | null {
@@ -58,11 +71,21 @@ export class UsuarioService {
   }
 
   obtenerUsuarioId(): number | null {
-    const usuario = this.obtenerUsuario();
-    return usuario?.id ?? null;
+    return this.obtenerUsuario()?.id ?? null;
   }
 
   logout() {
     localStorage.removeItem(this.usuarioKey);
+  }
+
+  private guardarUsuario(usuario: Usuario) {
+    localStorage.setItem(this.usuarioKey, JSON.stringify(usuario));
+  }
+
+  private manejarError<T>(mensaje: string) {
+    return (error: any): Observable<T> => {
+      console.error(mensaje, error);
+      return throwError(() => new Error(mensaje));
+    };
   }
 }
