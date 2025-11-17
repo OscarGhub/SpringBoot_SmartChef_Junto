@@ -3,7 +3,6 @@ package com.oscar.proyecto.entity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
-
 import java.math.BigDecimal;
 
 @Entity
@@ -11,6 +10,7 @@ import java.math.BigDecimal;
 @Getter
 @Setter
 public class InventarioIngrediente {
+
     @EmbeddedId
     private InventarioIngredienteId id;
 
@@ -26,5 +26,4 @@ public class InventarioIngrediente {
 
     @Column(precision = 10, scale = 2)
     private BigDecimal cantidad;
-
 }

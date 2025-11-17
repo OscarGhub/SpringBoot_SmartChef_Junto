@@ -38,5 +38,8 @@ public class Usuario {
     @JsonIgnore
     private Set<RecetaGuardada> recetasGuardadas;
 
+    @OneToOne(mappedBy = "usuario", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Inventario inventario;
+
     public Usuario() {}
 }

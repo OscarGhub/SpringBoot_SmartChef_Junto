@@ -10,6 +10,7 @@ public class WebConfig implements WebMvcConfigurer {
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         registry.addResourceHandler("/uploads/**")
-                .addResourceLocations("file:///C:/Users/dam/Desktop/SmartChef/SpringBoot/uploads/");
+                .addResourceLocations("file:uploads/");
     }
+
 }

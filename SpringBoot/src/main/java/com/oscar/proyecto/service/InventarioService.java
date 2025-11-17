@@ -21,17 +21,13 @@ public class InventarioService {
     private final InventarioRepository inventarioRepository;
     private final UsuarioRepository usuarioRepository;
 
-    public InventarioResponseDTO crearInventario(InventarioRequestDTO request) {
-        Usuario usuario = usuarioRepository.findById(request.getUsuarioId())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuario no encontrado"));
+    public Inventario crearInventarioParaUsuario(Usuario usuario) {
+        if (usuario.getInventario() != null) return usuario.getInventario();
 
         Inventario inventario = new Inventario();
-        inventario.setId(request.getIdInventario());
         inventario.setUsuario(usuario);
 
-        Inventario guardado = inventarioRepository.save(inventario);
-
-        return new InventarioResponseDTO(guardado.getId(), usuario.getId());
+        return inventarioRepository.save(inventario);
     }
 
     public List<InventarioResponseDTO> obtenerInventariosPorUsuario(Integer usuarioId) {
@@ -40,4 +36,12 @@ public class InventarioService {
                 .map(i -> new InventarioResponseDTO(i.getId(), i.getUsuario().getId()))
                 .collect(Collectors.toList());
     }
+
+    public Inventario crearInventarioParaUsuarioPorId(Integer usuarioId) {
+        Usuario usuario = usuarioRepository.findById(usuarioId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuario no encontrado"));
+
+        return crearInventarioParaUsuario(usuario);
+    }
+
 }

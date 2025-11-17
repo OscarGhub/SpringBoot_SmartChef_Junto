@@ -1,11 +1,11 @@
-import { Component, Input, inject, Output, EventEmitter, OnInit } from '@angular/core';
-import { IonicModule } from '@ionic/angular';
-import { Router, RouterModule } from '@angular/router';
-import { CommonModule } from '@angular/common';
-import { Receta } from '../../modelos/receta.model';
-import { RecetaService } from '../../servicios/receta.service';
-import { CarritoService } from '../../servicios/carrito.service';
-import { firstValueFrom } from 'rxjs';
+import {Component, EventEmitter, inject, Input, OnInit, Output} from '@angular/core';
+import {IonicModule} from '@ionic/angular';
+import {Router, RouterModule} from '@angular/router';
+import {CommonModule} from '@angular/common';
+import {Receta} from '../../modelos/receta.model';
+import {RecetaService} from '../../servicios/receta.service';
+import {CarritoService} from '../../servicios/carrito.service';
+import {firstValueFrom} from 'rxjs';
 
 @Component({
   selector: 'app-tarjeta-receta-extendida',
@@ -45,10 +45,9 @@ export class TarjetaRecetaExtendidaComponent implements OnInit {
   private async marcarYaGuardada() {
     if (!this.receta || !this.usuario) return;
     try {
-      const yaGuardada = await firstValueFrom(
+      this.receta.yaGuardada = await firstValueFrom(
         this.recetaService.recetaYaGuardada(this.receta.id!, this.usuario.id)
       );
-      this.receta.yaGuardada = yaGuardada;
     } catch (err) {
       console.error('Error comprobando si la receta ya está guardada', err);
     }

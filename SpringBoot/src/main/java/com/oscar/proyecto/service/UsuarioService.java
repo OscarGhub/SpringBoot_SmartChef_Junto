@@ -23,8 +23,9 @@ public class UsuarioService {
 
     private final UsuarioRepository usuarioRepo;
     private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+    private final InventarioService inventarioService;
 
-    @Value("${usuario.uploads.path:C:/proyecto/uploads/}")
+    @Value("${usuario.uploads.path:uploads/}")
     private String CARPETA_UPLOADS;
 
     public List<Usuario> getTodos() {
@@ -49,7 +50,11 @@ public class UsuarioService {
             usuario.setFechaNacimiento(dto.getFechaNacimiento());
             usuario.setContrasena(passwordEncoder.encode(dto.getContrasena()));
 
-            return usuarioRepo.save(usuario);
+            Usuario nuevoUsuario = usuarioRepo.save(usuario);
+
+            inventarioService.crearInventarioParaUsuario(nuevoUsuario);
+
+            return nuevoUsuario;
         } catch (Exception e) {
             throw new RuntimeException("Error al crear el usuario: " + e.getMessage(), e);
         }
@@ -74,21 +79,24 @@ public class UsuarioService {
         if (usuario == null) return null;
         if (archivo == null || archivo.isEmpty()) return usuario;
 
-        File carpetaUploads = new File(CARPETA_UPLOADS);
+        File carpetaUploads;
+        if (new File(CARPETA_UPLOADS).isAbsolute()) {
+            carpetaUploads = new File(CARPETA_UPLOADS);
+        } else {
+            carpetaUploads = new File(System.getProperty("user.dir"), CARPETA_UPLOADS);
+        }
+
         if (!carpetaUploads.exists()) {
             boolean creado = carpetaUploads.mkdirs();
-            if (creado) {
-                System.out.println("Carpeta 'uploads' creada en: " + CARPETA_UPLOADS);
-            } else {
-                System.out.println("Error al crear la carpeta 'uploads'.");
+            if (!creado) {
+                throw new IOException("No se pudo crear la carpeta de uploads: " + carpetaUploads.getAbsolutePath());
             }
         }
 
         String nombreArchivo = "usuario_" + id + "_" + System.currentTimeMillis() + "_" +
                 archivo.getOriginalFilename().replaceAll("\\s+", "_");
 
-        File destino = new File(CARPETA_UPLOADS + nombreArchivo);
-
+        File destino = new File(carpetaUploads, nombreArchivo);
         archivo.transferTo(destino);
 
         usuario.setFotoUrl("/uploads/" + nombreArchivo);
@@ -100,8 +108,16 @@ public class UsuarioService {
         Usuario usuario = usuarioRepo.findById(id).orElse(null);
         if (usuario == null || usuario.getFotoUrl() == null) return null;
 
-        String path = usuario.getFotoUrl().replaceFirst("/uploads/", "");
-        File archivo = new File(CARPETA_UPLOADS + path);
+        String pathRelativo = usuario.getFotoUrl().replaceFirst("/uploads/", "");
+
+        File carpetaUploads;
+        if (new File(CARPETA_UPLOADS).isAbsolute()) {
+            carpetaUploads = new File(CARPETA_UPLOADS);
+        } else {
+            carpetaUploads = new File(System.getProperty("user.dir"), CARPETA_UPLOADS);
+        }
+
+        File archivo = new File(carpetaUploads, pathRelativo);
         if (!archivo.exists()) return null;
 
         return Files.readAllBytes(archivo.toPath());
@@ -111,8 +127,18 @@ public class UsuarioService {
         Usuario usuario = usuarioRepo.findById(id).orElse(null);
         if (usuario == null || usuario.getFotoUrl() == null) return null;
 
-        String path = usuario.getFotoUrl().replaceFirst("/uploads/", "");
-        File archivo = new File(CARPETA_UPLOADS + path);
+        String pathRelativo = usuario.getFotoUrl().replaceFirst("/uploads/", "");
+
+        File carpetaUploads;
+        if (new File(CARPETA_UPLOADS).isAbsolute()) {
+            carpetaUploads = new File(CARPETA_UPLOADS);
+        } else {
+            carpetaUploads = new File(System.getProperty("user.dir"), CARPETA_UPLOADS);
+        }
+
+        File archivo = new File(carpetaUploads, pathRelativo);
+        if (!archivo.exists()) return null;
+
         return Files.probeContentType(archivo.toPath());
     }
 
