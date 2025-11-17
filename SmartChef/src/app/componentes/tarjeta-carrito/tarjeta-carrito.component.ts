@@ -1,8 +1,8 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { IonicModule } from '@ionic/angular';
 import { CommonModule } from '@angular/common';
-import { CarritoService } from '../../servicios/carrito/carrito.service';
-import { ListaCompraIngrediente } from '../../servicios/carrito/carrito.model';
+import { CarritoService } from '../../servicios/carrito.service';
+import { ListaCompraIngrediente } from '../../modelos/carrito.model';
 import {Observable} from "rxjs";
 
 @Component({

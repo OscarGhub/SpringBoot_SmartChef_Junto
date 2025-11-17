@@ -4,8 +4,8 @@ import { FooterComponent } from "../../componentes/footer/footer.component";
 import { IonicModule } from "@ionic/angular";
 import { TarjetaRecetaExtendidaComponent } from "../../componentes/tarjeta-receta-extendida/tarjeta-receta-extendida.component";
 import { ActivatedRoute } from '@angular/router';
-import { RecetaService } from '../../servicios/receta/receta.service';
-import { Receta } from '../../servicios/receta/receta.model';
+import { RecetaService } from '../../servicios/receta.service';
+import { Receta } from '../../modelos/receta.model';
 import {CommonModule} from "@angular/common";
 
 @Component({

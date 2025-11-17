@@ -1,7 +1,7 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { IonicModule } from '@ionic/angular';
 import { Router } from '@angular/router';
-import { UsuarioService } from 'src/app/servicios/usuario/usuario.service';
+import { UsuarioService } from 'src/app/servicios/usuario.service';
 
 @Component({
   selector: 'app-cabecera',

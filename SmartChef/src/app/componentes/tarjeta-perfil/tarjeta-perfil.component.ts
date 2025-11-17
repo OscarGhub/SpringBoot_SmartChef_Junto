@@ -4,8 +4,8 @@ import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { firstValueFrom } from 'rxjs';
-import { AlertService } from '../../servicios/alert.service';
-import { UsuarioService } from '../../servicios/usuario/usuario.service';
+import { AlertService } from '../../servicios-ayuda/alert.service';
+import { UsuarioService } from '../../servicios/usuario.service';
 
 @Component({
   selector: 'app-tarjeta-perfil',

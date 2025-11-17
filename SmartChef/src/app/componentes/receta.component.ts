@@ -1,8 +1,8 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { IonicModule } from '@ionic/angular';
-import { RecetaService } from './receta.service';
-import { Receta } from './receta.model';
+import { RecetaService } from '../servicios/receta.service';
+import { Receta } from '../modelos/receta.model';
 
 @Component({
   selector: 'app-receta',

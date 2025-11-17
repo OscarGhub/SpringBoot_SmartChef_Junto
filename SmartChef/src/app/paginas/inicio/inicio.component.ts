@@ -4,14 +4,14 @@ import { TarjetaComponent } from '../../componentes/tarjeta_receta/tarjeta.compo
 import { CabeceraComponent } from '../../componentes/cabecera/cabecera.component';
 import { FooterComponent } from '../../componentes/footer/footer.component';
 import { SearchBarComponent } from '../../componentes/search-bar/search-bar.component';
-import { RecetaService } from '../../servicios/receta/receta.service';
-import { Receta } from '../../servicios/receta/receta.model';
+import { RecetaService } from '../../servicios/receta.service';
+import { Receta } from '../../modelos/receta.model';
 import { CommonModule } from '@angular/common';
-import { Preferencia } from "../../servicios/preferencia/preferencia.model";
-import { PreferenciaService } from '../../servicios/preferencia/preferencia.service';
-import { InventarioService } from '../../servicios/inventario/inventario.service';
-import { InventarioItem } from '../../servicios/inventario/inventario.model';
-import { UsuarioService } from '../../servicios/usuario/usuario.service';
+import { Preferencia } from "../../modelos/preferencia.model";
+import { PreferenciaService } from '../../servicios/preferencia.service';
+import { InventarioService } from '../../servicios/inventario.service';
+import { InventarioItem } from '../../modelos/inventario.model';
+import { UsuarioService } from '../../servicios/usuario.service';
 
 @Component({
   selector: 'app-inicio',

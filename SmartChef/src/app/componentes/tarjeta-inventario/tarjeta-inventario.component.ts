@@ -1,10 +1,10 @@
 import { Component, OnInit, inject, Input } from '@angular/core';
 import { IonicModule } from '@ionic/angular';
 import { CommonModule } from '@angular/common';
-import { InventarioService } from '../../servicios/inventario/inventario.service';
-import { IngredienteService } from '../../servicios/ingrediente/ingrediente.service';
-import { InventarioItem } from '../../servicios/inventario/inventario.model';
-import { Ingrediente } from '../../servicios/ingrediente/ingrediente.model';
+import { InventarioService } from '../../servicios/inventario.service';
+import { IngredienteService } from '../../servicios/ingrediente.service';
+import { InventarioItem } from '../../modelos/inventario.model';
+import { Ingrediente } from '../../modelos/ingrediente.model';
 
 @Component({
   selector: 'app-tarjeta-inventario',

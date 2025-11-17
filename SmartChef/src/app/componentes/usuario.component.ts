@@ -1,8 +1,8 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Usuario } from './usuario.model';
-import { UsuarioService } from './usuario.service';
+import { Usuario } from '../modelos/usuario.model';
+import { UsuarioService } from '../servicios/usuario.service';
 import { IonicModule } from '@ionic/angular';
 
 @Component({

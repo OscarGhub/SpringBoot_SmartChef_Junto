@@ -1,4 +1,4 @@
-import {Preferencia} from "../preferencia/preferencia.model";
+import {Preferencia} from "./preferencia.model";
 
 export interface Receta {
   id?: number;

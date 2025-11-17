@@ -1,7 +1,7 @@
 import { Component, Input, inject } from '@angular/core';
 import { IonicModule, AlertController } from '@ionic/angular';
 import { Router, RouterModule } from '@angular/router';
-import { Receta } from '../../servicios/receta/receta.model';
+import { Receta } from '../../modelos/receta.model';
 import { CommonModule } from '@angular/common';
 
 @Component({

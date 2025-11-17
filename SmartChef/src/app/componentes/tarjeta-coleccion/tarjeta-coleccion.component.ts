@@ -2,9 +2,9 @@ import { Component, Input, inject } from '@angular/core';
 import { IonicModule } from '@ionic/angular';
 import { Router, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { Coleccion } from "../../servicios/coleccion/coleccion.model";
-import { ColeccionService } from "../../servicios/coleccion/coleccion.service";
-import { UsuarioService } from "../../servicios/usuario/usuario.service";
+import { Coleccion } from "../../modelos/coleccion.model";
+import { ColeccionService } from "../../servicios/coleccion.service";
+import { UsuarioService } from "../../servicios/usuario.service";
 import {FormsModule} from "@angular/forms";
 
 @Component({

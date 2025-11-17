@@ -2,9 +2,9 @@ import { Component, Input, inject, Output, EventEmitter, OnInit } from '@angular
 import { IonicModule } from '@ionic/angular';
 import { Router, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { Receta } from '../../servicios/receta/receta.model';
-import { RecetaService } from '../../servicios/receta/receta.service';
-import { CarritoService } from '../../servicios/carrito/carrito.service';
+import { Receta } from '../../modelos/receta.model';
+import { RecetaService } from '../../servicios/receta.service';
+import { CarritoService } from '../../servicios/carrito.service';
 import { firstValueFrom } from 'rxjs';
 
 @Component({

@@ -3,8 +3,8 @@ import { CommonModule } from '@angular/common';
 import { IonicModule } from '@ionic/angular';
 import { CabeceraComponent } from '../../componentes/cabecera/cabecera.component';
 import { FooterComponent } from '../../componentes/footer/footer.component';
-import { RecetaService } from '../../servicios/receta/receta.service';
-import { UsuarioService } from '../../servicios/usuario/usuario.service';
+import { RecetaService } from '../../servicios/receta.service';
+import { UsuarioService } from '../../servicios/usuario.service';
 import {
   TarjetaRecetaExtendidaComponent
 } from "../../componentes/tarjeta-receta-extendida/tarjeta-receta-extendida.component";

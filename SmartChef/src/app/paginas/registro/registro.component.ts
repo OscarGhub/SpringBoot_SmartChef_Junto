@@ -1,11 +1,11 @@
 import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Usuario } from '../../servicios/usuario/usuario.model';
-import { UsuarioService } from '../../servicios/usuario/usuario.service';
+import { Usuario } from '../../modelos/usuario.model';
+import { UsuarioService } from '../../servicios/usuario.service';
 import { IonicModule } from '@ionic/angular';
-import { AlertService } from '../../servicios/alert.service';
-import { UsuarioHelper } from '../../servicios/usuario.helper';
+import { AlertService } from '../../servicios-ayuda/alert.service';
+import { UsuarioHelper } from '../../servicios-ayuda/usuario.helper';
 
 @Component({
   selector: 'app-registro',

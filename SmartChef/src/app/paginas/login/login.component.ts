@@ -1,6 +1,6 @@
 import { Component, inject } from '@angular/core';
-import { UsuarioService } from '../../servicios/usuario/usuario.service';
-import { AlertService } from '../../servicios/alert.service';
+import { UsuarioService } from '../../servicios/usuario.service';
+import { AlertService } from '../../servicios-ayuda/alert.service';
 import * as bcrypt from 'bcryptjs';
 import { IonicModule } from '@ionic/angular';
 import { FormsModule } from '@angular/forms';
