@@ -23,6 +23,7 @@ import { CommonModule } from '@angular/common';
 export class InventarioComponent implements OnInit {
 
   usuario?: Usuario | null;
+  usuarioCargado: boolean = false;
 
   private usuarioService = inject(UsuarioService);
 
@@ -32,25 +33,43 @@ export class InventarioComponent implements OnInit {
 
   private inicializarUsuario() {
     const data = localStorage.getItem('usuario');
-    if (!data) return;
+    console.log('Cargando usuario de localStorage:', data);
+
+    if (!data) {
+      this.usuarioCargado = true;
+      return;
+    }
 
     try {
       this.usuario = JSON.parse(data);
+      console.log('Usuario parseado:', this.usuario);
     } catch (e) {
       console.error('Error parseando usuario de localStorage', e);
+      this.usuarioCargado = true;
       return;
     }
 
     const correo = this.usuario?.correoElectronico;
-    if (!correo) return;
+    console.log('Correo del usuario:', correo);
+
+    if (!correo) {
+      this.usuarioCargado = true;
+      return;
+    }
 
     this.usuarioService.getUsuarioPorCorreo(correo).subscribe({
       next: (u) => {
+        console.log('Usuario recibido del backend:', u);
         if (u?.id != null) {
           this.usuario = u;
+          this.usuarioCargado = true;
         }
       },
-      error: (err) => console.error('Error obteniendo usuario del servidor', err)
+      error: (err) => {
+        console.error('Error obteniendo usuario del servidor', err);
+        this.usuarioCargado = true;
+      }
     });
   }
+
 }

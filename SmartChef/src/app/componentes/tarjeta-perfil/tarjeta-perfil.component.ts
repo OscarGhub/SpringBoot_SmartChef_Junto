@@ -35,7 +35,7 @@ export class TarjetaPerfilComponent implements OnInit {
     }
   }
 
-  private getFotoUrl(usuarioId: number): string {
+  protected getFotoUrl(usuarioId: number): string {
     return `http://localhost:8080/api/usuario/${usuarioId}/foto?t=${new Date().getTime()}`;
   }
 
@@ -114,4 +114,9 @@ export class TarjetaPerfilComponent implements OnInit {
       input.value = '';
     }
   }
+
+  onImageError($event: ErrorEvent) {
+    this.usuario.fotoUrl = '../../../assets/images/perfil.webp';
+  }
+
 }

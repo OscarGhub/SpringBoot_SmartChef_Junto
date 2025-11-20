@@ -14,7 +14,7 @@ export class InventarioService {
     return this.http.get<InventarioItem[]>(`${this.apiUrl}/usuario/${usuarioId}`);
   }
 
-  crearItem(param: { id: number; idUsuario: number | null; fecha_creacion: string }): Observable<InventarioItem> {
+  crearInventario(param: { id: number; idUsuario: number | null; fecha_creacion: string }): Observable<InventarioItem> {
     if (!param.idUsuario) {
       throw new Error('No se puede crear inventario: idUsuario es null');
     }
@@ -28,7 +28,16 @@ export class InventarioService {
     return this.http.post<InventarioItem>(this.apiUrl, payload);
   }
 
-  eliminarItem(id: number): Observable<void> {
-    return this.http.delete<void>(`${this.apiUrl}/${id}`);
+  agregarIngredienteAlInventario(idInventario: number, idIngrediente: number, cantidad: number): Observable<any> {
+    const url = `${this.apiUrl}/${idInventario}/ingredientes/${idIngrediente}`;
+    const payload = { cantidad };
+
+    return this.http.post<any>(url, payload);
   }
+
+  eliminarIngredienteDelInventario(idInventario: number, idIngrediente: number | undefined): Observable<any> {
+    const url = `${this.apiUrl}/${idInventario}/ingredientes/${idIngrediente}`;
+    return this.http.delete<any>(url);
+  }
+
 }

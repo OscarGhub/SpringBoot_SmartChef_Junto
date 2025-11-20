@@ -2,7 +2,8 @@
   <ion-card-content class="perfil-content">
     <div class="avatar-wrapper" style="position: relative; display: inline-block;">
       <ion-avatar class="perfil-avatar">
-        <img [src]="usuario.fotoUrl || '../../../assets/images/perfil.webp'" alt="Avatar del usuario" />
+        <img [src]="usuario.fotoUrl" alt="Avatar del usuario"
+             (error)="onImageError($event)" />
       </ion-avatar>
       <ion-button
         size="small"

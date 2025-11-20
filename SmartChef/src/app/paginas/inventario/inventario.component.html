@@ -9,11 +9,11 @@
     </div>
 
     <app-tarjeta-inventario
-      *ngIf="usuario?.id as id"
-      [usuarioId]="id">
+      *ngIf="usuario?.id !== undefined"
+      [usuarioId]="usuario?.id">
     </app-tarjeta-inventario>
 
-    <p *ngIf="!usuario" class="mensaje-cargando">
+    <p *ngIf="!usuario || usuario?.id === undefined">
       Cargando inventario...
     </p>
   </ion-toolbar>

@@ -18,8 +18,6 @@ export class RecetaComponent implements OnInit {
 
   recetas: Receta[] = [];
   recetasFiltradas: Receta[] = [];
-  preferenciasSeleccionadas: number[] = [];
-
   ngOnInit(): void {
     this.cargarRecetas();
   }

@@ -68,7 +68,7 @@ export class InicioComponent implements OnInit {
   }
 
   private crearInventario(usuarioId: number) {
-    this.inventarioService.crearItem({
+    this.inventarioService.crearInventario({
       id: 0,
       idUsuario: usuarioId,
       fecha_creacion: new Date().toISOString()
