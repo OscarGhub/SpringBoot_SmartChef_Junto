@@ -1,13 +1,47 @@
-<ion-card *ngFor="let item of listaCompraIngredientes" class="producto-card">
-  <div class="producto-container">
-    <div class="producto-info">
-      <p class="producto-nombre">{{ item.ingrediente.nombre }}</p>
-      <p class="producto-descripcion">{{ item.ingrediente.descripcion }} - Cantidad: {{ item.cantidad }} {{item.ingrediente.unidadMedida}}</p>
-      <div class="producto-acciones">
-        <ion-button (click)="eliminarIngrediente(item)">
-          <p class="boton-texto">Eliminar del carrito</p>
-        </ion-button>
-      </div>
+<ion-card class="tarjeta-carrito-container-principal">
+  <ion-card-header>
+    <ion-card-title>Lista de Compra</ion-card-title>
+  </ion-card-header>
+
+  <ion-card-content>
+    <div *ngIf="cargando" class="ion-text-center ion-padding">
+      <ion-spinner name="crescent"></ion-spinner>
+      <p>Cargando ingredientes...</p>
     </div>
-  </div>
+
+    <div *ngIf="!cargando && listaCompraIngredientes.length === 0" class="empty-state">
+      <ion-text color="medium">
+        <p>Tu carrito está vacío.</p>
+      </ion-text>
+    </div>
+
+    <div class="lista-contenedor" *ngIf="!cargando && listaCompraIngredientes.length > 0">
+
+      <ion-card *ngFor="let item of listaCompraIngredientes" class="producto-card">
+        <div class="producto-container">
+
+          <div class="producto-info">
+            <p class="producto-nombre">{{ item.ingrediente.nombre }}</p>
+            <p class="producto-descripcion">
+              {{ item.ingrediente.descripcion }} - Cantidad:
+              <strong>{{ item.cantidad }}</strong> {{ item.ingrediente.unidadMedida }}
+            </p>
+          </div>
+
+          <div class="producto-acciones">
+            <ion-button
+              (click)="eliminarIngrediente(item)"
+              color="danger"
+              fill="solid"
+              size="small"
+              class="boton">
+              <p class="boton-texto">Eliminar del carrito</p>
+            </ion-button>
+          </div>
+
+        </div>
+      </ion-card>
+
+    </div>
+  </ion-card-content>
 </ion-card>

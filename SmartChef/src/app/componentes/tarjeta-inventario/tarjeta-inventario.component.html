@@ -45,8 +45,8 @@
       <div class="inventario-elementos">
         <ion-item *ngFor="let ingrediente of ingredientesSeleccionados; " class="inventario-elemento">
           <ion-label>
-            <h2>{{ ingrediente.nombre }}</h2>
-            <p>{{ ingrediente.unidadMedida }}</p>
+            <h2>{{ ingrediente?.nombre }}</h2>
+            <p>{{ ingrediente?.unidadMedida }}</p>
           </ion-label>
 
           <ion-button
@@ -80,13 +80,17 @@
 
     <ion-content>
       <ion-list>
-        <ion-item *ngFor="let ingrediente of ingredientesDisponibles" (click)="agregarIngrediente(ingrediente)">
+        <ion-item
+          *ngFor="let ingrediente of ingredientesDisponibles"
+          class="inventario-elemento"
+          (click)="agregarIngrediente(ingrediente)">
+
           <ion-avatar slot="start">
-            <img [src]="ingrediente.imagenUrl" alt="{{ ingrediente.nombre }}" />
+            <img [src]="ingrediente?.imagenUrl" alt="{{ ingrediente?.nombre }}" />
           </ion-avatar>
           <ion-label>
-            <h2>{{ ingrediente.nombre }}</h2>
-            <p>{{ ingrediente.unidadMedida }}</p>
+            <h2>{{ ingrediente?.nombre }}</h2>
+            <p>{{ ingrediente?.unidadMedida }}</p>
           </ion-label>
           <ion-button slot="end" color="primary" size="small">Agregar</ion-button>
         </ion-item>

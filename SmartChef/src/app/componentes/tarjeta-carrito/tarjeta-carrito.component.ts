@@ -1,9 +1,9 @@
 import { Component, OnInit, inject } from '@angular/core';
-import { IonicModule } from '@ionic/angular';
+import { IonicModule, AlertController } from '@ionic/angular';
 import { CommonModule } from '@angular/common';
 import { CarritoService } from '../../servicios/carrito.service';
 import { ListaCompraIngrediente } from '../../modelos/carrito.model';
-import {Observable} from "rxjs";
+import { firstValueFrom } from "rxjs";
 
 @Component({
   selector: 'app-tarjeta-carrito',
@@ -14,28 +14,72 @@ import {Observable} from "rxjs";
 })
 export class TarjetaCarritoComponent implements OnInit {
   private carritoService = inject(CarritoService);
+  private alertCtrl = inject(AlertController);
+
   listaCompraIngredientes: ListaCompraIngrediente[] = [];
   idLista: number = 1;
+  cargando: boolean = false;
 
   ngOnInit() {
     this.cargarLista();
   }
 
-  cargarLista() {
-    this.carritoService.getIngredientes(this.idLista).subscribe({
-      next: data => this.listaCompraIngredientes = data,
-      error: err => console.error(err)
-    });
+  async cargarLista() {
+    this.cargando = true;
+    try {
+      this.listaCompraIngredientes = await firstValueFrom(
+        this.carritoService.getIngredientes(this.idLista)
+      );
+    } catch (error) {
+      console.error('Error al cargar la lista:', error);
+    } finally {
+      this.cargando = false;
+    }
   }
 
-  eliminarIngrediente(item: ListaCompraIngrediente) {
-    this.carritoService.eliminarIngrediente(this.idLista, item.ingrediente.id).subscribe({
-      next: (mensaje) => {
-        console.log(mensaje);
-        this.cargarLista();
-      },
-      error: err => console.error('Error al eliminar ingrediente:', err)
-    });
-  }
+  async eliminarIngrediente(item: ListaCompraIngrediente) {
+    const idIngrediente = item.ingrediente.id;
+    const nombreIngrediente = item.ingrediente.nombre;
 
+    const alert = await this.alertCtrl.create({
+      header: 'Confirmar',
+      message: `¿Deseas eliminar **${nombreIngrediente}** del carrito?`,
+      buttons: [
+        { text: 'Cancelar', role: 'cancel' },
+        {
+          text: 'Eliminar',
+          cssClass: 'alerta-danger',
+          handler: async () => {
+            try {
+              await firstValueFrom(
+                this.carritoService.eliminarIngrediente(this.idLista, idIngrediente)
+              );
+
+              this.listaCompraIngredientes = this.listaCompraIngredientes.filter(
+                i => i.ingrediente.id !== idIngrediente
+              );
+
+              const successAlert = await this.alertCtrl.create({
+                header: 'Éxito',
+                message: `${nombreIngrediente} eliminado.`,
+                buttons: ['OK'],
+              });
+              await successAlert.present();
+
+            } catch (error) {
+              console.error('Error al eliminar ingrediente:', error);
+              const errorAlert = await this.alertCtrl.create({
+                header: 'Error',
+                message: `No se pudo eliminar ${nombreIngrediente}.`,
+                buttons: ['OK'],
+              });
+              await errorAlert.present();
+            }
+          },
+        },
+      ],
+    });
+
+    await alert.present();
+  }
 }

@@ -14,7 +14,7 @@ public class InventarioIngredienteResponseDTO {
     private Integer idInventario;
     private Integer idIngrediente;
     private Integer usuarioId;
-    private String nombreIngrediente;
+    private String nombre;
     private String unidadMedida;
     private String imagenUrl;
     private BigDecimal cantidad;

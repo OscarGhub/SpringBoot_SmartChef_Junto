@@ -1,3 +1,16 @@
+.tarjeta-carrito-container-principal {
+  max-width: 420px;
+  margin: 30px auto;
+  border-radius: 16px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  background-color: #217A43;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 20px;
+}
+
 .producto-card {
   background-color: #217A43;
   color: white;
@@ -33,6 +46,7 @@
 .producto-descripcion {
   font-size: 0.9rem;
   color: white;
+  word-break: break-word;
 }
 
 .producto-acciones {
@@ -43,6 +57,7 @@
 
 .boton {
   --background: #217A43;
+  --background-activated: #309556;
   --border-radius: 20px;
   --box-shadow: 0 6px 12px rgba(0, 0, 0, 0.35);
   font-weight: bold;

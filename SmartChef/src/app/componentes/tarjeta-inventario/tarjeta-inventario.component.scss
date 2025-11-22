@@ -67,3 +67,15 @@ ion-card-title {
   font-style: italic;
   margin-top: 12px;
 }
+
+ion-modal {
+  ion-label {
+    h2, p {
+      color: #000000 !important;
+    }
+  }
+
+  ion-content {
+    --background: #f4f5f8;
+  }
+}
