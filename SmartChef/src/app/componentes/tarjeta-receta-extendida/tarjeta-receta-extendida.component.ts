@@ -57,26 +57,14 @@ export class TarjetaRecetaExtendidaComponent implements OnInit {
     if (!this.receta || !this.usuario) return;
 
     try {
-      const listaId = await this.obtenerListaCompra(this.usuario.id);
-      const ingredientes = await firstValueFrom(this.carritoService.getIngredientes(listaId));
-
-      this.receta.enCarrito = ingredientes.some(ing => ing.recetaId === this.receta!.id);
-
+      this.receta.enCarrito = await firstValueFrom(
+        this.carritoService.recetaEstaEnCarrito(this.usuario.id, this.receta.id!)
+      );
     } catch (err) {
       console.error('Error comprobando si la receta está en el carrito', err);
       this.receta.enCarrito = false;
     }
   }
-
-  private async obtenerListaCompra(idUsuario: number): Promise<number> {
-    const listaGuardada = localStorage.getItem('id_lista');
-    if (listaGuardada) return Number(listaGuardada);
-
-    const lista = await firstValueFrom(this.carritoService.crearListaCompra(idUsuario));
-    localStorage.setItem('id_lista', lista.id);
-    return lista.id;
-  }
-
   async toggleCarrito(event: Event, receta: Receta) {
     event.stopPropagation();
     if (!receta || !this.usuario) return;
@@ -101,20 +89,26 @@ export class TarjetaRecetaExtendidaComponent implements OnInit {
     if (!this.receta || !this.usuario) return;
 
     try {
+      let recetaActualizada: any;
+
       if (!this.receta.yaGuardada) {
-        const recetaActualizada = await firstValueFrom(
+        recetaActualizada = await firstValueFrom(
           this.recetaService.guardarReceta(this.receta.id!, this.usuario.id)
         );
         this.receta.yaGuardada = true;
-        this.receta.numFavoritos = recetaActualizada.numFavoritos;
       } else {
-        const recetaActualizada = await firstValueFrom(
+        recetaActualizada = await firstValueFrom(
           this.recetaService.quitarRecetaGuardada(this.receta.id!, this.usuario.id)
         );
         this.receta.yaGuardada = false;
+      }
+
+      if (recetaActualizada && recetaActualizada.numFavoritos !== undefined) {
         this.receta.numFavoritos = recetaActualizada.numFavoritos;
       }
+
       this.cambioFavorito.emit();
+
     } catch (err) {
       console.error('Error al guardar/quitar receta', err);
     }

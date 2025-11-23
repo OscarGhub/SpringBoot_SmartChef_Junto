@@ -6,7 +6,7 @@ import lombok.Setter;
 @Getter
 @Setter
 public class ListaCompraIngredienteDTO {
-    private Integer idIngrediente;
-    private String nombreIngrediente;
+
+    private IngredienteEnCarritoDTO ingrediente;
     private Double cantidad;
 }

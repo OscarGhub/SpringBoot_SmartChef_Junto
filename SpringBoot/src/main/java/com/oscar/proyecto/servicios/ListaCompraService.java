@@ -1,5 +1,6 @@
 package com.oscar.proyecto.servicios;
 
+import com.oscar.proyecto.dto.ListaCompra.IngredienteEnCarritoDTO;
 import com.oscar.proyecto.dto.ListaCompra.ListaCompraRequestDTO;
 import com.oscar.proyecto.dto.ListaCompra.ListaCompraResponseDTO;
 import com.oscar.proyecto.dto.ListaCompra.ListaCompraIngredienteDTO;
@@ -10,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -53,7 +55,15 @@ public class ListaCompraService {
         ListaCompra listaCompra = listaCompraRepository.findById(idLista)
                 .orElseThrow(() -> new RuntimeException("Lista de compra no encontrada"));
 
-        Ingrediente ingrediente = ingredienteRepository.findById(request.getIdIngrediente())
+        Integer idIngrediente = (request.getIngrediente() != null)
+                ? request.getIngrediente().getId()
+                : null;
+
+        if (idIngrediente == null) {
+            throw new IllegalArgumentException("El ID del ingrediente es requerido.");
+        }
+
+        Ingrediente ingrediente = ingredienteRepository.findById(idIngrediente)
                 .orElseThrow(() -> new RuntimeException("Ingrediente no encontrado"));
 
         ListaCompraIngredienteId id = new ListaCompraIngredienteId(idLista, ingrediente.getId());
@@ -63,12 +73,13 @@ public class ListaCompraService {
         listaIngrediente.setId(id);
         listaIngrediente.setListaCompra(listaCompra);
         listaIngrediente.setIngrediente(ingrediente);
-        listaIngrediente.setCantidad(request.getCantidad() != null ? request.getCantidad() : 1.0);
+
+        Double cantidad = request.getCantidad() != null ? request.getCantidad() : 1.0;
+        listaIngrediente.setCantidad(cantidad);
 
         listaCompraIngredienteRepository.save(listaIngrediente);
 
-        request.setNombreIngrediente(ingrediente.getNombre());
-        return request;
+        return crearListaCompraIngredienteDTO(listaIngrediente);
     }
 
     public void eliminarIngrediente(Integer idLista, Integer idIngrediente) {
@@ -88,14 +99,23 @@ public class ListaCompraService {
         List<ListaCompraIngrediente> ingredientes = listaCompraIngredienteRepository.findByListaCompra(listaCompra);
 
         return ingredientes.stream()
-                .map(li -> {
-                    ListaCompraIngredienteDTO dto = new ListaCompraIngredienteDTO();
-                    dto.setIdIngrediente(li.getIngrediente().getId());
-                    dto.setNombreIngrediente(li.getIngrediente().getNombre());
-                    dto.setCantidad(li.getCantidad());
-                    return dto;
-                })
+                .map(this::crearListaCompraIngredienteDTO)
                 .collect(Collectors.toList());
+    }
+
+    private ListaCompraIngredienteDTO crearListaCompraIngredienteDTO(ListaCompraIngrediente li) {
+        Ingrediente ingredienteEntidad = li.getIngrediente();
+
+        IngredienteEnCarritoDTO ingredienteDto = new IngredienteEnCarritoDTO();
+        ingredienteDto.setId(ingredienteEntidad.getId());
+        ingredienteDto.setNombre(ingredienteEntidad.getNombre());
+        ingredienteDto.setUnidadMedida(ingredienteEntidad.getUnidadMedida());
+
+        ListaCompraIngredienteDTO dto = new ListaCompraIngredienteDTO();
+        dto.setIngrediente(ingredienteDto);
+        dto.setCantidad(li.getCantidad());
+
+        return dto;
     }
 
     public void anadirRecetaAlCarrito(Integer idUsuario, Integer idReceta) {
@@ -109,9 +129,15 @@ public class ListaCompraService {
                     return listaCompraRepository.save(nuevaLista);
                 });
 
-        List<RecetaIngrediente> ingredientesReceta = recetaIngredienteRepository.findByRecetaId(idReceta);
+        List<RecetaIngrediente> ingredientesReceta = recetaIngredienteRepository.findByRecetaIdEagerly(idReceta);
 
         for (RecetaIngrediente ri : ingredientesReceta) {
+
+            if (ri.getIngrediente() == null) {
+                System.err.println("ERROR: El ingrediente está nulo en la receta " + idReceta + ". Saltando.");
+                continue;
+            }
+
             ListaCompraIngredienteId listaIngredienteId = new ListaCompraIngredienteId(
                     listaCompra.getId(),
                     ri.getIngrediente().getId()
@@ -120,10 +146,18 @@ public class ListaCompraService {
             ListaCompraIngrediente listaIngrediente = listaCompraIngredienteRepository.findById(listaIngredienteId)
                     .orElse(new ListaCompraIngrediente());
 
+
+            Double cantidadActual = (listaIngrediente.getCantidad() != null) ? listaIngrediente.getCantidad() : 0.0;
+
+            Double cantidadAReceta = ri.getCantidad();
+
+            Double nuevaCantidad = cantidadActual + cantidadAReceta;
+
             listaIngrediente.setId(listaIngredienteId);
             listaIngrediente.setListaCompra(listaCompra);
             listaIngrediente.setIngrediente(ri.getIngrediente());
-            listaIngrediente.setCantidad(ri.getCantidad());
+
+            listaIngrediente.setCantidad(nuevaCantidad);
 
             listaCompraIngredienteRepository.save(listaIngrediente);
         }
@@ -131,19 +165,91 @@ public class ListaCompraService {
 
     public void eliminarRecetaDelCarrito(Integer idUsuario, Integer idReceta) {
         ListaCompra listaCompra = listaCompraRepository.findByUsuarioId(idUsuario)
-                .orElseThrow(() -> new RuntimeException("Lista de compra no encontrada"));
+                .orElseThrow(() -> new RuntimeException("Lista de compra no encontrada para el usuario: " + idUsuario));
 
-        List<RecetaIngrediente> ingredientesReceta = recetaIngredienteRepository.findByRecetaId(idReceta);
+        List<RecetaIngrediente> ingredientesReceta = recetaIngredienteRepository.findByRecetaIdEagerly(idReceta);
 
         for (RecetaIngrediente ri : ingredientesReceta) {
+
+            if (ri.getIngrediente() == null) {
+                System.err.println("ERROR: El ingrediente está nulo en la receta " + idReceta + ". Saltando.");
+                continue;
+            }
+
             ListaCompraIngredienteId listaIngredienteId = new ListaCompraIngredienteId(
                     listaCompra.getId(),
                     ri.getIngrediente().getId()
             );
 
-            if (listaCompraIngredienteRepository.existsById(listaIngredienteId)) {
-                listaCompraIngredienteRepository.deleteById(listaIngredienteId);
-            }
+            listaCompraIngredienteRepository.findById(listaIngredienteId)
+                    .ifPresent(listaIngrediente -> {
+
+                        Double cantidadARestar = ri.getCantidad();
+
+                        Double cantidadActual = listaIngrediente.getCantidad();
+
+                        double nuevaCantidad = cantidadActual - cantidadARestar;
+
+                        if (nuevaCantidad > 0) {
+                            listaIngrediente.setCantidad(nuevaCantidad);
+                            listaCompraIngredienteRepository.save(listaIngrediente);
+
+                        } else {
+                            listaCompraIngredienteRepository.delete(listaIngrediente);
+                        }
+                    });
         }
     }
+
+    public boolean recetaEstaEnCarrito(Integer idUsuario, Integer idReceta) {
+        ListaCompra listaCompra = listaCompraRepository.findByUsuarioId(idUsuario).orElse(null);
+        if (listaCompra == null) {
+            return false;
+        }
+
+        List<RecetaIngrediente> ingredientesReceta = recetaIngredienteRepository.findByRecetaIdEagerly(idReceta);
+
+        if (ingredientesReceta.isEmpty()) {
+            return false;
+        }
+
+        Map<Integer, Double> cantidadesRequeridas = ingredientesReceta.stream()
+                .collect(Collectors.toMap(
+                        ri -> ri.getIngrediente().getId(),
+                        RecetaIngrediente::getCantidad
+                ));
+
+        List<Integer> idsIngredientesRequeridos = new java.util.ArrayList<>(cantidadesRequeridas.keySet());
+
+        List<ListaCompraIngrediente> ingredientesEnLista = listaCompraIngredienteRepository.findByListaAndIngredientesIds(
+                listaCompra.getId(),
+                idsIngredientesRequeridos
+        );
+
+        if (ingredientesEnLista.size() != cantidadesRequeridas.size()) {
+            return false;
+        }
+
+        for (RecetaIngrediente ri : ingredientesReceta) {
+            Integer ingredienteId = ri.getIngrediente().getId();
+            Double cantidadRequerida = ri.getCantidad();
+
+            Optional<ListaCompraIngrediente> match = ingredientesEnLista.stream()
+                    .filter(lci -> lci.getIngrediente().getId().equals(ingredienteId))
+                    .findFirst();
+
+            if (match.isEmpty()) {
+                return false;
+            }
+
+            Double cantidadPresente = match.get().getCantidad();
+
+            if (cantidadPresente < cantidadRequerida) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
 }

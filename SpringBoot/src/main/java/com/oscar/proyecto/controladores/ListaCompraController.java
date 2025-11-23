@@ -59,4 +59,10 @@ public class ListaCompraController {
         service.eliminarRecetaDelCarrito(idUsuario, idReceta);
         return ResponseEntity.ok("Ingredientes de la receta eliminados del carrito");
     }
+
+    @GetMapping("/usuario/{idUsuario}/receta/{idReceta}/existe")
+    public ResponseEntity<Boolean> recetaEstaEnCarrito(@PathVariable Integer idUsuario,
+                                                       @PathVariable Integer idReceta) {
+        return ResponseEntity.ok(service.recetaEstaEnCarrito(idUsuario, idReceta));
+    }
 }

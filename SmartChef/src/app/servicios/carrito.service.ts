@@ -29,4 +29,8 @@ export class CarritoService {
   crearListaCompra(idUsuario: number): Observable<any> {
     return this.http.post<any>(`${this.apiUrl}`, { id_usuario: idUsuario });
   }
+
+  recetaEstaEnCarrito(idUsuario: number, idReceta: number): Observable<boolean> {
+    return this.http.get<boolean>(`${this.apiUrl}/usuario/${idUsuario}/receta/${idReceta}/existe`);
+  }
 }
