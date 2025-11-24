@@ -1,7 +1,4 @@
 <ion-card class="tarjeta-carrito-container-principal">
-  <ion-card-header>
-    <ion-card-title>Lista de Compra</ion-card-title>
-  </ion-card-header>
 
   <ion-card-content>
     <div *ngIf="cargando" class="ion-text-center ion-padding">
@@ -10,8 +7,8 @@
     </div>
 
     <div *ngIf="!cargando && listaCompraIngredientes.length === 0" class="empty-state">
-      <ion-text color="medium">
-        <p>Tu carrito está vacío.</p>
+      <ion-text>
+        <p style="color: white">Tu carrito está vacío.</p>
       </ion-text>
     </div>
 
@@ -19,6 +16,14 @@
 
       <ion-card *ngFor="let item of listaCompraIngredientes" class="producto-card">
         <div class="producto-container">
+
+          <div class="imagen-container">
+            <ion-img
+              [src]="item.ingrediente.imagenUrl"
+              [alt]="'Imagen de ' + item.ingrediente.nombre"
+              class="imagen-ingrediente"
+            ></ion-img>
+          </div>
 
           <div class="producto-info">
             <p class="producto-nombre">{{ item.ingrediente.nombre }}</p>

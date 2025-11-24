@@ -68,7 +68,7 @@ public class InventarioIngredienteService {
                 i.getInventario().getUsuario().getId(),
                 i.getIngrediente().getNombre(),
                 i.getIngrediente().getUnidadMedida(),
-                i.getIngrediente().getImagen_url(),
+                i.getIngrediente().getImagenUrl(),
                 i.getCantidad()
         );
     }

@@ -15,11 +15,6 @@ import java.util.List;
 public interface ListaCompraIngredienteRepository extends JpaRepository<ListaCompraIngrediente, ListaCompraIngredienteId> {
     List<ListaCompraIngrediente> findByListaCompra(ListaCompra listaCompra);
 
-    @Query("SELECT COUNT(lci) FROM ListaCompraIngrediente lci " +
-            "WHERE lci.listaCompra.id = :idLista AND lci.ingrediente.id IN :idsIngredientes")
-    int existeIngredienteDeRecetaEnLista(@Param("idLista") Integer idLista,
-                                         @Param("idsIngredientes") List<Integer> idsIngredientes);
-
     @Query("SELECT lci FROM ListaCompraIngrediente lci WHERE lci.listaCompra.id = :idLista AND lci.ingrediente.id IN :idsIngredientes")
     List<ListaCompraIngrediente> findByListaAndIngredientesIds(@Param("idLista") Integer idLista,
                                                                @Param("idsIngredientes") List<Integer> idsIngredientes);

@@ -19,6 +19,6 @@ public class Ingrediente {
     @Column(name = "unidad_medida", length = 50)
     private String unidadMedida;
 
-    @Column(length = 255)
-    private String imagen_url;
+    @Column(name = "imagen_url")
+    private String imagenUrl;
 }

@@ -35,7 +35,7 @@ public class IngredienteService {
                 ingrediente.getId(),
                 ingrediente.getNombre(),
                 ingrediente.getUnidadMedida(),
-                ingrediente.getImagen_url()
+                ingrediente.getImagenUrl()
         );
     }
 }

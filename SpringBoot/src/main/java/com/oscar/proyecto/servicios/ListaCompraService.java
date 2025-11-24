@@ -110,6 +110,7 @@ public class ListaCompraService {
         ingredienteDto.setId(ingredienteEntidad.getId());
         ingredienteDto.setNombre(ingredienteEntidad.getNombre());
         ingredienteDto.setUnidadMedida(ingredienteEntidad.getUnidadMedida());
+        ingredienteDto.setImagenUrl(ingredienteEntidad.getImagenUrl());
 
         ListaCompraIngredienteDTO dto = new ListaCompraIngredienteDTO();
         dto.setIngrediente(ingredienteDto);
