@@ -1,6 +1,8 @@
 package com.oscar.proyecto.controladores;
 
+import com.oscar.proyecto.dto.Inventario.InventarioRequestDTO;
 import com.oscar.proyecto.dto.Inventario.InventarioResponseDTO;
+import com.oscar.proyecto.dto.InventarioIngrediente.InventarioIngredienteResponseDTO;
 import com.oscar.proyecto.modelos.Inventario;
 import com.oscar.proyecto.modelos.InventarioIngrediente;
 import com.oscar.proyecto.servicios.InventarioService;
@@ -19,15 +21,20 @@ public class InventarioController {
 
     private final InventarioService service;
 
-    @PostMapping("/usuario/{usuarioId}")
-    public ResponseEntity<InventarioResponseDTO> crearInventarioParaUsuario(@PathVariable Integer usuarioId) {
-        Inventario inventario = service.crearInventarioParaUsuarioPorId(usuarioId);
+    @PostMapping
+    public ResponseEntity<InventarioResponseDTO> crearInventarioParaUsuario(@RequestBody InventarioRequestDTO request) {
+        Inventario inventario = service.crearInventarioParaUsuarioPorId(request.getUsuarioId());
         return ResponseEntity.ok(new InventarioResponseDTO(inventario.getId(), inventario.getUsuario().getId()));
     }
 
-    @GetMapping("/usuario/{usuarioId}")
-    public ResponseEntity<List<InventarioResponseDTO>> obtenerInventariosPorUsuario(@PathVariable Integer usuarioId) {
+    @GetMapping("/base/usuario/{usuarioId}")
+    public ResponseEntity<List<InventarioResponseDTO>> obtenerInventariosBasePorUsuario(@PathVariable Integer usuarioId) {
         return ResponseEntity.ok(service.obtenerInventariosPorUsuario(usuarioId));
+    }
+
+    @GetMapping("/usuario/{usuarioId}")
+    public ResponseEntity<List<InventarioIngredienteResponseDTO>> obtenerInventarioDetalladoPorUsuario(@PathVariable Integer usuarioId) {
+        return ResponseEntity.ok(service.obtenerIngredientesDeInventarioPorUsuario(usuarioId));
     }
 
     @PostMapping("/{idInventario}/ingredientes/{idIngrediente}")
@@ -41,4 +48,9 @@ public class InventarioController {
         return ResponseEntity.ok(inventarioIngrediente);
     }
 
+    @DeleteMapping("/{idInventario}/ingredientes/{idIngrediente}")
+    public ResponseEntity<String> eliminarIngredienteDelInventario(@PathVariable Integer idInventario, @PathVariable Integer idIngrediente) {
+        service.eliminarIngredienteDelInventario(idInventario, idIngrediente);
+        return ResponseEntity.ok("Ingrediente eliminado del inventario");
+    }
 }

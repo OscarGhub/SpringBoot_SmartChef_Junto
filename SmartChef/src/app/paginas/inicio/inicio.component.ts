@@ -47,32 +47,31 @@ export class InicioComponent implements OnInit {
     this.usuarioId = usuario?.id ?? null;
 
     if (this.usuarioId) {
-      this.cargarInventario(this.usuarioId);
+      this.cargarInventarioInicial(this.usuarioId);
     }
 
     this.cargarRecetas();
     this.cargarPreferencias();
   }
 
-  private cargarInventario(usuarioId: number) {
+  private cargarInventarioInicial(usuarioId: number) {
     this.inventarioService.getInventarioPorUsuario(usuarioId).subscribe({
       next: (data) => {
-        if (data.length > 0) {
+        if (data && data.length > 0) {
           this.inventario = data[0];
+          console.log('Inventario cargado:', this.inventario);
+          this.cargarIngredientes(this.inventario.id);
         } else {
+          console.log('No se encontró inventario. Creando uno nuevo.');
           this.crearInventario(usuarioId);
         }
       },
-      error: (err) => console.error('Error al cargar inventario', err)
+      error: (err) => console.error('Error al cargar inventario inicial', err)
     });
   }
 
   private crearInventario(usuarioId: number) {
-    this.inventarioService.crearInventario({
-      id: 0,
-      idUsuario: usuarioId,
-      fecha_creacion: new Date().toISOString()
-    }).subscribe({
+    this.inventarioService.crearInventario(usuarioId).subscribe({
       next: (nuevoInventario) => {
         this.inventario = nuevoInventario;
         console.log('Inventario creado automáticamente', nuevoInventario);
@@ -109,6 +108,7 @@ export class InicioComponent implements OnInit {
     this.recetaService.filtrarPorPreferencias(preferenciaIds).subscribe({
       next: (data) => {
         this.recetasFiltradas = data;
+        this.aplicarFiltros();
       },
       error: (err) => console.error('Error al filtrar recetas', err)
     });
@@ -127,4 +127,9 @@ export class InicioComponent implements OnInit {
       return coincidePreferencia && coincideTexto;
     });
   }
+
+  private cargarIngredientes(inventarioId: number) {
+    console.log(`Inventario ${inventarioId} existe. Si es necesario, cargar ingredientes detallados aquí.`);
+  }
+
 }

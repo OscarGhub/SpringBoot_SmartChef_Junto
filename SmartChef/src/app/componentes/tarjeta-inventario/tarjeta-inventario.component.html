@@ -16,8 +16,8 @@
       <div class="inventario-elementos">
         <ion-item *ngFor="let item of items; " class="inventario-elemento">
           <ion-label>
-            <h2>{{ item.descripcion }}</h2>
-            <p>Cantidad: {{ item.cantidad }}</p>
+            <h2>{{ item.nombre }}</h2>
+            <p>Cantidad: {{ item.cantidad }} {{ item.unidadMedida }}</p>
           </ion-label>
 
           <ion-button
