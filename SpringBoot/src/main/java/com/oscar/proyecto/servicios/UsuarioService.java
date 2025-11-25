@@ -3,6 +3,7 @@ package com.oscar.proyecto.servicios;
 import com.oscar.proyecto.dto.Usuario.UsuarioDTO;
 import com.oscar.proyecto.modelos.Usuario;
 import com.oscar.proyecto.repositorios.UsuarioRepository;
+import com.oscar.proyecto.mapper.UsuarioMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -11,9 +12,9 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.util.List;
 import java.util.Optional;
 
@@ -22,8 +23,10 @@ import java.util.Optional;
 public class UsuarioService {
 
     private final UsuarioRepository usuarioRepo;
-    private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
     private final InventarioService inventarioService;
+    private final UsuarioMapper usuarioMapper;
+
+    private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
     @Value("${usuario.uploads.path:uploads/}")
     private String CARPETA_UPLOADS;
@@ -44,10 +47,8 @@ public class UsuarioService {
                 throw new IllegalArgumentException("Ya existe un usuario con este correo");
             }
 
-            Usuario usuario = new Usuario();
-            usuario.setNombre(dto.getNombre());
-            usuario.setCorreoElectronico(dto.getCorreoElectronico());
-            usuario.setFechaNacimiento(dto.getFechaNacimiento());
+            Usuario usuario = usuarioMapper.toEntity(dto);
+
             usuario.setContrasena(passwordEncoder.encode(dto.getContrasena()));
 
             Usuario nuevoUsuario = usuarioRepo.save(usuario);
@@ -63,9 +64,8 @@ public class UsuarioService {
     public Usuario actualizarUsuario(Integer id, UsuarioDTO dto) {
         return usuarioRepo.findById(id)
                 .map(u -> {
-                    u.setNombre(dto.getNombre());
-                    u.setCorreoElectronico(dto.getCorreoElectronico());
-                    u.setFechaNacimiento(dto.getFechaNacimiento());
+                    usuarioMapper.updateEntityFromDto(dto, u);
+
                     if (dto.getContrasena() != null && !dto.getContrasena().isBlank()) {
                         u.setContrasena(passwordEncoder.encode(dto.getContrasena()));
                     }

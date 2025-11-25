@@ -9,6 +9,7 @@ import com.oscar.proyecto.modelos.Ingrediente;
 import com.oscar.proyecto.repositorios.InventarioIngredienteRepository;
 import com.oscar.proyecto.repositorios.InventarioRepository;
 import com.oscar.proyecto.repositorios.IngredienteRepository;
+import com.oscar.proyecto.mapper.InventarioIngredienteMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpStatus;
@@ -16,7 +17,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -25,12 +25,12 @@ public class InventarioIngredienteService {
     private final InventarioIngredienteRepository inventarioIngredienteRepository;
     private final InventarioRepository inventarioRepository;
     private final IngredienteRepository ingredienteRepository;
+    private final InventarioIngredienteMapper inventarioIngredienteMapper;
 
     public List<InventarioIngredienteResponseDTO> obtenerInventarioPorUsuario(Integer usuarioId) {
-        return inventarioIngredienteRepository.findByInventarioUsuarioId(usuarioId)
-                .stream()
-                .map(this::toResponseDTO)
-                .collect(Collectors.toList());
+        return inventarioIngredienteMapper.toResponseDTOList(
+                inventarioIngredienteRepository.findByInventarioUsuarioId(usuarioId)
+        );
     }
 
     public InventarioIngredienteResponseDTO agregarIngredienteInventario(InventarioIngredienteRequestDTO request) {
@@ -49,7 +49,8 @@ public class InventarioIngredienteService {
         inventarioIngrediente.setCantidad(request.getCantidad());
 
         InventarioIngrediente guardado = inventarioIngredienteRepository.save(inventarioIngrediente);
-        return toResponseDTO(guardado);
+
+        return inventarioIngredienteMapper.toResponseDTO(guardado);
     }
 
     public void eliminarIngredienteInventario(Integer idInventario, Integer idIngrediente) {
@@ -61,15 +62,4 @@ public class InventarioIngredienteService {
         }
     }
 
-    private InventarioIngredienteResponseDTO toResponseDTO(InventarioIngrediente i) {
-        return new InventarioIngredienteResponseDTO(
-                i.getId().getIdInventario(),
-                i.getId().getIdIngrediente(),
-                i.getInventario().getUsuario().getId(),
-                i.getIngrediente().getNombre(),
-                i.getIngrediente().getUnidadMedida(),
-                i.getIngrediente().getImagenUrl(),
-                i.getCantidad()
-        );
-    }
 }

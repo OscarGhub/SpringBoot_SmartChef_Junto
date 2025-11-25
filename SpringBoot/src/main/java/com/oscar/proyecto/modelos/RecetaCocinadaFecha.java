@@ -1,13 +1,11 @@
 package com.oscar.proyecto.modelos;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.math.BigDecimal;
-import java.util.Set;
+import java.time.LocalDate;
 
 @Getter
 @Setter
@@ -16,18 +14,18 @@ import java.util.Set;
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class RecetaCocinadaFecha {
 
-    @EmbeddedId
-    private InventarioIngredienteId id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer id;
 
-    @ManyToOne
-    @MapsId("idUsuario")
-    @JoinColumn(name="id_usuario")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id_usuario", nullable = false)
     private Usuario usuario;
 
-    @ManyToOne
-    @MapsId("idReceta")
-    @JoinColumn(name="id_receta")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id_receta", nullable = false)
     private Receta receta;
 
-    private String fecha_cocinado;
+    @Column(name = "fecha_cocinado", nullable = false)
+    private LocalDate fechaCocinado;
 }

@@ -2,6 +2,7 @@ package com.oscar.proyecto.servicios;
 
 import com.oscar.proyecto.dto.Ingrediente.IngredienteResponseDTO;
 import com.oscar.proyecto.dto.Ingrediente.TopIngredienteDTO;
+import com.oscar.proyecto.mapper.IngredienteMapper;
 import com.oscar.proyecto.modelos.Ingrediente;
 import com.oscar.proyecto.modelos.IngredienteUsoProjection;
 import com.oscar.proyecto.repositorios.IngredienteRepository;
@@ -11,42 +12,28 @@ import org.springframework.web.server.ResponseStatusException;
 import org.springframework.http.HttpStatus;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class IngredienteService {
 
     private final IngredienteRepository ingredienteRepository;
+    private final IngredienteMapper ingredienteMapper;
 
     public List<IngredienteResponseDTO> getAllIngredientes() {
-        return ingredienteRepository.findAll()
-                .stream()
-                .map(this::toResponse)
-                .collect(Collectors.toList());
+        List<Ingrediente> ingredientes = ingredienteRepository.findAll();
+        return ingredienteMapper.toResponseDTOList(ingredientes);
     }
 
     public IngredienteResponseDTO getIngredienteById(Integer id) {
         Ingrediente ingrediente = ingredienteRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Ingrediente no encontrado"));
-        return toResponse(ingrediente);
-    }
-
-    private IngredienteResponseDTO toResponse(Ingrediente ingrediente) {
-        return new IngredienteResponseDTO(
-                ingrediente.getId(),
-                ingrediente.getNombre(),
-                ingrediente.getUnidadMedida(),
-                ingrediente.getImagenUrl()
-        );
+        return ingredienteMapper.toResponseDTO(ingrediente);
     }
 
     public List<TopIngredienteDTO> getTop5Ingredientes() {
         List<IngredienteUsoProjection> proyecciones = ingredienteRepository.findTop5UsedIngredientsProjection();
 
-        return proyecciones.stream()
-                .map(p -> new TopIngredienteDTO(p.getIngrediente(), p.getVecesUtilizado()))
-                .collect(Collectors.toList());
+        return ingredienteMapper.toTopIngredienteDTOList(proyecciones);
     }
-
 }

@@ -1,9 +1,9 @@
 package com.oscar.proyecto.servicios;
 
-import com.oscar.proyecto.dto.ListaCompra.IngredienteEnCarritoDTO;
 import com.oscar.proyecto.dto.ListaCompra.ListaCompraRequestDTO;
 import com.oscar.proyecto.dto.ListaCompra.ListaCompraResponseDTO;
 import com.oscar.proyecto.dto.ListaCompra.ListaCompraIngredienteDTO;
+import com.oscar.proyecto.mapper.ListaCompraMapper;
 import com.oscar.proyecto.modelos.*;
 import com.oscar.proyecto.repositorios.*;
 import lombok.RequiredArgsConstructor;
@@ -23,6 +23,7 @@ public class ListaCompraService {
     private final ListaCompraIngredienteRepository listaCompraIngredienteRepository;
     private final IngredienteRepository ingredienteRepository;
     private final RecetaIngredienteRepository recetaIngredienteRepository;
+    private final ListaCompraMapper listaCompraMapper;
 
     public ListaCompraResponseDTO crearListaCompra(ListaCompraRequestDTO request) {
         ListaCompra listaCompra = new ListaCompra();
@@ -33,22 +34,15 @@ public class ListaCompraService {
 
         ListaCompra guardada = listaCompraRepository.save(listaCompra);
 
-        return new ListaCompraResponseDTO(
-                guardada.getId(),
-                guardada.getUsuario().getId(),
-                guardada.getFecha_creacion()
-        );
+        return listaCompraMapper.toListaCompraResponseDTO(guardada);
     }
 
     public List<ListaCompraResponseDTO> obtenerListasPorUsuario(Integer idUsuario) {
-        Optional<ListaCompra> listas = listaCompraRepository.findByUsuarioId(idUsuario);
-        return listas.stream()
-                .map(lc -> new ListaCompraResponseDTO(
-                        lc.getId(),
-                        lc.getUsuario().getId(),
-                        lc.getFecha_creacion()
-                ))
-                .collect(Collectors.toList());
+        Optional<ListaCompra> listaOptional = listaCompraRepository.findByUsuarioId(idUsuario);
+
+        return listaOptional
+                .map(lista -> List.of(listaCompraMapper.toListaCompraResponseDTO(lista)))
+                .orElse(List.of());
     }
 
     public ListaCompraIngredienteDTO anadirIngrediente(Integer idLista, ListaCompraIngredienteDTO request) {
@@ -77,9 +71,9 @@ public class ListaCompraService {
         Double cantidad = request.getCantidad() != null ? request.getCantidad() : 1.0;
         listaIngrediente.setCantidad(cantidad);
 
-        listaCompraIngredienteRepository.save(listaIngrediente);
+        ListaCompraIngrediente guardado = listaCompraIngredienteRepository.save(listaIngrediente);
 
-        return crearListaCompraIngredienteDTO(listaIngrediente);
+        return listaCompraMapper.toListaCompraIngredienteDTO(guardado);
     }
 
     public void eliminarIngrediente(Integer idLista, Integer idIngrediente) {
@@ -98,25 +92,7 @@ public class ListaCompraService {
 
         List<ListaCompraIngrediente> ingredientes = listaCompraIngredienteRepository.findByListaCompra(listaCompra);
 
-        return ingredientes.stream()
-                .map(this::crearListaCompraIngredienteDTO)
-                .collect(Collectors.toList());
-    }
-
-    private ListaCompraIngredienteDTO crearListaCompraIngredienteDTO(ListaCompraIngrediente li) {
-        Ingrediente ingredienteEntidad = li.getIngrediente();
-
-        IngredienteEnCarritoDTO ingredienteDto = new IngredienteEnCarritoDTO();
-        ingredienteDto.setId(ingredienteEntidad.getId());
-        ingredienteDto.setNombre(ingredienteEntidad.getNombre());
-        ingredienteDto.setUnidadMedida(ingredienteEntidad.getUnidadMedida());
-        ingredienteDto.setImagenUrl(ingredienteEntidad.getImagenUrl());
-
-        ListaCompraIngredienteDTO dto = new ListaCompraIngredienteDTO();
-        dto.setIngrediente(ingredienteDto);
-        dto.setCantidad(li.getCantidad());
-
-        return dto;
+        return listaCompraMapper.toListaCompraIngredienteDTOList(ingredientes);
     }
 
     public void anadirRecetaAlCarrito(Integer idUsuario, Integer idReceta) {

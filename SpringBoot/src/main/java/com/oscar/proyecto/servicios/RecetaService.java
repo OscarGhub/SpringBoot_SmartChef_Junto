@@ -9,6 +9,7 @@ import com.oscar.proyecto.modelos.Usuario;
 import com.oscar.proyecto.repositorios.RecetaGuardadaRepository;
 import com.oscar.proyecto.repositorios.RecetaRepository;
 import com.oscar.proyecto.repositorios.UsuarioRepository;
+import com.oscar.proyecto.mapper.RecetaMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,39 +24,29 @@ public class RecetaService {
     private final RecetaRepository recetaRepo;
     private final RecetaGuardadaRepository recetaGuardadaRepo;
     private final UsuarioRepository usuarioRepo;
+    private final RecetaMapper recetaMapper;
 
     public List<RecetaResponseDTO> getAllRecetas() {
-        return recetaRepo.findAll().stream()
-                .map(this::mapToDTO)
-                .collect(Collectors.toList());
+        return recetaMapper.toResponseDTOList(recetaRepo.findAll());
     }
 
     public RecetaResponseDTO getRecetaById(Integer id) {
         return recetaRepo.findById(id)
-                .map(this::mapToDTO)
+                .map(recetaMapper::toResponseDTO)
                 .orElse(null);
     }
 
     public RecetaResponseDTO crearReceta(RecetaRequestDTO dto) {
-        Receta receta = new Receta();
-        receta.setTitulo(dto.getTitulo());
-        receta.setDescripcion(dto.getDescripcion());
-        receta.setTutorial(dto.getTutorial());
-        receta.setTiempoPreparacion(dto.getTiempoPreparacion());
-        receta.setFotoUrl(dto.getFotoUrl());
+        Receta receta = recetaMapper.toEntity(dto);
         Receta guardada = recetaRepo.save(receta);
-        return mapToDTO(guardada);
+        return recetaMapper.toResponseDTO(guardada);
     }
 
     public RecetaResponseDTO actualizarReceta(Integer id, RecetaRequestDTO dto) {
         return recetaRepo.findById(id)
                 .map(receta -> {
-                    receta.setTitulo(dto.getTitulo());
-                    receta.setDescripcion(dto.getDescripcion());
-                    receta.setTutorial(dto.getTutorial());
-                    receta.setTiempoPreparacion(dto.getTiempoPreparacion());
-                    receta.setFotoUrl(dto.getFotoUrl());
-                    return mapToDTO(recetaRepo.save(receta));
+                    recetaMapper.updateEntityFromDto(dto, receta);
+                    return recetaMapper.toResponseDTO(recetaRepo.save(receta));
                 })
                 .orElse(null);
     }
@@ -77,7 +68,9 @@ public class RecetaService {
         }
 
         Receta updatedReceta = recetaRepo.findById(idReceta).orElse(receta);
-        return mapToDTO(updatedReceta);
+        RecetaResponseDTO dto = recetaMapper.toResponseDTO(updatedReceta);
+        dto.setGuardada(true);
+        return dto;
     }
 
     @Transactional
@@ -93,7 +86,7 @@ public class RecetaService {
         }
 
         Receta updatedReceta = recetaRepo.findById(idReceta).orElse(receta);
-        return mapToDTO(updatedReceta);
+        return recetaMapper.toResponseDTO(updatedReceta);
     }
 
     public boolean recetaYaGuardada(Integer idReceta, Integer idUsuario) {
@@ -105,7 +98,7 @@ public class RecetaService {
                 .stream()
                 .map(rg -> {
                     Receta r = rg.getReceta();
-                    RecetaResponseDTO dto = mapToDTO(r);
+                    RecetaResponseDTO dto = recetaMapper.toResponseDTO(r);
                     dto.setGuardada(true);
                     return dto;
                 })
@@ -119,19 +112,6 @@ public class RecetaService {
         } else {
             recetas = recetaRepo.findByPreferenciasIn(preferencias);
         }
-        return recetas.stream().map(this::mapToDTO).collect(Collectors.toList());
-    }
-
-    private RecetaResponseDTO mapToDTO(Receta receta) {
-        return new RecetaResponseDTO(
-                receta.getId(),
-                receta.getTitulo(),
-                receta.getDescripcion(),
-                receta.getTutorial(),
-                receta.getTiempoPreparacion(),
-                receta.getFotoUrl(),
-                receta.getNumFavoritos(),
-                false
-        );
+        return recetaMapper.toResponseDTOList(recetas);
     }
 }

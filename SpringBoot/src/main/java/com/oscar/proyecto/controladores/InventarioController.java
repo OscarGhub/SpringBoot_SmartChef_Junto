@@ -4,7 +4,6 @@ import com.oscar.proyecto.dto.Inventario.InventarioRequestDTO;
 import com.oscar.proyecto.dto.Inventario.InventarioResponseDTO;
 import com.oscar.proyecto.dto.InventarioIngrediente.InventarioIngredienteResponseDTO;
 import com.oscar.proyecto.modelos.Inventario;
-import com.oscar.proyecto.modelos.InventarioIngrediente;
 import com.oscar.proyecto.servicios.InventarioService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -38,12 +37,12 @@ public class InventarioController {
     }
 
     @PostMapping("/{idInventario}/ingredientes/{idIngrediente}")
-    public ResponseEntity<InventarioIngrediente> agregarIngredienteAlInventario(
+    public ResponseEntity<InventarioIngredienteResponseDTO> agregarIngredienteAlInventario(
             @PathVariable Integer idInventario,
             @PathVariable Integer idIngrediente,
             @RequestParam BigDecimal cantidad) {
 
-        InventarioIngrediente inventarioIngrediente = service.agregarIngredienteAlInventario(idInventario, idIngrediente, cantidad);
+        InventarioIngredienteResponseDTO inventarioIngrediente = service.agregarIngredienteAlInventario(idInventario, idIngrediente, cantidad);
 
         return ResponseEntity.ok(inventarioIngrediente);
     }
