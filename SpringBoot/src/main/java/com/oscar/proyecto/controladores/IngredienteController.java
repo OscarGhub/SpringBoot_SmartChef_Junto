@@ -1,6 +1,7 @@
 package com.oscar.proyecto.controladores;
 
 import com.oscar.proyecto.dto.Ingrediente.IngredienteResponseDTO;
+import com.oscar.proyecto.dto.Ingrediente.TopIngredienteDTO;
 import com.oscar.proyecto.servicios.IngredienteService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -24,6 +25,11 @@ public class IngredienteController {
     @GetMapping("/{id}")
     public ResponseEntity<IngredienteResponseDTO> getIngredienteById(@PathVariable Integer id) {
         return ResponseEntity.ok(service.getIngredienteById(id));
+    }
+
+    @GetMapping("/top5")
+    public List<TopIngredienteDTO> getTop5() {
+        return service.getTop5Ingredientes();
     }
 
 }

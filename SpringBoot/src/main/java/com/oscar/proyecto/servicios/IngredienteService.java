@@ -1,7 +1,9 @@
 package com.oscar.proyecto.servicios;
 
 import com.oscar.proyecto.dto.Ingrediente.IngredienteResponseDTO;
+import com.oscar.proyecto.dto.Ingrediente.TopIngredienteDTO;
 import com.oscar.proyecto.modelos.Ingrediente;
+import com.oscar.proyecto.modelos.IngredienteUsoProjection;
 import com.oscar.proyecto.repositorios.IngredienteRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -38,4 +40,13 @@ public class IngredienteService {
                 ingrediente.getImagenUrl()
         );
     }
+
+    public List<TopIngredienteDTO> getTop5Ingredientes() {
+        List<IngredienteUsoProjection> proyecciones = ingredienteRepository.findTop5UsedIngredientsProjection();
+
+        return proyecciones.stream()
+                .map(p -> new TopIngredienteDTO(p.getIngrediente(), p.getVecesUtilizado()))
+                .collect(Collectors.toList());
+    }
+
 }
