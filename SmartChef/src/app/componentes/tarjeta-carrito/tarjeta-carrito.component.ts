@@ -1,9 +1,10 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, Input } from '@angular/core';
 import { IonicModule, AlertController } from '@ionic/angular';
 import { CommonModule } from '@angular/common';
 import { CarritoService } from '../../servicios/carrito.service';
 import { ListaCompraIngrediente } from '../../modelos/carrito.model';
 import { firstValueFrom } from "rxjs";
+import { UsuarioService } from '../../servicios/usuario.service';
 
 @Component({
   selector: 'app-tarjeta-carrito',
@@ -15,16 +16,23 @@ import { firstValueFrom } from "rxjs";
 export class TarjetaCarritoComponent implements OnInit {
   private carritoService = inject(CarritoService);
   private alertCtrl = inject(AlertController);
+  private usuarioService = inject(UsuarioService);
 
   listaCompraIngredientes: ListaCompraIngrediente[] = [];
-  idLista: number = 1;
   cargando: boolean = false;
+  private idLista: number | null = null;
 
   ngOnInit() {
+    this.idLista = this.usuarioService.obtenerUsuarioId();
     this.cargarLista();
   }
 
   async cargarLista() {
+    if (!this.idLista) {
+      console.warn('Advertencia: Usuario no logeado o ID de lista no encontrado. No se cargará la lista.');
+      return;
+    }
+
     this.cargando = true;
     try {
       this.listaCompraIngredientes = await firstValueFrom(
@@ -38,6 +46,11 @@ export class TarjetaCarritoComponent implements OnInit {
   }
 
   async eliminarIngrediente(item: ListaCompraIngrediente) {
+    if (!this.idLista) {
+      console.error('Error: ID de lista no disponible para eliminar ingrediente.');
+      return;
+    }
+
     const idIngrediente = item.ingrediente.id;
     const nombreIngrediente = item.ingrediente.nombre;
 
@@ -52,7 +65,7 @@ export class TarjetaCarritoComponent implements OnInit {
           handler: async () => {
             try {
               await firstValueFrom(
-                this.carritoService.eliminarIngrediente(this.idLista, idIngrediente)
+                this.carritoService.eliminarIngrediente(this.idLista!, idIngrediente)
               );
 
               this.listaCompraIngredientes = this.listaCompraIngredientes.filter(
