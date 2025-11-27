@@ -1,8 +1,6 @@
 package com.oscar.proyecto.repositorios;
 
-import com.oscar.proyecto.modelos.RecetaCocinadaFecha;
-import com.oscar.proyecto.modelos.RecetaCocinadaFechaId;
-import com.oscar.proyecto.modelos.RecetaUsoProjection;
+import com.oscar.proyecto.modelos.*;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -26,4 +24,7 @@ public interface RecetaCocinadaFechaRepository extends JpaRepository<RecetaCocin
         LIMIT 5
         """, nativeQuery = true)
     List<RecetaUsoProjection> findRecetasUltimaSemana();
+
+    boolean existsByUsuarioAndReceta(Usuario usuario, Receta receta);
+
 }

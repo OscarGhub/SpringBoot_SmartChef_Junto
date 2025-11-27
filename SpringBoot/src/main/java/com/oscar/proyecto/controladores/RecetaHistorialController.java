@@ -1,12 +1,10 @@
 package com.oscar.proyecto.controladores;
 
 import com.oscar.proyecto.dto.Receta.RecetaUsoDTO;
+import com.oscar.proyecto.dto.Receta.RecetaUsoRequestDTO;
 import com.oscar.proyecto.servicios.RecetaCocinadaFechaService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -21,5 +19,10 @@ public class RecetaHistorialController {
     @GetMapping("/recetas-semanal")
     public List<RecetaUsoDTO> getRecetasSemana() {
         return recetaCocinadaFechaService.getRecetasUltimaSemana();
+    }
+
+    @PostMapping("/receta-dia")
+    public RecetaUsoDTO guardarRecetaDia(@RequestBody RecetaUsoRequestDTO dto) {
+        return recetaCocinadaFechaService.guardarRecetaEnFecha(dto);
     }
 }
