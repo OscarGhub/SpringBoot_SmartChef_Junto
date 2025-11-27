@@ -2,7 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import {Observable} from 'rxjs';
 import { Ingrediente } from '../modelos/ingrediente.model';
-import {TopIngrediente} from "../modelos/top.ingrediente.model";
+import {TopIngrediente} from "../modelos/top-ingrediente.model";
 
 @Injectable({
   providedIn: 'root'
