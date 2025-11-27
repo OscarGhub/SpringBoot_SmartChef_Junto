@@ -28,6 +28,5 @@ public interface RecetaMapper {
     Receta toEntity(RecetaRequestDTO dto);
 
     @Mapping(target = "id", ignore = true)
-    @Mapping(target = "numFavoritos", ignore = true)
     void updateEntityFromDto(RecetaRequestDTO dto, @MappingTarget Receta receta);
 }

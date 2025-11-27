@@ -34,9 +34,6 @@ public class Receta {
     @JsonProperty("fotoUrl")
     private String fotoUrl;
 
-    @Column(name = "num_favoritos")
-    private Integer numFavoritos = 0;
-
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
             name = "receta_preferencia",

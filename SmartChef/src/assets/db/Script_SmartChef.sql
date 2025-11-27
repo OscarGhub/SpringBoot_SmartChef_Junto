@@ -40,8 +40,7 @@ CREATE TABLE Receta (
     descripcion TEXT,
     tutorial VARCHAR(255),
     tiempo_preparacion INT,
-    foto_url VARCHAR(255),
-    num_favoritos BIGINT DEFAULT 0
+    foto_url VARCHAR(255)
 );
 
 -- ============================

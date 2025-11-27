@@ -26,67 +26,76 @@ public class RecetaService {
     private final UsuarioRepository usuarioRepo;
     private final RecetaMapper recetaMapper;
 
+    private RecetaResponseDTO mapRecetaConFavoritos(Receta receta) {
+        RecetaResponseDTO dto = recetaMapper.toResponseDTO(receta);
+        int numFav = recetaGuardadaRepo.contarGuardados(receta.getId());
+        dto.setNumFavoritos(numFav);
+        return dto;
+    }
+
     public List<RecetaResponseDTO> getAllRecetas() {
         return recetaMapper.toResponseDTOList(recetaRepo.findAll());
     }
 
     public RecetaResponseDTO getRecetaById(Integer id) {
         return recetaRepo.findById(id)
-                .map(recetaMapper::toResponseDTO)
+                .map(this::mapRecetaConFavoritos)
                 .orElse(null);
     }
 
     public RecetaResponseDTO crearReceta(RecetaRequestDTO dto) {
         Receta receta = recetaMapper.toEntity(dto);
         Receta guardada = recetaRepo.save(receta);
-        return recetaMapper.toResponseDTO(guardada);
+        return mapRecetaConFavoritos(guardada);
     }
 
     public RecetaResponseDTO actualizarReceta(Integer id, RecetaRequestDTO dto) {
         return recetaRepo.findById(id)
                 .map(receta -> {
                     recetaMapper.updateEntityFromDto(dto, receta);
-                    return recetaMapper.toResponseDTO(recetaRepo.save(receta));
+                    Receta actualizada = recetaRepo.save(receta);
+                    return mapRecetaConFavoritos(actualizada);
                 })
                 .orElse(null);
     }
 
     @Transactional
     public RecetaResponseDTO guardarReceta(Integer idReceta, Integer idUsuario) {
+
         Receta receta = recetaRepo.findById(idReceta).orElse(null);
         Usuario usuario = usuarioRepo.findById(idUsuario).orElse(null);
         if (receta == null || usuario == null) return null;
 
         RecetaGuardadaId rgId = new RecetaGuardadaId(idUsuario, idReceta);
+
         if (!recetaGuardadaRepo.existsById(rgId)) {
             RecetaGuardada rg = new RecetaGuardada();
             rg.setId(rgId);
             rg.setReceta(receta);
             rg.setUsuario(usuario);
             recetaGuardadaRepo.save(rg);
-            recetaRepo.incrementarNumFavoritos(idReceta);
         }
 
-        Receta updatedReceta = recetaRepo.findById(idReceta).orElse(receta);
-        RecetaResponseDTO dto = recetaMapper.toResponseDTO(updatedReceta);
+        RecetaResponseDTO dto = mapRecetaConFavoritos(receta);
         dto.setGuardada(true);
+
         return dto;
     }
 
     @Transactional
     public RecetaResponseDTO quitarRecetaGuardada(Integer idReceta, Integer idUsuario) {
+
         Receta receta = recetaRepo.findById(idReceta).orElse(null);
         Usuario usuario = usuarioRepo.findById(idUsuario).orElse(null);
         if (receta == null || usuario == null) return null;
 
         RecetaGuardadaId rgId = new RecetaGuardadaId(idUsuario, idReceta);
+
         if (recetaGuardadaRepo.existsById(rgId)) {
             recetaGuardadaRepo.deleteById(rgId);
-            recetaRepo.decrementarNumFavoritos(idReceta);
         }
 
-        Receta updatedReceta = recetaRepo.findById(idReceta).orElse(receta);
-        return recetaMapper.toResponseDTO(updatedReceta);
+        return mapRecetaConFavoritos(receta);
     }
 
     public boolean recetaYaGuardada(Integer idReceta, Integer idUsuario) {
@@ -97,8 +106,7 @@ public class RecetaService {
         return recetaGuardadaRepo.findAllByIdUsuario(idUsuario)
                 .stream()
                 .map(rg -> {
-                    Receta r = rg.getReceta();
-                    RecetaResponseDTO dto = recetaMapper.toResponseDTO(r);
+                    RecetaResponseDTO dto = mapRecetaConFavoritos(rg.getReceta());
                     dto.setGuardada(true);
                     return dto;
                 })
@@ -107,27 +115,26 @@ public class RecetaService {
 
     public List<RecetaResponseDTO> filtrarRecetasPorPreferencias(List<Integer> preferencias) {
         List<Receta> recetas;
+
         if (preferencias == null || preferencias.isEmpty()) {
             recetas = recetaRepo.findAll();
         } else {
             recetas = recetaRepo.findByPreferenciasIn(preferencias);
         }
-        return recetaMapper.toResponseDTOList(recetas);
+
+        return recetas.stream()
+                .map(this::mapRecetaConFavoritos)
+                .collect(Collectors.toList());
     }
 
     public RecetaResponseDTO obtenerRecetaMasGuardada() {
-
         Integer idReceta = recetaGuardadaRepo.findRecetaMasGuardada();
-        if (idReceta == null) {
-            return null;
-        }
+        if (idReceta == null) return null;
 
         Receta receta = recetaRepo.findById(idReceta).orElse(null);
-        if (receta == null) {
-            return null;
-        }
+        if (receta == null) return null;
 
-        RecetaResponseDTO dto = recetaMapper.toResponseDTO(receta);
+        RecetaResponseDTO dto = mapRecetaConFavoritos(receta);
 
         List<Usuario> usuarios = recetaGuardadaRepo.findUsuariosPorReceta(idReceta);
         dto.setUsuariosQueGuardaron(usuarios);
@@ -142,7 +149,7 @@ public class RecetaService {
         Receta receta = recetaRepo.findById(idRecetaMasGuardada).orElse(null);
         if (receta == null) return null;
 
-        RecetaResponseDTO dto = recetaMapper.toResponseDTO(receta);
+        RecetaResponseDTO dto = mapRecetaConFavoritos(receta);
 
         List<Usuario> usuarios = recetaGuardadaRepo.findUsuariosPorReceta(idRecetaMasGuardada);
         dto.setUsuariosQueGuardaron(usuarios);
