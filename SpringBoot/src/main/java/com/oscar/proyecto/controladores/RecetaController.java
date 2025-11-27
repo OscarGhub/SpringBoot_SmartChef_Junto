@@ -63,4 +63,17 @@ public class RecetaController {
     public List<RecetaResponseDTO> filtrarRecetas(@RequestBody(required = false) List<Integer> preferencias) {
         return service.filtrarRecetasPorPreferencias(preferencias);
     }
+
+    @GetMapping("/receta-mas-guardada")
+    public RecetaResponseDTO getRecetaMasGuardada() {
+        return service.obtenerRecetaMasGuardada();
+    }
+
+    @GetMapping("/receta-mas-guardada-con-usuario")
+    public ResponseEntity<RecetaResponseDTO> getRecetaMasGuardadaConUsuarios() {
+        RecetaResponseDTO dto = service.obtenerRecetaMasGuardadaConUsuarios();
+        if (dto == null) return ResponseEntity.noContent().build();
+        return ResponseEntity.ok(dto);
+    }
+
 }

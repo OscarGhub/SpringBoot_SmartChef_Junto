@@ -1,9 +1,12 @@
 package com.oscar.proyecto.dto.Receta;
 
+import com.oscar.proyecto.modelos.Usuario;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
+import java.util.List;
 
 @Getter
 @Setter
@@ -18,4 +21,5 @@ public class RecetaResponseDTO {
     private String fotoUrl;
     private Integer numFavoritos;
     private Boolean guardada;
+    private List<Usuario> usuariosQueGuardaron;
 }

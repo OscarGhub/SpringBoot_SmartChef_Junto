@@ -17,12 +17,12 @@ public class RecetaGuardada {
     private RecetaGuardadaId id;
 
     @ManyToOne
-    @MapsId("id_receta")
+    @MapsId("idReceta")
     @JoinColumn(name = "id_receta", nullable = false)
     private Receta receta;
 
     @ManyToOne
-    @MapsId("id_usuario")
+    @MapsId("idUsuario")
     @JoinColumn(name = "id_usuario", nullable = false)
     @JsonIgnore
     private Usuario usuario;

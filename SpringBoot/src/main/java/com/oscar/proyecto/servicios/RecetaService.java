@@ -114,4 +114,40 @@ public class RecetaService {
         }
         return recetaMapper.toResponseDTOList(recetas);
     }
+
+    public RecetaResponseDTO obtenerRecetaMasGuardada() {
+
+        Integer idReceta = recetaGuardadaRepo.findRecetaMasGuardada();
+        if (idReceta == null) {
+            return null;
+        }
+
+        Receta receta = recetaRepo.findById(idReceta).orElse(null);
+        if (receta == null) {
+            return null;
+        }
+
+        RecetaResponseDTO dto = recetaMapper.toResponseDTO(receta);
+
+        List<Usuario> usuarios = recetaGuardadaRepo.findUsuariosPorReceta(idReceta);
+        dto.setUsuariosQueGuardaron(usuarios);
+
+        return dto;
+    }
+
+    public RecetaResponseDTO obtenerRecetaMasGuardadaConUsuarios() {
+        Integer idRecetaMasGuardada = recetaGuardadaRepo.findRecetaMasGuardada();
+        if (idRecetaMasGuardada == null) return null;
+
+        Receta receta = recetaRepo.findById(idRecetaMasGuardada).orElse(null);
+        if (receta == null) return null;
+
+        RecetaResponseDTO dto = recetaMapper.toResponseDTO(receta);
+
+        List<Usuario> usuarios = recetaGuardadaRepo.findUsuariosPorReceta(idRecetaMasGuardada);
+        dto.setUsuariosQueGuardaron(usuarios);
+
+        return dto;
+    }
+
 }
