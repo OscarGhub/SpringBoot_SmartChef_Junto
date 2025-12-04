@@ -1,11 +1,13 @@
 import { Component, Input, inject } from '@angular/core';
-import { IonicModule } from '@ionic/angular';
+import {IonicModule, ModalController} from '@ionic/angular';
 import { Router, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { Coleccion } from "../../modelos/coleccion.model";
 import { ColeccionService } from "../../servicios/coleccion.service";
 import { UsuarioService } from "../../servicios/usuario.service";
 import {FormsModule} from "@angular/forms";
+import {FormularioInventarioComponent} from "../formulario-inventario/formulario-inventario.component";
+import {FormularioColeccionComponent} from "../formulario-coleccion/formulario-coleccion.component";
 
 @Component({
   selector: 'app-tarjeta-coleccion',
@@ -22,6 +24,7 @@ export class TarjetaColeccionComponent {
   private router = inject(Router);
   private coleccionService = inject(ColeccionService);
   private usuarioService = inject(UsuarioService);
+  private modalCtrl = inject(ModalController);
 
   idUsuario: number | null = null;
 
@@ -38,29 +41,18 @@ export class TarjetaColeccionComponent {
     }
   }
 
-  abrirModalCrearColeccion() {
-    this.mostrarModalCrearColeccion = true;
-  }
+  async abrirModalInsertar() {
+    const modal = await this.modalCtrl.create({
+      component: FormularioColeccionComponent,
+      componentProps: {}
+    });
 
-  cerrarModalCrearColeccion() {
-    this.mostrarModalCrearColeccion = false;
-  }
+    await modal.present();
 
-  crearColeccion() {
-    if (this.nombreColeccion.trim() && this.idUsuario) {
-      const nuevaColeccion: Coleccion = {
-        id: 0,
-        idUsuario: this.idUsuario,
-        nombre: this.nombreColeccion
-      };
+    const { data, role } = await modal.onWillDismiss();
+    if (role === 'creado' && data) {
 
-      this.coleccionService.crearColeccion(nuevaColeccion).subscribe((coleccionCreada) => {
-        console.log('Colección creada:', coleccionCreada);
-        this.cerrarModalCrearColeccion();
-        this.router.navigate(['/coleccion', coleccionCreada.id]);
-      });
-    } else {
-      console.warn('El nombre de la colección no puede estar vacío o el usuario no está autenticado');
     }
   }
+
 }

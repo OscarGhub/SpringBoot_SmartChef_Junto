@@ -3,6 +3,7 @@ package com.oscar.proyecto.servicios;
 import com.oscar.proyecto.dto.Inventario.InventarioResponseDTO;
 import com.oscar.proyecto.dto.InventarioIngrediente.InventarioIngredienteRequestDTO;
 import com.oscar.proyecto.dto.InventarioIngrediente.InventarioIngredienteResponseDTO;
+import com.oscar.proyecto.exception.ElementoNoEncontradoException;
 import com.oscar.proyecto.modelos.Inventario;
 import com.oscar.proyecto.modelos.Usuario;
 import com.oscar.proyecto.repositorios.InventarioRepository;
@@ -41,7 +42,7 @@ public class InventarioService {
 
     public Inventario crearInventarioParaUsuarioPorId(Integer usuarioId) {
         Usuario usuario = usuarioRepository.findById(usuarioId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuario no encontrado"));
+                .orElseThrow(() -> new ElementoNoEncontradoException("Usuario no encontrado"));
 
         return crearInventarioParaUsuario(usuario);
     }

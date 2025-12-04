@@ -1,6 +1,7 @@
 package com.oscar.proyecto.servicios;
 
 import com.oscar.proyecto.dto.Usuario.UsuarioDTO;
+import com.oscar.proyecto.exception.ElementoNoEncontradoException;
 import com.oscar.proyecto.modelos.Usuario;
 import com.oscar.proyecto.repositorios.UsuarioRepository;
 import com.oscar.proyecto.mapper.UsuarioMapper;
@@ -57,7 +58,7 @@ public class UsuarioService {
 
             return nuevoUsuario;
         } catch (Exception e) {
-            throw new RuntimeException("Error al crear el usuario: " + e.getMessage(), e);
+            throw new ElementoNoEncontradoException("Error al crear el usuario " + e.getMessage() + e);
         }
     }
 

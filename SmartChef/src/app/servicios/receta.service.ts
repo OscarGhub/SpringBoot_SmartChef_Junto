@@ -48,4 +48,7 @@ export class RecetaService {
     return this.http.get<RecetaMasGuardadaConUsuarios>(`${this.apiUrl}/receta-mas-guardada-con-usuario`);
   }
 
+  crearReceta(recetaParaGuardar: Receta) {
+
+  }
 }

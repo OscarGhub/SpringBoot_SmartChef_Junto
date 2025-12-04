@@ -56,3 +56,16 @@ ion-header, ion-toolbar {
   max-width: 500px;
   margin: 0 auto;
 }
+
+.boton {
+  width: 110px;
+  height: 60px;
+  --border-radius: 40px;
+  --background: #217A43;
+  --color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 0.9rem;
+  text-align: center;
+}

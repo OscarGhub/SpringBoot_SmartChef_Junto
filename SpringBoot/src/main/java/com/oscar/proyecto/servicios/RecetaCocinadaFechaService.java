@@ -2,6 +2,7 @@ package com.oscar.proyecto.servicios;
 
 import com.oscar.proyecto.dto.Receta.RecetaUsoDTO;
 import com.oscar.proyecto.dto.Receta.RecetaUsoRequestDTO;
+import com.oscar.proyecto.exception.ElementoNoEncontradoException;
 import com.oscar.proyecto.modelos.RecetaCocinadaFecha;
 import com.oscar.proyecto.modelos.RecetaUsoProjection;
 import com.oscar.proyecto.repositorios.RecetaCocinadaFechaRepository;
@@ -40,15 +41,15 @@ public class RecetaCocinadaFechaService {
     public RecetaUsoDTO guardarRecetaEnFecha(RecetaUsoRequestDTO dto) {
 
         var receta = recetaRepository.findById(dto.getIdReceta())
-                .orElseThrow(() -> new RuntimeException("Receta no encontrada"));
+                .orElseThrow(() -> new ElementoNoEncontradoException("Receta no encontrada"));
 
         var usuario = usuarioRepository.findById(dto.getIdUsuario())
-                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+                .orElseThrow(() -> new ElementoNoEncontradoException("Usuario no encontrado"));
 
         boolean existe = recetaCocinadaFechaRepository.existsByUsuarioAndReceta(usuario, receta);
 
         if (existe) {
-            throw new RuntimeException("El usuario ya registró esta receta");
+            throw new ElementoNoEncontradoException("El usuario ya registró esta receta");
         }
 
         RecetaCocinadaFecha entidad = new RecetaCocinadaFecha();

@@ -2,14 +2,13 @@ package com.oscar.proyecto.servicios;
 
 import com.oscar.proyecto.dto.Ingrediente.IngredienteResponseDTO;
 import com.oscar.proyecto.dto.Ingrediente.TopIngredienteDTO;
+import com.oscar.proyecto.exception.ElementoNoEncontradoException;
 import com.oscar.proyecto.mapper.IngredienteMapper;
 import com.oscar.proyecto.modelos.Ingrediente;
 import com.oscar.proyecto.modelos.IngredienteUsoProjection;
 import com.oscar.proyecto.repositorios.IngredienteRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
-import org.springframework.http.HttpStatus;
 
 import java.util.List;
 
@@ -27,7 +26,7 @@ public class IngredienteService {
 
     public IngredienteResponseDTO getIngredienteById(Integer id) {
         Ingrediente ingrediente = ingredienteRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Ingrediente no encontrado"));
+                .orElseThrow(() -> new ElementoNoEncontradoException("Ingrediente no encontrado"));
         return ingredienteMapper.toResponseDTO(ingrediente);
     }
 

@@ -12,6 +12,8 @@ import { PreferenciaService } from '../../servicios/preferencia.service';
 import { InventarioService } from '../../servicios/inventario.service';
 import { InventarioItem } from '../../modelos/inventario.model';
 import { UsuarioService } from '../../servicios/usuario.service';
+import { ModalController } from '@ionic/angular';
+import { FormularioRecetaComponent } from '../../componentes/formulario-receta/formulario-receta.component';
 
 @Component({
   selector: 'app-inicio',
@@ -32,6 +34,7 @@ export class InicioComponent implements OnInit {
   private preferenciaService = inject(PreferenciaService);
   private inventarioService = inject(InventarioService);
   private usuarioService = inject(UsuarioService);
+  private modalCtrl = inject(ModalController);
 
   recetas: Receta[] = [];
   recetasFiltradas: Receta[] = [];
@@ -130,6 +133,21 @@ export class InicioComponent implements OnInit {
 
   private cargarIngredientes(inventarioId: number) {
     console.log(`Inventario ${inventarioId} existe. Si es necesario, cargar ingredientes detallados aquí.`);
+  }
+
+  async abrirModalInsertar() {
+    const modal = await this.modalCtrl.create({
+      component: FormularioRecetaComponent,
+      componentProps: { usuarioId: this.usuarioId }
+    });
+
+    await modal.present();
+
+    const { data, role } = await modal.onWillDismiss();
+    if (role === 'creado' && data) {
+      this.recetas.push(data);
+      this.aplicarFiltros();
+    }
   }
 
 }

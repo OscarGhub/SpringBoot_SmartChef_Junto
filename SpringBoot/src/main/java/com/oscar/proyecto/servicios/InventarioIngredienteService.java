@@ -2,6 +2,7 @@ package com.oscar.proyecto.servicios;
 
 import com.oscar.proyecto.dto.InventarioIngrediente.InventarioIngredienteRequestDTO;
 import com.oscar.proyecto.dto.InventarioIngrediente.InventarioIngredienteResponseDTO;
+import com.oscar.proyecto.exception.ElementoNoEncontradoException;
 import com.oscar.proyecto.modelos.Inventario;
 import com.oscar.proyecto.modelos.InventarioIngrediente;
 import com.oscar.proyecto.modelos.InventarioIngredienteId;
@@ -35,10 +36,10 @@ public class InventarioIngredienteService {
 
     public InventarioIngredienteResponseDTO agregarIngredienteInventario(InventarioIngredienteRequestDTO request) {
         Inventario inventario = inventarioRepository.findById(request.getIdInventario())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Inventario no encontrado"));
+                .orElseThrow(() -> new ElementoNoEncontradoException("Inventario no encontrado"));
 
         Ingrediente ingrediente = ingredienteRepository.findById(request.getIdIngrediente())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Ingrediente no encontrado"));
+                .orElseThrow(() -> new ElementoNoEncontradoException("Ingrediente no encontrado"));
 
         InventarioIngredienteId id = new InventarioIngredienteId(inventario.getId(), ingrediente.getId());
 
@@ -58,7 +59,7 @@ public class InventarioIngredienteService {
         try {
             inventarioIngredienteRepository.deleteById(id);
         } catch (EmptyResultDataAccessException e) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Ingrediente en inventario no existe");
+            throw new ElementoNoEncontradoException("Ingrediente en Inventario no existe");
         }
     }
 

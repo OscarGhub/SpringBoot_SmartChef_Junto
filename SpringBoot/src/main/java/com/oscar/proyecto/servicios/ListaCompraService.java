@@ -3,6 +3,7 @@ package com.oscar.proyecto.servicios;
 import com.oscar.proyecto.dto.ListaCompra.ListaCompraRequestDTO;
 import com.oscar.proyecto.dto.ListaCompra.ListaCompraResponseDTO;
 import com.oscar.proyecto.dto.ListaCompra.ListaCompraIngredienteDTO;
+import com.oscar.proyecto.exception.ElementoNoEncontradoException;
 import com.oscar.proyecto.mapper.ListaCompraMapper;
 import com.oscar.proyecto.modelos.*;
 import com.oscar.proyecto.repositorios.*;
@@ -47,7 +48,7 @@ public class ListaCompraService {
 
     public ListaCompraIngredienteDTO anadirIngrediente(Integer idLista, ListaCompraIngredienteDTO request) {
         ListaCompra listaCompra = listaCompraRepository.findById(idLista)
-                .orElseThrow(() -> new RuntimeException("Lista de compra no encontrada"));
+                .orElseThrow(() -> new ElementoNoEncontradoException("Lista de compra no encontrada"));
 
         Integer idIngrediente = (request.getIngrediente() != null)
                 ? request.getIngrediente().getId()
@@ -58,7 +59,7 @@ public class ListaCompraService {
         }
 
         Ingrediente ingrediente = ingredienteRepository.findById(idIngrediente)
-                .orElseThrow(() -> new RuntimeException("Ingrediente no encontrado"));
+                .orElseThrow(() -> new ElementoNoEncontradoException("Ingrediente no encontrado"));
 
         ListaCompraIngredienteId id = new ListaCompraIngredienteId(idLista, ingrediente.getId());
         ListaCompraIngrediente listaIngrediente = listaCompraIngredienteRepository.findById(id)
@@ -80,7 +81,7 @@ public class ListaCompraService {
         ListaCompraIngredienteId id = new ListaCompraIngredienteId(idLista, idIngrediente);
 
         if (!listaCompraIngredienteRepository.existsById(id)) {
-            throw new RuntimeException("Ingrediente no existe en la lista");
+            throw new ElementoNoEncontradoException("Ingrediente no existe en lista");
         }
 
         listaCompraIngredienteRepository.deleteById(id);
@@ -88,7 +89,7 @@ public class ListaCompraService {
 
     public List<ListaCompraIngredienteDTO> obtenerIngredientes(Integer idLista) {
         ListaCompra listaCompra = listaCompraRepository.findById(idLista)
-                .orElseThrow(() -> new RuntimeException("Lista de compra no encontrada"));
+                .orElseThrow(() -> new ElementoNoEncontradoException("Lista de compra no encontrada"));
 
         List<ListaCompraIngrediente> ingredientes = listaCompraIngredienteRepository.findByListaCompra(listaCompra);
 
@@ -142,7 +143,7 @@ public class ListaCompraService {
 
     public void eliminarRecetaDelCarrito(Integer idUsuario, Integer idReceta) {
         ListaCompra listaCompra = listaCompraRepository.findByUsuarioId(idUsuario)
-                .orElseThrow(() -> new RuntimeException("Lista de compra no encontrada para el usuario: " + idUsuario));
+                .orElseThrow(() -> new ElementoNoEncontradoException("Lista de compra no encontrada del usuario" + idUsuario));
 
         List<RecetaIngrediente> ingredientesReceta = recetaIngredienteRepository.findByRecetaIdEagerly(idReceta);
 

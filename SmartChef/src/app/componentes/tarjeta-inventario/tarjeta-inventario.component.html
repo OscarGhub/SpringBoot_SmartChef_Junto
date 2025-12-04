@@ -1,101 +1,15 @@
 <ion-header>
   <ion-toolbar>
-    <ion-buttons slot="end">
-      <ion-button (click)="abrirSelector()">Agregar Ingredientes</ion-button>
-    </ion-buttons>
+    <ion-button class="boton" (click)="abrirModalInsertar()">
+      Insertar Ingredientes
+    </ion-button>
   </ion-toolbar>
 </ion-header>
 
 <ion-content>
-  <div class="inventario-card" *ngIf="items.length > 0; else noItems">
-    <ion-card-header>
-      <ion-card-title>Ingredientes en tu Inventario</ion-card-title>
-    </ion-card-header>
-
-    <ion-card-content>
-      <div class="inventario-elementos">
-        <ion-item *ngFor="let item of items; " class="inventario-elemento">
-          <ion-label>
-            <h2>{{ item.nombre }}</h2>
-            <p>Cantidad: {{ item.cantidad }} {{ item.unidadMedida }}</p>
-          </ion-label>
-
-          <ion-button
-            class="eliminar-icono"
-            color="danger"
-            size="small"
-            (click)="eliminarItemBackend(item)">
-            Eliminar
-          </ion-button>
-        </ion-item>
-      </div>
-    </ion-card-content>
-  </div>
 
   <ng-template #noItems>
     <p class="texto-vacio">No hay ingredientes en tu inventario. ¡Agrega algunos!</p>
   </ng-template>
-
-  <ion-card *ngIf="ingredientesSeleccionados.length > 0" class="inventario-card">
-    <ion-card-header>
-      <ion-card-title>Ingredientes Seleccionados</ion-card-title>
-    </ion-card-header>
-
-    <ion-card-content>
-      <div class="inventario-elementos">
-        <ion-item *ngFor="let ingrediente of ingredientesSeleccionados; " class="inventario-elemento">
-          <ion-label>
-            <h2>{{ ingrediente?.nombre }}</h2>
-            <p>{{ ingrediente?.unidadMedida }}</p>
-          </ion-label>
-
-          <ion-button
-            class="eliminar-icono"
-            color="danger"
-            size="small"
-            (click)="eliminarIngrediente(ingrediente)">
-            Eliminar
-          </ion-button>
-        </ion-item>
-      </div>
-
-      <ion-button
-        expand="block"
-        color="success"
-        (click)="confirmarSeleccion()">
-        Confirmar Selección
-      </ion-button>
-    </ion-card-content>
-  </ion-card>
-
-  <ion-modal [isOpen]="mostrarSelector" (didDismiss)="cerrarSelector()" fullscreen>
-    <ion-header>
-      <ion-toolbar color="primary">
-        <ion-title>Selecciona Ingredientes</ion-title>
-        <ion-buttons slot="end">
-          <ion-button (click)="cerrarSelector()">Cerrar</ion-button>
-        </ion-buttons>
-      </ion-toolbar>
-    </ion-header>
-
-    <ion-content>
-      <ion-list>
-        <ion-item
-          *ngFor="let ingrediente of ingredientesDisponibles"
-          class="inventario-elemento"
-          (click)="agregarIngrediente(ingrediente)">
-
-          <ion-avatar slot="start">
-            <img [src]="ingrediente?.imagenUrl" alt="{{ ingrediente?.nombre }}" />
-          </ion-avatar>
-          <ion-label>
-            <h2>{{ ingrediente?.nombre }}</h2>
-            <p>{{ ingrediente?.unidadMedida }}</p>
-          </ion-label>
-          <ion-button slot="end" color="primary" size="small">Agregar</ion-button>
-        </ion-item>
-      </ion-list>
-    </ion-content>
-  </ion-modal>
 
 </ion-content>
