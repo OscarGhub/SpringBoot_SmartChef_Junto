@@ -10,10 +10,6 @@ export class CarritoService {
   private http = inject(HttpClient);
   private apiUrl = 'http://localhost:8080/api/carrito';
 
-  eliminarIngrediente(idLista: number, idIngrediente: number): Observable<string> {
-    return this.http.delete(`${this.apiUrl}/${idLista}/ingrediente/${idIngrediente}`, { responseType: 'text' });
-  }
-
   getIngredientes(idLista: number): Observable<ListaCompraIngrediente[]> {
     return this.http.get<ListaCompraIngrediente[]>(`${this.apiUrl}/${idLista}/ingredientes`);
   }
@@ -24,10 +20,6 @@ export class CarritoService {
 
   eliminarRecetaDelCarrito(idUsuario: number, idReceta: number): Observable<string> {
     return this.http.delete(`${this.apiUrl}/usuario/${idUsuario}/receta/${idReceta}`, { responseType: 'text' });
-  }
-
-  crearListaCompra(idUsuario: number): Observable<any> {
-    return this.http.post<any>(`${this.apiUrl}`, { id_usuario: idUsuario });
   }
 
   recetaEstaEnCarrito(idUsuario: number, idReceta: number): Observable<boolean> {

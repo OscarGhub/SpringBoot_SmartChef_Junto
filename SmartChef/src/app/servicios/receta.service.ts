@@ -14,7 +14,6 @@ export class RecetaService {
   getRecetas(): Observable<Receta[]> {
     return this.http.get<Receta[]>(this.apiUrl);
   }
-
   getRecetaById(id: number): Observable<Receta> {
     return this.http.get<Receta>(`${this.apiUrl}/${id}`);
   }
@@ -46,9 +45,5 @@ export class RecetaService {
 
   getRecetaMasGuardadaPorUsuario(): Observable<RecetaMasGuardadaConUsuarios> {
     return this.http.get<RecetaMasGuardadaConUsuarios>(`${this.apiUrl}/receta-mas-guardada-con-usuario`);
-  }
-
-  crearReceta(recetaParaGuardar: Receta) {
-
   }
 }
