@@ -19,26 +19,27 @@ export class TarjetaCarritoComponent implements OnInit {
 
   listaCompraIngredientes: ListaCompraIngrediente[] = [];
   cargando: boolean = false;
-  private idLista: number | null = null;
+  private idUsuario: number | null = null;
 
   ngOnInit() {
-    this.idLista = this.usuarioService.obtenerUsuarioId();
+    this.idUsuario = this.usuarioService.obtenerUsuarioId();
     this.cargarLista();
   }
 
   async cargarLista() {
-    if (!this.idLista) {
-      console.warn('Advertencia: Usuario no logeado o ID de lista no encontrado. No se cargará la lista.');
+    if (!this.idUsuario) {
+      console.warn('Advertencia: Usuario no logeado o ID de usuario no encontrado. No se cargará la lista.');
       return;
     }
 
     this.cargando = true;
     try {
       this.listaCompraIngredientes = await firstValueFrom(
-        this.carritoService.getIngredientes(this.idLista)
+        this.carritoService.getIngredientesPorUsuario(this.idUsuario)
       );
     } catch (error) {
       console.error('Error al cargar la lista:', error);
+      this.listaCompraIngredientes = [];
     } finally {
       this.cargando = false;
     }

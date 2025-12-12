@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Receta } from '../modelos/receta.model';
 import { Observable } from 'rxjs';
 import {RecetaMasGuardada, RecetaMasGuardadaConUsuarios} from "../modelos/receta-masguardada.model";
+import {RecetaRequest} from "../modelos/receta-request.model";
 
 @Injectable({
   providedIn: 'root'
@@ -45,5 +46,9 @@ export class RecetaService {
 
   getRecetaMasGuardadaPorUsuario(): Observable<RecetaMasGuardadaConUsuarios> {
     return this.http.get<RecetaMasGuardadaConUsuarios>(`${this.apiUrl}/receta-mas-guardada-con-usuario`);
+  }
+
+  crearReceta(receta: RecetaRequest): Observable<Receta> {
+    return this.http.post<Receta>(this.apiUrl, receta);
   }
 }

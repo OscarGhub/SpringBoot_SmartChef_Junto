@@ -230,4 +230,16 @@ public class ListaCompraService {
         return true;
     }
 
+    public List<ListaCompraIngredienteDTO> obtenerIngredientesPorUsuario(Integer idUsuario) {
+        Optional<ListaCompra> listaOptional = listaCompraRepository.findByUsuarioId(idUsuario);
+
+        if (listaOptional.isEmpty()) {
+            return List.of();
+        }
+
+        Integer idLista = listaOptional.get().getId();
+
+        return this.obtenerIngredientes(idLista);
+    }
+
 }

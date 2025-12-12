@@ -70,3 +70,8 @@ ion-header, ion-toolbar {
   font-size: 0.9rem;
   text-align: center;
 }
+
+ion-modal {
+  --background: transparent !important;
+  --box-shadow: none !important;
+}

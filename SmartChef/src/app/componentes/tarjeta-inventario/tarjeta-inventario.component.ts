@@ -5,7 +5,6 @@ import { InventarioService } from '../../servicios/inventario.service';
 import { IngredienteService } from '../../servicios/ingrediente.service';
 import { Ingrediente } from '../../modelos/ingrediente.model';
 import { InventarioIngredienteItem } from "../../modelos/inventario-ingrediente.model";
-import {FormularioRecetaComponent} from "../formulario-receta/formulario-receta.component";
 import {FormularioInventarioComponent} from "../formulario-inventario/formulario-inventario.component";
 
 @Component({
@@ -64,17 +63,32 @@ export class TarjetaInventarioComponent implements OnInit {
   }
 
   async abrirModalInsertar() {
+    const idInventarioPrincipal = this.items.length > 0 ? this.items[0].idInventario : null;
+
+    if (!this.usuarioId || !idInventarioPrincipal) {
+      console.error('ID de usuario o de inventario no disponible.');
+      return;
+    }
+
     const modal = await this.modalCtrl.create({
       component: FormularioInventarioComponent,
-      componentProps: { usuarioId: this.usuarioId }
+      componentProps: {
+        usuarioId: this.usuarioId,
+        idInventario: idInventarioPrincipal, // Pasar el ID del inventario
+        ingredientesDisponibles: this.ingredientesDisponibles // Pasar la lista de ingredientes
+      }
     });
 
-    await modal.present();
+    modal.onDidDismiss().then((result) => {
+      if (result.role === 'confirm') {
+        console.log('Ingrediente añadido con éxito. Recargando lista...');
+        this.cargarInventarioBackend();
+      } else if (result.role === 'error') {
+        console.warn('Ocurrió un error al intentar añadir el ingrediente.');
+      }
+    });
 
-    const { data, role } = await modal.onWillDismiss();
-    if (role === 'creado' && data) {
-
-    }
+    return await modal.present();
   }
 
 }

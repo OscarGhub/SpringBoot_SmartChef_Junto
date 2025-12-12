@@ -2,6 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Coleccion } from '../modelos/coleccion.model';
+import {ColeccionRequest} from "../modelos/coleccion.request.model";
 
 @Injectable({
   providedIn: 'root'
@@ -13,7 +14,7 @@ export class ColeccionService {
 
   constructor() { }
 
-  crearColeccion(coleccion: Coleccion): Observable<Coleccion> {
+  crearColeccion(coleccion: ColeccionRequest): Observable<Coleccion> {
     return this.http.post<Coleccion>(`${this.apiUrl}/crear`, coleccion);
   }
 

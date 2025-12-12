@@ -116,7 +116,7 @@ export class TarjetaPerfilComponent implements OnInit {
   }
 
   onImageError($event: ErrorEvent) {
-    this.usuario.fotoUrl = '../../../assets/images/perfil.webp';
+    this.usuario.fotoUrl = '../../../assets/images/perfil.png';
   }
 
 }

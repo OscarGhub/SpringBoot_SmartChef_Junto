@@ -15,7 +15,7 @@ export class CabeceraComponent implements OnInit {
   private router = inject(Router);
   private usuarioService = inject(UsuarioService);
 
-  fotoPerfilUrl: string = '../../../assets/images/perfil.webp';
+  fotoPerfilUrl: string = '../../../assets/images/perfil.png';
   correoValido: boolean = false;
 
   constructor() { }
@@ -67,6 +67,6 @@ export class CabeceraComponent implements OnInit {
   }
 
   onImageError() {
-    this.fotoPerfilUrl = '../../../assets/images/perfil.webp';
+    this.fotoPerfilUrl = '../../../assets/images/perfil.png';
   }
 }

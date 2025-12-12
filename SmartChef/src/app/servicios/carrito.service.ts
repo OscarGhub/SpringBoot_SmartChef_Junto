@@ -9,9 +9,14 @@ import {inject, Injectable} from "@angular/core";
 export class CarritoService {
   private http = inject(HttpClient);
   private apiUrl = 'http://localhost:8080/api/carrito';
+  private ingredienteApiUrl = 'http://localhost:8080/api/ingrediente';
 
   getIngredientes(idLista: number): Observable<ListaCompraIngrediente[]> {
     return this.http.get<ListaCompraIngrediente[]>(`${this.apiUrl}/${idLista}/ingredientes`);
+  }
+
+  getIngredientesPorUsuario(idUsuario: number): Observable<ListaCompraIngrediente[]> {
+    return this.http.get<ListaCompraIngrediente[]>(`${this.ingredienteApiUrl}/usuario/${idUsuario}/ingredientes`);
   }
 
   anadirRecetaAlCarrito(idUsuario: number, idReceta: number): Observable<string> {

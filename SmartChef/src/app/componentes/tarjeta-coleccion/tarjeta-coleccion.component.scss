@@ -1,3 +1,10 @@
+.contenedor{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
 .coleccion-card {
   background-color: #217A43;
   padding: 16px;
@@ -40,3 +47,14 @@
   font-size: 16px;
 }
 
+.lista-colecciones {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  padding: 10px 0;
+}
+
+.img{
+  width: 10%;
+  height: 10%;
+}
