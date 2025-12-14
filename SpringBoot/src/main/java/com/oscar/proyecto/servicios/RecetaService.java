@@ -49,6 +49,16 @@ public class RecetaService {
         return mapRecetaConFavoritos(guardada);
     }
 
+    @Transactional
+    public void eliminarReceta(Integer id) {
+        if (!recetaRepo.existsById(id)) {
+            System.out.println("Receta con ID " + id + " no encontrada para eliminar.");
+            return;
+        }
+
+        recetaRepo.deleteById(id);
+    }
+
     public RecetaResponseDTO actualizarReceta(Integer id, RecetaRequestDTO dto) {
         return recetaRepo.findById(id)
                 .map(receta -> {

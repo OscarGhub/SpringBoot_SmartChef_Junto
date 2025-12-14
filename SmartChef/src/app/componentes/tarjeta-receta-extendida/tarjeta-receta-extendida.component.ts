@@ -1,5 +1,5 @@
 import {Component, EventEmitter, inject, Input, OnInit, Output} from '@angular/core';
-import {IonicModule} from '@ionic/angular';
+import {AlertController, IonicModule, ModalController} from '@ionic/angular';
 import {Router, RouterModule} from '@angular/router';
 import {CommonModule} from '@angular/common';
 import {Receta} from '../../modelos/receta.model';
@@ -21,6 +21,8 @@ export class TarjetaRecetaExtendidaComponent implements OnInit {
   private router = inject(Router);
   private recetaService = inject(RecetaService);
   private carritoService = inject(CarritoService);
+  private modalCtrl = inject(ModalController);
+  private alertCtrl = inject(AlertController);
 
   private usuario?: { id: number };
 
@@ -121,5 +123,65 @@ export class TarjetaRecetaExtendidaComponent implements OnInit {
   onImageError(event: Event) {
     const img = event.target as HTMLImageElement;
     img.src = '../../../assets/images/receta.png';
+  }
+
+  async abrirModalEditar(event: Event) {
+    event.stopPropagation();
+    if (!this.receta) return;
+
+    const { FormularioRecetaComponent } = await import('../formulario-receta/formulario-receta.component');
+
+    const modal = await this.modalCtrl.create({
+      component: FormularioRecetaComponent,
+      componentProps: {
+        recetaAEditar: this.receta
+      }
+    });
+
+    await modal.present();
+
+    const { data, role } = await modal.onWillDismiss();
+
+    if (role === 'confirm' && data) {
+      this.receta = { ...this.receta, ...data };
+      console.log('Receta actualizada desde el modal:', this.receta);
+      this.cambioFavorito.emit();
+    }
+  }
+
+  async eliminarReceta(event: Event) {
+    event.stopPropagation();
+
+    if (!this.receta || !this.receta.id) return;
+
+    const alert = await this.alertCtrl.create({
+      header: 'Confirmar Eliminación',
+      message: `¿Estás seguro de que quieres eliminar la receta "${this.receta.titulo}"?`,
+      buttons: [
+        {
+          text: 'Cancelar',
+          role: 'cancel',
+          handler: () => { console.log('Eliminación cancelada'); }
+        },
+        {
+          text: 'Eliminar',
+          role: 'confirm',
+          cssClass: 'alert-danger-button',
+          handler: async () => {
+            try {
+              await firstValueFrom(this.recetaService.eliminarReceta(this.receta!.id!));
+
+              console.log('Receta eliminada con éxito:', this.receta!.titulo);
+
+              this.cambioFavorito.emit();
+            } catch (err) {
+              console.error('Error al intentar eliminar la receta', err);
+            }
+          }
+        }
+      ]
+    });
+
+    await alert.present();
   }
 }

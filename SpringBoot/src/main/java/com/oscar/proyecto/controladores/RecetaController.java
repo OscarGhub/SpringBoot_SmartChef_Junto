@@ -33,6 +33,12 @@ public class RecetaController {
         return service.crearReceta(dto);
     }
 
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> eliminarReceta(@PathVariable Integer id) {
+        service.eliminarReceta(id);
+        return ResponseEntity.noContent().build();
+    }
+
     @PutMapping("/{id}")
     public ResponseEntity<RecetaResponseDTO> actualizarReceta(@PathVariable Integer id, @RequestBody RecetaRequestDTO dto) {
         RecetaResponseDTO actualizado = service.actualizarReceta(id, dto);

@@ -51,4 +51,12 @@ export class RecetaService {
   crearReceta(receta: RecetaRequest): Observable<Receta> {
     return this.http.post<Receta>(this.apiUrl, receta);
   }
+
+  eliminarReceta(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/${id}`);
+  }
+
+  actualizarReceta(id: number, receta: RecetaRequest): Observable<Receta> {
+    return this.http.put<Receta>(`${this.apiUrl}/${id}`, receta);
+  }
 }

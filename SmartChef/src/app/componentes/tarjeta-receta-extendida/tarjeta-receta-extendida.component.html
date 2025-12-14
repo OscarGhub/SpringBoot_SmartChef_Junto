@@ -32,6 +32,24 @@
           {{ receta.enCarrito ? 'En carrito' : 'Añadir al carrito' }}
         </ion-button>
 
+        <div class="opciones-receta">
+          <ion-button
+            class="boton-edel"
+            (click)="abrirModalEditar($event)"
+          >
+            <ion-icon name="create-outline" slot="center"></ion-icon>
+            Editar
+          </ion-button>
+
+          <ion-button
+            class="boton-edel"
+            (click)="eliminarReceta($event)"
+          >
+            <ion-icon name="trash-outline" slot="center"></ion-icon>
+            Eliminar
+          </ion-button>
+        </div>
+
       </div>
     </div>
   </div>

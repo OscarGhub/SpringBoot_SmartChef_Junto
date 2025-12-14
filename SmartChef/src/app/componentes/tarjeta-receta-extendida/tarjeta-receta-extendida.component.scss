@@ -10,6 +10,22 @@
   border: none;
 }
 
+.boton-edel {
+  width: 90px;
+  height: 50px;
+  --background: #ffffff;
+  --color: black;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+  border-radius: 8px;
+  font-weight: bold;
+}
+
+.opciones-receta {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
 .receta-container {
   display: flex;
   flex-direction: column;

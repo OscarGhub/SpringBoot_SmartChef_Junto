@@ -1,9 +1,9 @@
-import {Component, inject, Input} from "@angular/core";
+import {Component, inject, Input, OnInit} from "@angular/core";
 import {IonicModule, ModalController} from "@ionic/angular";
 import {FormsModule, NgForm} from "@angular/forms";
 import {RecetaService} from "../../servicios/receta.service";
 import {Receta} from "../../modelos/receta.model";
-
+import {firstValueFrom} from "rxjs";
 
 interface NuevaRecetaForm {
   titulo: string;
@@ -23,11 +23,12 @@ interface NuevaRecetaForm {
     FormsModule
   ]
 })
-export class FormularioRecetaComponent {
+export class FormularioRecetaComponent implements OnInit {
   private modalCtrl = inject(ModalController);
   private recetaService = inject(RecetaService);
 
   @Input() usuarioId: number | null = null;
+  @Input() recetaAEditar?: Receta;
 
   nuevaReceta: NuevaRecetaForm = {
     titulo: '',
@@ -37,15 +38,28 @@ export class FormularioRecetaComponent {
     pasos: ''
   };
 
-  constructor() { }
+  esEdicion: boolean = false;
+
+  ngOnInit() {
+    if (this.recetaAEditar) {
+      this.esEdicion = true;
+      this.nuevaReceta = {
+        titulo: this.recetaAEditar.titulo,
+        descripcion: this.recetaAEditar.descripcion,
+        tiempoPreparacion: this.recetaAEditar.tiempoPreparacion,
+        img: this.recetaAEditar.fotoUrl || '',
+        pasos: this.recetaAEditar.tutorial || ''
+      };
+    }
+  }
 
   cancelar() {
     this.modalCtrl.dismiss(null, 'cancel');
   }
 
-  guardarReceta(form: NgForm) {
-    if (form.invalid || !this.usuarioId) {
-      console.error('Formulario inválido o usuario no identificado.');
+  async guardarReceta(form: NgForm) {
+    if (form.invalid) {
+      console.error('Formulario inválido.');
       return;
     }
 
@@ -57,15 +71,31 @@ export class FormularioRecetaComponent {
       fotoUrl: this.nuevaReceta.img,
     };
 
-    this.recetaService.crearReceta(recetaRequest).subscribe({
-      next: (recetaGuardada: Receta) => {
-        console.log('Receta guardada:', recetaGuardada);
-        this.modalCtrl.dismiss(recetaGuardada, 'creado');
-      },
-      error: (err) => {
-        console.error('Error al guardar la receta:', err);
-      }
-    });
-  }
+    try {
+      let recetaGuardada: Receta;
 
+      if (this.esEdicion) {
+        if (!this.recetaAEditar!.id) {
+          throw new Error("ID de receta faltante para la edición.");
+        }
+        recetaGuardada = await firstValueFrom(
+          this.recetaService.actualizarReceta(this.recetaAEditar!.id, recetaRequest)
+        );
+      } else {
+        if (!this.usuarioId) {
+          console.error('ID de usuario faltante para la creación.');
+          return;
+        }
+        recetaGuardada = await firstValueFrom(
+          this.recetaService.crearReceta(recetaRequest)
+        );
+      }
+
+      console.log('Receta guardada/editada:', recetaGuardada);
+      this.modalCtrl.dismiss(recetaGuardada, 'confirm');
+
+    } catch (err) {
+      console.error('Error al guardar la receta:', err);
+    }
+  }
 }
