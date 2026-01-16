@@ -1,9 +1,10 @@
 package com.oscar.proyecto.servicios;
 
+import com.oscar.proyecto.dto.Receta.RecetaRequestDTO;
 import com.oscar.proyecto.dto.Receta.RecetaResponseDTO;
-import com.oscar.proyecto.modelos.Receta;
-import com.oscar.proyecto.repositorios.RecetaRepository;
-import org.junit.jupiter.api.BeforeEach;
+import com.oscar.proyecto.modelos.Usuario;
+import com.oscar.proyecto.repositorios.UsuarioRepository;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -19,38 +20,53 @@ public class RecetaServiceTest {
     private RecetaService recetaService;
 
     @Autowired
-    private RecetaRepository recetaRepository;
+    private UsuarioRepository usuarioRepository;
 
-    private Integer idExistente;
+    @Test
+    @DisplayName("Positivo: Agregar una nueva receta con ingredientes y pasos")
+    public void testAgregarRecetaExitoso() {
 
-    @BeforeEach
-    void cargarDatos() {
-        recetaRepository.deleteAll();
+        RecetaRequestDTO nuevaReceta = new RecetaRequestDTO();
+        nuevaReceta.setTitulo("Tortilla de Patatas");
+        nuevaReceta.setDescripcion("4 patatas, 6 huevos, sal");
+        nuevaReceta.setTutorial("1. Freír patatas. 2. Batir huevos. 3. Mezclar y cuajar.");
 
-        Receta receta = new Receta();
-        receta.setTitulo("Pizza");
-        receta.setDescripcion("Pizza muy rica");
-        receta.setTutorial("Paso a paso de la pizza");
-        receta.setTiempoPreparacion(100);
-        receta.setFotoUrl("https://picsum.photos/2000/300");
+        RecetaResponseDTO guardada = recetaService.crearReceta(nuevaReceta);
 
-        Receta guardada = recetaRepository.save(receta);
-        this.idExistente = guardada.getId();
+        assertNotNull(guardada, "La receta debería haberse guardado");
+        assertEquals("Tortilla de Patatas", guardada.getTitulo());
+        assertNotNull(guardada.getId(), "La receta debería tener un ID asignado");
     }
 
     @Test
-    public void getRecetaByIdTest() {
-        RecetaResponseDTO dto = recetaService.getRecetaById(idExistente);
+    @DisplayName("Negativo: Agregar Receta - Faltan pasos")
+    public void testAgregarRecetaFaltanPasos() {
+        RecetaRequestDTO recetaSinPasos = new RecetaRequestDTO();
+        recetaSinPasos.setTitulo("Receta incompleta");
+        recetaSinPasos.setDescripcion("Ingrediente 1");
+        recetaSinPasos.setTutorial(null);
 
-        assertNotNull(dto, "La receta debería existir");
-        assertEquals("Pizza", dto.getTitulo());
+        Exception exception = assertThrows(RuntimeException.class, () -> {
+            recetaService.crearReceta(recetaSinPasos);
+        });
+
+        assertTrue(exception.getMessage().contains("pasos faltan"),
+                "Debe saltar una excepción mencionando que pasos faltan");
     }
 
     @Test
-    public void getRecetaByIdNegativoTest() {
-        assertThrows(RuntimeException.class, () -> {
-            recetaService.getRecetaById(999);
-        }, "Debería lanzar una excepción si la receta no existe");
-    }
+    @DisplayName("Negativo: Agregar Receta - Formato de ingredientes incorrecto")
+    public void testAgregarRecetaIngredientesFormatoIncorrecto() {
+        RecetaRequestDTO recetaFormatoMal = new RecetaRequestDTO();
+        recetaFormatoMal.setTitulo("Receta mal formato");
+        recetaFormatoMal.setDescripcion("!!!");
+        recetaFormatoMal.setTutorial("Paso 1...");
 
+        Exception exception = assertThrows(RuntimeException.class, () -> {
+            recetaService.crearReceta(recetaFormatoMal);
+        });
+
+        assertTrue(exception.getMessage().toLowerCase().contains("formato") ||
+                exception.getMessage().toLowerCase().contains("incorrecto"));
+    }
 }
