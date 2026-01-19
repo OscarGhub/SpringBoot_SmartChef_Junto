@@ -1,4 +1,4 @@
-package com.oscar.proyecto.servicios.Receta;
+package com.oscar.proyecto.servicios.Crear_Receta;
 
 import com.oscar.proyecto.dto.Receta.RecetaRequestDTO;
 import com.oscar.proyecto.dto.Receta.RecetaResponseDTO;

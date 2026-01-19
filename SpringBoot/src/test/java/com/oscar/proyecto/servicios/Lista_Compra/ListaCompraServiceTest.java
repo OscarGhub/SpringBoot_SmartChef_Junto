@@ -1,4 +1,4 @@
-package com.oscar.proyecto.servicios.ListaCompra;
+package com.oscar.proyecto.servicios.Lista_Compra;
 
 import com.oscar.proyecto.modelos.*;
 import com.oscar.proyecto.repositorios.*;
