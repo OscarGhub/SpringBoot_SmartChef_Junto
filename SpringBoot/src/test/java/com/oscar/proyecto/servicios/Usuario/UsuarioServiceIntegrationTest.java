@@ -1,8 +1,9 @@
-package com.oscar.proyecto.servicios;
+package com.oscar.proyecto.servicios.Usuario;
 
 import com.oscar.proyecto.dto.Usuario.UsuarioDTO;
 import com.oscar.proyecto.modelos.Usuario;
 import com.oscar.proyecto.repositorios.UsuarioRepository;
+import com.oscar.proyecto.servicios.UsuarioService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -14,7 +15,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @Transactional
-public class UsuarioServiceTest {
+public class UsuarioServiceIntegrationTest {
 
     @Autowired
     private UsuarioService usuarioService;
@@ -35,33 +36,7 @@ public class UsuarioServiceTest {
     }
 
     @Test
-    @DisplayName("Negativo: Registro Usuario - El email ya existe")
-    public void testRegistroUsuarioEmailDuplicado() {
-        UsuarioDTO dtoRepetido = new UsuarioDTO();
-        dtoRepetido.setNombre("Intento");
-        dtoRepetido.setCorreoElectronico("oscar@ejemplo.com");
-
-        Exception exception = assertThrows(RuntimeException.class, () -> {
-            usuarioService.crearUsuario(dtoRepetido);
-        });
-
-        assertTrue(exception.getMessage().contains("el email ya está registrado"));
-    }
-
-    @Test
-    @DisplayName("Negativo: Registro Usuario - Faltan datos obligatorios")
-    public void testRegistroUsuarioDatosFaltantes() {
-        UsuarioDTO dtoIncompleto = new UsuarioDTO();
-
-        Exception exception = assertThrows(RuntimeException.class, () -> {
-            usuarioService.crearUsuario(dtoIncompleto);
-        });
-
-        assertTrue(exception.getMessage().contains("Faltan datos obligatorios"));
-    }
-
-    @Test
-    @DisplayName("Positivo: Registrar usuario con preferencias alimentarias")
+    @DisplayName("Test Integrado Positivo: Registrar Usuario")
     public void testRegistroUsuarioExitoso() {
         UsuarioDTO nuevoUsuarioDTO = new UsuarioDTO();
         nuevoUsuarioDTO.setNombre("Oscar Nuevo");
