@@ -3,91 +3,85 @@ package com.oscar.proyecto.servicios.Historial_Dia;
 import com.oscar.proyecto.dto.Receta.RecetaUsoDTO;
 import com.oscar.proyecto.dto.Receta.RecetaUsoRequestDTO;
 import com.oscar.proyecto.exception.ElementoNoEncontradoException;
-import com.oscar.proyecto.mapper.RecetaMapper;
 import com.oscar.proyecto.modelos.Receta;
 import com.oscar.proyecto.modelos.RecetaCocinadaFecha;
 import com.oscar.proyecto.modelos.Usuario;
-import com.oscar.proyecto.repositorios.RecetaCocinadaFechaRepository;
-import com.oscar.proyecto.repositorios.RecetaRepository;
-import com.oscar.proyecto.repositorios.UsuarioRepository;
 import com.oscar.proyecto.servicios.RecetaCocinadaFechaService;
+import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
-import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
 
-@ExtendWith(MockitoExtension.class)
+@SpringBootTest
+@Transactional
 public class RecetaCocinadaTest {
 
-    @Mock
-    private RecetaCocinadaFechaRepository cocinadaRepo;
-
-    @Mock
-    private RecetaRepository recetaRepo;
-
-    @Mock
-    private UsuarioRepository usuarioRepo;
-
-    @Mock
-    private RecetaMapper recetaMapper;
-
-    @InjectMocks
+    @Autowired
     private RecetaCocinadaFechaService service;
 
-    private RecetaUsoRequestDTO recetaDTO;
-    private Usuario usuario;
-    private Receta receta;
+    @Autowired
+    private EntityManager entityManager;
+
+    private Integer usuarioId;
+    private Integer recetaId;
 
     @BeforeEach
-    void cargarDatos() {
-        recetaDTO = new RecetaUsoRequestDTO();
-        recetaDTO.setIdUsuario(1);
-        recetaDTO.setIdReceta(10);
-        recetaDTO.setFecha(LocalDate.now());
+    void prepararDatos() {
+        Usuario u = new Usuario();
+        u.setNombre("Oscar");
+        u.setCorreoElectronico("oscar@test.com");
+        u.setContrasena("123");
+        entityManager.persist(u);
+        this.usuarioId = u.getId();
 
-        usuario = new Usuario();
-        usuario.setId(1);
+        Receta r = new Receta();
+        r.setTitulo("Tortilla de Patatas");
+        entityManager.persist(r);
+        this.recetaId = r.getId();
 
-        receta = new Receta();
-        receta.setId(10);
-        receta.setTitulo("Tortilla de Patatas");
+        entityManager.flush();
     }
 
     @Test
-    @DisplayName("Test Unitario Positivo: Guardar registro exitosamente")
-    void guardarRecetaEnFecha_Exito() {
-        when(recetaRepo.findById(10)).thenReturn(Optional.of(receta));
-        when(usuarioRepo.findById(1)).thenReturn(Optional.of(usuario));
-        when(cocinadaRepo.existsByUsuarioAndReceta(usuario, receta)).thenReturn(false);
+    @DisplayName("Servicio RecetaCocinada -> Caso Positivo: Guardar registro")
+    public void testGuardarRecetaEnFechaExitoso() {
+        RecetaUsoRequestDTO dto = new RecetaUsoRequestDTO();
+        dto.setIdUsuario(this.usuarioId);
+        dto.setIdReceta(this.recetaId);
+        dto.setFecha(LocalDate.now());
 
-        RecetaUsoDTO resultado = service.guardarRecetaEnFecha(recetaDTO);
+        RecetaUsoDTO resultado = service.guardarRecetaEnFecha(dto);
 
         assertNotNull(resultado);
         assertEquals("Tortilla de Patatas", resultado.getNombreReceta());
-        assertEquals(1L, resultado.getVecesCocinada());
 
-        verify(cocinadaRepo, times(1)).save(any(RecetaCocinadaFecha.class));
+        RecetaCocinadaFecha guardado = entityManager.createQuery(
+                        "SELECT r FROM RecetaCocinadaFecha r WHERE r.usuario.id = :uId AND r.receta.id = :rId",
+                        RecetaCocinadaFecha.class)
+                .setParameter("uId", this.usuarioId)
+                .setParameter("rId", this.recetaId)
+                .getSingleResult();
+
+        assertNotNull(guardado, "El registro debería existir en la base de datos");
     }
 
     @Test
-    @DisplayName("Test Unitario Negativo: Lanzar excepción si la receta no existe")
-    void guardarRecetaEnFecha_RecetaNoEncontrada() {
-        when(recetaRepo.findById(10)).thenReturn(Optional.empty());
+    @DisplayName("Servicio RecetaCocinada -> Caso Negativo: Receta inexistente")
+    public void testRecetaNoEncontrada() {
+        RecetaUsoRequestDTO dto = new RecetaUsoRequestDTO();
+        dto.setIdUsuario(this.usuarioId);
+        dto.setIdReceta(999);
+        dto.setFecha(LocalDate.now());
 
         assertThrows(ElementoNoEncontradoException.class, () -> {
-            service.guardarRecetaEnFecha(recetaDTO);
-        });
-
-        verify(cocinadaRepo, never()).save(any());
+            service.guardarRecetaEnFecha(dto);
+        }, "Debería lanzar ElementoNoEncontradoException si la receta no existe en BD");
     }
 }

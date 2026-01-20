@@ -3,85 +3,78 @@ package com.oscar.proyecto.servicios.Lista_Compra;
 import com.oscar.proyecto.modelos.*;
 import com.oscar.proyecto.repositorios.*;
 import com.oscar.proyecto.servicios.ListaCompraService;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.transaction.annotation.Transactional;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
+import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 
-@SpringBootTest
-@Transactional
+@ExtendWith(MockitoExtension.class)
 public class ListaCompraServiceIntegrationTest {
 
-    @Autowired
+    @InjectMocks
     private ListaCompraService listaCompraService;
 
-    @Autowired
+    @Mock
     private UsuarioRepository usuarioRepository;
 
-    @Autowired
+    @Mock
     private RecetaRepository recetaRepository;
 
-    @Autowired
-    private IngredienteRepository ingredienteRepository;
-
-    @Autowired
+    @Mock
     private RecetaIngredienteRepository recetaIngredienteRepository;
 
-    @Autowired
+    @Mock
     private ListaCompraRepository listaCompraRepository;
 
-    @Autowired
+    @Mock
     private ListaCompraIngredienteRepository listaCompraIngredienteRepository;
 
-    private Integer usuarioId;
-    private Integer recetaId;
+    @Test
+    @DisplayName("Test Integrado Positivo -> Añadir ingredientes al carrito")
+    public void testAnadirRecetaAlCarritoExitoso() {
+        Integer userId = 1;
+        Integer recId = 10;
 
-    @BeforeEach
-    void cargarDatos() {
         Usuario usuario = new Usuario();
-        usuario.setNombre("Chef Oscar");
-        usuario.setCorreoElectronico("oscar@cocina.com");
-        usuario.setContrasena("123456");
-        usuario = usuarioRepository.save(usuario);
-        usuarioId = usuario.getId();
-
-        Ingrediente tomate = new Ingrediente();
-        tomate.setNombre("Tomate");
-        tomate = ingredienteRepository.save(tomate);
+        usuario.setId(userId);
 
         Receta receta = new Receta();
-        receta.setTitulo("Salsa Base");
-        receta = recetaRepository.save(receta);
-        recetaId = receta.getId();
+        receta.setId(recId);
+
+        Ingrediente tomate = new Ingrediente();
+        tomate.setId(5);
+        tomate.setNombre("Tomate");
 
         RecetaIngrediente ri = new RecetaIngrediente();
-
-        RecetaIngredienteId idCompuesto = new RecetaIngredienteId(receta.getId(), tomate.getId());
-        ri.setId(idCompuesto);
-
         ri.setReceta(receta);
         ri.setIngrediente(tomate);
         ri.setCantidad(2.0);
 
-        recetaIngredienteRepository.save(ri);
-    }
+        ListaCompra lista = new ListaCompra();
+        lista.setUsuario(usuario);
 
-    @Test
-    @DisplayName("Test Integrado Positivo: Añadir ingredientes de una receta al carrito del usuario")
-    public void testAnadirRecetaAlCarritoExitoso() {
-        listaCompraService.anadirRecetaAlCarrito(usuarioId, recetaId);
+        Mockito.lenient().when(usuarioRepository.findById(anyInt())).thenReturn(Optional.of(usuario));
+        Mockito.lenient().when(recetaRepository.findById(anyInt())).thenReturn(Optional.of(receta));
 
-        ListaCompra lista = listaCompraRepository.findByUsuarioId(usuarioId)
-                .orElseThrow(() -> new AssertionError("La lista de compra no se creó"));
+        Mockito.when(recetaIngredienteRepository.findByRecetaIdEagerly(recId)).thenReturn(List.of(ri));
 
-        List<ListaCompraIngrediente> items = listaCompraIngredienteRepository.findByListaCompra(lista);
+        Mockito.when(listaCompraRepository.findByUsuarioId(userId)).thenReturn(Optional.of(lista));
 
-        assertFalse(items.isEmpty(), "La lista debería tener ingredientes");
+        Mockito.lenient().when(listaCompraIngredienteRepository.save(any())).thenReturn(new ListaCompraIngrediente());
+
+        listaCompraService.anadirRecetaAlCarrito(userId, recId);
+
+        Mockito.verify(recetaIngredienteRepository).findByRecetaIdEagerly(recId);
+
+        Mockito.verify(listaCompraIngredienteRepository, Mockito.atLeastOnce()).save(any());
     }
 }

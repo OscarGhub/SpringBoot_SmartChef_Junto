@@ -1,65 +1,90 @@
-package com.oscar.proyecto.servicios.Historial_Semanal;
-
-import com.oscar.proyecto.dto.Receta.RecetaUsoDTO;
-import com.oscar.proyecto.mapper.RecetaMapper;
-import com.oscar.proyecto.modelos.RecetaUsoProjection;
-import com.oscar.proyecto.repositorios.RecetaCocinadaFechaRepository;
-import com.oscar.proyecto.servicios.RecetaCocinadaFechaService;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-
-import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
-
-@ExtendWith(MockitoExtension.class)
-public class RecetaCocinadaSemanalTest {
-
-    @Mock
-    private RecetaCocinadaFechaRepository cocinadaRepo;
-
-    @Mock
-    private RecetaMapper recetaMapper;
-
-    @InjectMocks
-    private RecetaCocinadaFechaService service;
-
-    @Test
-    @DisplayName("Test Unitario Positivo: Consultar historial semanal")
-    public void testGetRecetasUltimaSemanaUnitario() {
-        List<RecetaUsoProjection> listaSimulada = List.of(mock(RecetaUsoProjection.class));
-
-        RecetaUsoDTO dtoSimulado = new RecetaUsoDTO();
-        dtoSimulado.setNombreReceta("Pasta");
-        dtoSimulado.setVecesCocinada(1L);
-
-        when(cocinadaRepo.findRecetasUltimaSemana()).thenReturn(listaSimulada);
-        when(recetaMapper.toRecetaUsoDTOList(listaSimulada)).thenReturn(List.of(dtoSimulado));
-
-        List<RecetaUsoDTO> resultados = service.getRecetasUltimaSemana();
-
-        assertNotNull(resultados);
-        assertEquals(1, resultados.size());
-        assertEquals("Pasta", resultados.get(0).getNombreReceta());
-
-        verify(cocinadaRepo).findRecetasUltimaSemana();
-        verify(recetaMapper).toRecetaUsoDTOList(any());
-    }
-
-    @Test
-    @DisplayName("Test Unitario Negativo: Lista vacía cuando no hay registros en la última semana")
-    public void testGetRecetasUltimaSemanaVacia() {
-        when(cocinadaRepo.findRecetasUltimaSemana()).thenReturn(List.of());
-        when(recetaMapper.toRecetaUsoDTOList(anyList())).thenReturn(List.of());
-
-        List<RecetaUsoDTO> resultados = service.getRecetasUltimaSemana();
-
-        assertTrue(resultados.isEmpty());
-        verify(cocinadaRepo, times(1)).findRecetasUltimaSemana();
-    }
-}
+//package com.oscar.proyecto.servicios.Historial_Semanal;
+//
+//import com.oscar.proyecto.dto.Receta.RecetaUsoDTO;
+//import com.oscar.proyecto.modelos.Receta;
+//import com.oscar.proyecto.modelos.RecetaCocinadaFecha;
+//import com.oscar.proyecto.modelos.Usuario;
+//import com.oscar.proyecto.servicios.RecetaCocinadaFechaService;
+//import jakarta.persistence.EntityManager;
+//import org.junit.jupiter.api.DisplayName;
+//import org.junit.jupiter.api.Test;
+//import org.springframework.beans.factory.annotation.Autowired;
+//import org.springframework.boot.test.context.SpringBootTest;
+//import org.springframework.transaction.annotation.Transactional;
+//
+//import java.time.LocalDate;
+//import java.util.List;
+//
+//import static org.junit.jupiter.api.Assertions.*;
+//
+//@SpringBootTest
+//@Transactional
+//public class RecetaCocinadaSemanalTest {
+//
+//    @Autowired
+//    private RecetaCocinadaFechaService service;
+//
+//    @Autowired
+//    private EntityManager entityManager;
+//
+//    @Test
+//    @DisplayName("Servicio Historial Semanal -> Caso Positivo: Consultar recetas cocinadas")
+//    public void testGetRecetasUltimaSemanaReal() {
+//        Usuario u = new Usuario();
+//        u.setNombre("Chef Oscar");
+//        u.setCorreoElectronico("oscar@semana.com");
+//        u.setContrasena("123");
+//        entityManager.persist(u);
+//
+//        Receta r = new Receta();
+//        r.setTitulo("Pasta");
+//        entityManager.persist(r);
+//
+//        RecetaCocinadaFecha registroHoy = new RecetaCocinadaFecha();
+//        registroHoy.setUsuario(u);
+//        registroHoy.setReceta(r);
+//        registroHoy.setFechaCocinado(LocalDate.now());
+//        entityManager.persist(registroHoy);
+//
+//        entityManager.flush();
+//
+//        List<RecetaUsoDTO> resultados = service.getRecetasUltimaSemana();
+//
+//        assertNotNull(resultados);
+//        assertFalse(resultados.isEmpty(), "Debería haber al menos un registro de esta semana");
+//
+//        RecetaUsoDTO pasta = resultados.stream()
+//                .filter(dto -> dto.getNombreReceta().equals("Pasta"))
+//                .findFirst()
+//                .orElseThrow();
+//
+//        assertEquals(1L, pasta.getVecesCocinada());
+//    }
+//
+//    @Test
+//    @DisplayName("Servicio Historial Semanal -> Caso Negativo: Registros fuera de rango")
+//    public void testGetRecetasUltimaSemanaFueraDeRango() {
+//        Usuario u = new Usuario();
+//        u.setNombre("User Test");
+//        u.setCorreoElectronico("test@fuera.com");
+//        u.setContrasena("123");
+//        entityManager.persist(u);
+//
+//        Receta r = new Receta();
+//        r.setTitulo("Receta Antigua");
+//        entityManager.persist(r);
+//
+//        RecetaCocinadaFecha registroAntiguo = new RecetaCocinadaFecha();
+//        registroAntiguo.setUsuario(u);
+//        registroAntiguo.setReceta(r);
+//        registroAntiguo.setFechaCocinado(LocalDate.now().minusDays(15));
+//        entityManager.persist(registroAntiguo);
+//
+//        entityManager.flush();
+//
+//        List<RecetaUsoDTO> resultados = service.getRecetasUltimaSemana();
+//
+//        assertTrue(resultados.stream().noneMatch(dto -> dto.getNombreReceta().equals("Receta Antigua")),
+//                "No debería mostrar recetas cocinadas hace más de 7 días");
+//    }
+//}

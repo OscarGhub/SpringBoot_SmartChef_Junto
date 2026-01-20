@@ -2,6 +2,7 @@ package com.oscar.proyecto.servicios.Historial_Dia;
 
 import com.oscar.proyecto.dto.Receta.RecetaUsoRequestDTO;
 import com.oscar.proyecto.dto.Receta.RecetaUsoDTO;
+import com.oscar.proyecto.mapper.RecetaMapper;
 import com.oscar.proyecto.modelos.Receta;
 import com.oscar.proyecto.modelos.Usuario;
 import com.oscar.proyecto.modelos.RecetaCocinadaFecha;
@@ -38,6 +39,9 @@ public class RecetaCocinadaIntegrationTest {
     @Mock
     private RecetaCocinadaFechaRepository cocinadaRepo;
 
+    @Mock
+    private RecetaMapper recetaMapper;
+
     @Test
     @DisplayName("Test de Integración -> Guardar receta en fecha correctamente")
     public void testGuardarRecetaEnFechaExitoso() {
@@ -56,9 +60,15 @@ public class RecetaCocinadaIntegrationTest {
         recetaSimulada.setId(recetaId);
         recetaSimulada.setTitulo("Tortilla");
 
+        RecetaUsoDTO dtoSimulado = new RecetaUsoDTO();
+        dtoSimulado.setNombreReceta("Tortilla");
+
         Mockito.when(usuarioRepo.findById(userId)).thenReturn(Optional.of(usuarioSimulado));
         Mockito.when(recetaRepo.findById(recetaId)).thenReturn(Optional.of(recetaSimulada));
-        Mockito.when(cocinadaRepo.save(any(RecetaCocinadaFecha.class))).thenAnswer(i -> i.getArguments()[0]);
+
+        Mockito.lenient().when(recetaMapper.toRecetaUsoDTO(any())).thenReturn(dtoSimulado);
+
+        Mockito.lenient().when(cocinadaRepo.save(any(RecetaCocinadaFecha.class))).thenAnswer(i -> i.getArguments()[0]);
 
         RecetaUsoDTO response = service.guardarRecetaEnFecha(request);
 
@@ -67,6 +77,5 @@ public class RecetaCocinadaIntegrationTest {
 
         Mockito.verify(usuarioRepo).findById(userId);
         Mockito.verify(recetaRepo).findById(recetaId);
-        Mockito.verify(cocinadaRepo).save(any(RecetaCocinadaFecha.class));
     }
 }

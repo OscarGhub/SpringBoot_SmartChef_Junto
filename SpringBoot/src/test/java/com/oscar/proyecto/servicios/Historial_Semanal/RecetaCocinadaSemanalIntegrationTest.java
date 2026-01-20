@@ -1,6 +1,7 @@
 package com.oscar.proyecto.servicios.Historial_Semanal;
 
 import com.oscar.proyecto.dto.Receta.RecetaUsoDTO;
+import com.oscar.proyecto.mapper.RecetaMapper;
 import com.oscar.proyecto.modelos.Receta;
 import com.oscar.proyecto.modelos.RecetaCocinadaFecha;
 import com.oscar.proyecto.modelos.Usuario;
@@ -18,6 +19,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.anyList;
 
 @ExtendWith(MockitoExtension.class)
 public class RecetaCocinadaSemanalIntegrationTest {
@@ -27,6 +29,9 @@ public class RecetaCocinadaSemanalIntegrationTest {
 
     @Mock
     private RecetaCocinadaFechaRepository cocinadaRepo;
+
+    @Mock
+    private RecetaMapper recetaMapper;
 
     @Test
     @DisplayName("Test de Integración -> Consultar historial semanal")
@@ -44,14 +49,21 @@ public class RecetaCocinadaSemanalIntegrationTest {
 
         List<RecetaCocinadaFecha> listaSimulada = List.of(hoy);
 
-        Mockito.when(cocinadaRepo.findRecetasUltimaSemana()).thenReturn(listaSimulada);
+        Mockito.doReturn(listaSimulada).when(cocinadaRepo).findRecetasUltimaSemana();
+
+        RecetaUsoDTO dto = new RecetaUsoDTO();
+        dto.setNombreReceta("Pasta");
+        List<RecetaUsoDTO> listaDTOs = List.of(dto);
+
+        Mockito.doReturn(listaDTOs).when(recetaMapper).toRecetaUsoDTOList(anyList());
 
         List<RecetaUsoDTO> resultados = service.getRecetasUltimaSemana();
 
         assertNotNull(resultados);
-        assertEquals(1, resultados.size());
+        assertEquals(1, resultados.size(), "La lista debería tener 1 elemento mapeado");
         assertEquals("Pasta", resultados.get(0).getNombreReceta());
 
         Mockito.verify(cocinadaRepo).findRecetasUltimaSemana();
+        Mockito.verify(recetaMapper).toRecetaUsoDTOList(anyList());
     }
 }

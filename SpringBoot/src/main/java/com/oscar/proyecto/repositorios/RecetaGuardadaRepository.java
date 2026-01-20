@@ -25,4 +25,6 @@ public interface RecetaGuardadaRepository extends JpaRepository<RecetaGuardada, 
     @Query("SELECT COUNT(rg) FROM RecetaGuardada rg WHERE rg.receta.id = :idReceta")
     int contarGuardados(@Param("idReceta") Integer idReceta);
 
+    long countByRecetaId(Integer recetaId);
+
 }

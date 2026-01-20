@@ -1,73 +1,69 @@
 package com.oscar.proyecto.servicios.Receta_Filtro;
 
 import com.oscar.proyecto.dto.Receta.RecetaResponseDTO;
+import com.oscar.proyecto.mapper.RecetaMapper;
 import com.oscar.proyecto.modelos.Receta;
-import com.oscar.proyecto.modelos.Usuario;
-import com.oscar.proyecto.modelos.RecetaGuardada;
-import com.oscar.proyecto.modelos.RecetaGuardadaId;
-import com.oscar.proyecto.repositorios.RecetaRepository;
-import com.oscar.proyecto.repositorios.UsuarioRepository;
 import com.oscar.proyecto.repositorios.RecetaGuardadaRepository;
+import com.oscar.proyecto.repositorios.RecetaRepository;
 import com.oscar.proyecto.servicios.RecetaService;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.transaction.annotation.Transactional;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
 
-@SpringBootTest
-@Transactional
+@ExtendWith(MockitoExtension.class)
 public class RecetaFiltroServiceIntegrationTest {
 
-    @Autowired
+    @InjectMocks
     private RecetaService recetaService;
 
-    @Autowired
+    @Mock
     private RecetaRepository recetaRepo;
 
-    @Autowired
-    private UsuarioRepository usuarioRepo;
-
-    @Autowired
+    @Mock
     private RecetaGuardadaRepository recetaGuardadaRepo;
 
-    @BeforeEach
-    void cargarDatos() {
-        Receta receta = new Receta();
-        receta.setTitulo("Pasta Carbonara");
-        receta.setTiempoPreparacion(20);
-        receta = recetaRepo.save(receta);
-
-        Usuario user = new Usuario();
-        user.setNombre("Oscar");
-        user.setCorreoElectronico("oscar@test.com");
-        user.setContrasena("123456");
-        user = usuarioRepo.save(user);
-
-        RecetaGuardadaId rgId = new RecetaGuardadaId(user.getId(), receta.getId());
-        RecetaGuardada rg = new RecetaGuardada();
-        rg.setId(rgId);
-        rg.setUsuario(user);
-        rg.setReceta(receta);
-        recetaGuardadaRepo.save(rg);
-    }
+    @Mock
+    private RecetaMapper recetaMapper;
 
     @Test
-    @DisplayName("Test Integración Positivo: Filtrar por preferencias y verificar contador de favoritos")
-    public void testFiltrarPorPreferenciasYFavoritos() {
+    @DisplayName("Test Integrado Positivo -> Filtrar las recetas por IDs de preferencias")
+    public void testFiltrarPorPreferenciasEspecificas() {
+        List<Integer> preferenciasIds = List.of(1, 2);
 
-        List<RecetaResponseDTO> resultados = recetaService.filtrarRecetasPorPreferencias(null);
+        Receta recetaFiltrada = new Receta();
+        recetaFiltrada.setId(100);
+        recetaFiltrada.setTitulo("Ensalada Proteica");
 
-        assertFalse(resultados.isEmpty());
-        RecetaResponseDTO dto = resultados.get(0);
+        RecetaResponseDTO dtoEsperado = new RecetaResponseDTO();
+        dtoEsperado.setTitulo("Ensalada Proteica");
 
-        assertEquals(1, dto.getNumFavoritos(), "La receta debería tener 1 favorito");
-        assertEquals("Pasta Carbonara", dto.getTitulo());
+        Mockito.when(recetaRepo.findByPreferenciasIn(preferenciasIds))
+                .thenReturn(List.of(recetaFiltrada));
+
+        Mockito.when(recetaMapper.toResponseDTO(any(Receta.class)))
+                .thenReturn(dtoEsperado);
+
+        Mockito.when(recetaGuardadaRepo.contarGuardados(100))
+                .thenReturn(3);
+
+        List<RecetaResponseDTO> resultados = recetaService.filtrarRecetasPorPreferencias(preferenciasIds);
+
+        assertNotNull(resultados);
+        assertEquals(1, resultados.size());
+        assertEquals("Ensalada Proteica", resultados.get(0).getTitulo());
+        assertEquals(3, resultados.get(0).getNumFavoritos());
+
+        Mockito.verify(recetaRepo, Mockito.never()).findAll();
+        Mockito.verify(recetaRepo).findByPreferenciasIn(preferenciasIds);
+        Mockito.verify(recetaGuardadaRepo).contarGuardados(100);
     }
-
 }
