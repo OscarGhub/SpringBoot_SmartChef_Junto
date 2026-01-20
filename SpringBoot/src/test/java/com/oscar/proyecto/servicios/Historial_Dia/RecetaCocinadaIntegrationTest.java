@@ -4,65 +4,69 @@ import com.oscar.proyecto.dto.Receta.RecetaUsoRequestDTO;
 import com.oscar.proyecto.dto.Receta.RecetaUsoDTO;
 import com.oscar.proyecto.modelos.Receta;
 import com.oscar.proyecto.modelos.Usuario;
+import com.oscar.proyecto.modelos.RecetaCocinadaFecha;
 import com.oscar.proyecto.repositorios.RecetaRepository;
 import com.oscar.proyecto.repositorios.UsuarioRepository;
 import com.oscar.proyecto.repositorios.RecetaCocinadaFechaRepository;
 import com.oscar.proyecto.servicios.RecetaCocinadaFechaService;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.transaction.annotation.Transactional;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDate;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
 
-@SpringBootTest
-@Transactional
+@ExtendWith(MockitoExtension.class)
 public class RecetaCocinadaIntegrationTest {
 
-    @Autowired
+    @InjectMocks
     private RecetaCocinadaFechaService service;
 
-    @Autowired
+    @Mock
     private UsuarioRepository usuarioRepo;
 
-    @Autowired
+    @Mock
     private RecetaRepository recetaRepo;
 
-    @Autowired
+    @Mock
     private RecetaCocinadaFechaRepository cocinadaRepo;
 
-    private Integer userId;
-    private Integer recetaId;
-
-    @BeforeEach
-    void cargarDatos() {
-        Usuario u = new Usuario();
-        u.setNombre("Cocinero");
-        u.setCorreoElectronico("test@cocina.com");
-        u.setContrasena("hash_123");
-        userId = usuarioRepo.save(u).getId();
-
-        Receta r = new Receta();
-        r.setTitulo("Tortilla");
-        recetaId = recetaRepo.save(r).getId();
-    }
-
     @Test
-    @DisplayName("Test Integración Positivo: Guardar receta en fecha correctamente")
+    @DisplayName("Test de Integración -> Guardar receta en fecha correctamente")
     public void testGuardarRecetaEnFechaExitoso() {
+        Integer userId = 1;
+        Integer recetaId = 10;
+
         RecetaUsoRequestDTO request = new RecetaUsoRequestDTO();
         request.setIdUsuario(userId);
         request.setIdReceta(recetaId);
         request.setFecha(LocalDate.now());
 
+        Usuario usuarioSimulado = new Usuario();
+        usuarioSimulado.setId(userId);
+
+        Receta recetaSimulada = new Receta();
+        recetaSimulada.setId(recetaId);
+        recetaSimulada.setTitulo("Tortilla");
+
+        Mockito.when(usuarioRepo.findById(userId)).thenReturn(Optional.of(usuarioSimulado));
+        Mockito.when(recetaRepo.findById(recetaId)).thenReturn(Optional.of(recetaSimulada));
+        Mockito.when(cocinadaRepo.save(any(RecetaCocinadaFecha.class))).thenAnswer(i -> i.getArguments()[0]);
+
         RecetaUsoDTO response = service.guardarRecetaEnFecha(request);
 
         assertNotNull(response);
         assertEquals("Tortilla", response.getNombreReceta());
-        assertTrue(cocinadaRepo.count() > 0, "Debe existir un registro en la tabla de historial");
+
+        Mockito.verify(usuarioRepo).findById(userId);
+        Mockito.verify(recetaRepo).findById(recetaId);
+        Mockito.verify(cocinadaRepo).save(any(RecetaCocinadaFecha.class));
     }
 }

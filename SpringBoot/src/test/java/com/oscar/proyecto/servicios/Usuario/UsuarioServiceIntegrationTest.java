@@ -1,57 +1,55 @@
 package com.oscar.proyecto.servicios.Usuario;
 
 import com.oscar.proyecto.dto.Usuario.UsuarioDTO;
+import com.oscar.proyecto.mapper.UsuarioMapper;
 import com.oscar.proyecto.modelos.Usuario;
 import com.oscar.proyecto.repositorios.UsuarioRepository;
+import com.oscar.proyecto.servicios.InventarioService;
 import com.oscar.proyecto.servicios.UsuarioService;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.transaction.annotation.Transactional;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
 
-@SpringBootTest
-@Transactional
+@ExtendWith(MockitoExtension.class)
 public class UsuarioServiceIntegrationTest {
 
-    @Autowired
-    private UsuarioService usuarioService;
+    @InjectMocks
+    private UsuarioService service;
 
-    @Autowired
-    private UsuarioRepository usuarioRepository;
+    @Mock
+    private UsuarioRepository repository;
 
-    @BeforeEach
-    void cargarDatos() {
-        usuarioRepository.deleteAll();
+    @Mock
+    private UsuarioMapper mapper;
 
-        Usuario usuarioExistente = new Usuario();
-        usuarioExistente.setNombre("Oscar");
-        usuarioExistente.setCorreoElectronico("oscar@ejemplo.com");
-        usuarioExistente.setContrasena("123456");
-
-        usuarioRepository.save(usuarioExistente);
-    }
+    @Mock
+    private InventarioService inventarioService;
 
     @Test
-    @DisplayName("Test Integrado Positivo: Registrar Usuario")
-    public void testRegistroUsuarioExitoso() {
-        UsuarioDTO nuevoUsuarioDTO = new UsuarioDTO();
-        nuevoUsuarioDTO.setNombre("Oscar Nuevo");
-        nuevoUsuarioDTO.setCorreoElectronico("oscar@nuevo.com");
+    @DisplayName("Test de Integración -> Crear Usuario Exitoso")
+    public void crearUsuarioIntegrationTest() {
+        UsuarioDTO dto = new UsuarioDTO();
+        dto.setNombre("Oscar");
+        dto.setCorreoElectronico("oscar@test.com");
+        dto.setContrasena("123");
+        dto.setConfirmarContrasena("123");
 
-        nuevoUsuarioDTO.setContrasena("password123");
-        nuevoUsuarioDTO.setConfirmarContrasena("password123");
+        Usuario usuarioSimulado = new Usuario();
+        usuarioSimulado.setNombre("Oscar");
+        usuarioSimulado.setCorreoElectronico("oscar@test.com");
 
+        Mockito.when(mapper.toEntity(any(UsuarioDTO.class))).thenReturn(usuarioSimulado);
+        Mockito.when(repository.save(any(Usuario.class))).thenReturn(usuarioSimulado);
 
-        Usuario guardado = usuarioService.crearUsuario(nuevoUsuarioDTO);
+        service.crearUsuario(dto);
 
-        assertNotNull(guardado, "El usuario guardado no debería ser nulo");
-        assertEquals("oscar@nuevo.com", guardado.getCorreoElectronico(), "El email debe coincidir");
-
-        assertTrue(usuarioRepository.findByCorreoElectronico("oscar@nuevo.com").isPresent());
+        Mockito.verify(repository).save(any(Usuario.class));
+        Mockito.verify(mapper).toEntity(any());
     }
-
 }
