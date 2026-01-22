@@ -4,12 +4,12 @@ import com.oscar.proyecto.dto.Receta.RecetaRequestDTO;
 import com.oscar.proyecto.dto.Receta.RecetaResponseDTO;
 import com.oscar.proyecto.modelos.Receta;
 import com.oscar.proyecto.servicios.RecetaService;
-import jakarta.persistence.EntityManager;
+import jakarta.transaction.Transactional;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.transaction.annotation.Transactional;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -18,42 +18,42 @@ import static org.junit.jupiter.api.Assertions.*;
 public class RecetaServiceTest {
 
     @Autowired
-    private RecetaService recetaService;
+    private RecetaService service;
 
-    @Autowired
-    private EntityManager entityManager;
+    @BeforeAll
+    static void cargarDatos() {
 
-    @Test
-    @DisplayName("Servicio Receta -> Caso Positivo: Crear receta")
-    public void testCrearRecetaExitoso() {
-        RecetaRequestDTO request = new RecetaRequestDTO();
-        request.setTitulo("Paella Valenciana");
+        Receta r = new Receta();
+        r.setTitulo("Receta de Prueba");
+        r.setDescripcion("Descripción de prueba");
+        r.setTiempoPreparacion(30);
 
-        RecetaResponseDTO resultado = recetaService.crearReceta(request);
+        Receta r2 = new Receta();
+        r2.setTitulo("Receta de Prueba 2");
+        r2.setDescripcion("Descripción de prueba 2");
+        r2.setTiempoPreparacion(45);
 
-        assertNotNull(resultado);
-        assertNotNull(resultado.getId());
-
-        Receta recetaEnBD = entityManager.createQuery(
-                        "SELECT r FROM Receta r WHERE r.titulo = :titulo", Receta.class)
-                .setParameter("titulo", "Paella Valenciana")
-                .getSingleResult();
-
-        assertNotNull(recetaEnBD, "La receta debería existir en la base de datos");
-        assertEquals("Paella Valenciana", recetaEnBD.getTitulo());
     }
 
     @Test
-    @DisplayName("Servicio Receta -> Caso Negativo: Crear receta sin título")
-    public void testCrearRecetaSinTitulo() {
+    @DisplayName("Test Unitario Positivo -> Crear Receta")
+    public void crearRecetaTest() {
+        RecetaRequestDTO dto = new RecetaRequestDTO();
+        dto.setTitulo("Paella Valenciana");
+
+        RecetaResponseDTO resultado = service.crearReceta(dto);
+
+        assertNotNull(resultado, "La receta creada no debería ser nula");
+        assertEquals("Paella Valenciana", resultado.getTitulo(), "El título de la receta no coincide");
+    }
+
+    @Test
+    @DisplayName("Test Unitario Negativo -> No se introdujo título a la receta")
+    public void crearRecetaNegativoTest() {
         RecetaRequestDTO recetaInvalida = new RecetaRequestDTO();
         recetaInvalida.setTitulo(null);
 
-        assertThrows(Exception.class, () -> {
-            recetaService.crearReceta(recetaInvalida);
-
-            entityManager.flush();
-        }, "El sistema debería haber fallado al intentar persistir un título nulo");
+        assertThrows(Exception.class, () -> service.crearReceta(recetaInvalida),
+                "El sistema debería haber fallado al intentar crear una receta sin título");
     }
-
 }

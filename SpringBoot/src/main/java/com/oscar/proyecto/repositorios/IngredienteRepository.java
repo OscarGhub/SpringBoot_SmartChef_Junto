@@ -15,9 +15,9 @@ public interface IngredienteRepository extends JpaRepository<Ingrediente, Intege
             I.nombre AS Ingrediente,
             COUNT(RI.id_ingrediente) AS vecesUtilizado 
         FROM
-            Ingrediente I
+            smartchef.Ingrediente I
         JOIN
-            Receta_Ingrediente RI ON I.id = RI.id_ingrediente
+            smartchef.Receta_Ingrediente RI ON I.id = RI.id_ingrediente
         GROUP BY
             I.id, I.nombre
         ORDER BY

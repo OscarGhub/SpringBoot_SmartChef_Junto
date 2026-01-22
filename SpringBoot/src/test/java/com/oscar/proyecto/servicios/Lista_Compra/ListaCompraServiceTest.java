@@ -3,71 +3,108 @@ package com.oscar.proyecto.servicios.Lista_Compra;
 import com.oscar.proyecto.modelos.*;
 import com.oscar.proyecto.repositorios.*;
 import com.oscar.proyecto.servicios.ListaCompraService;
+import jakarta.transaction.Transactional;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import java.util.List;
-import java.util.Optional;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
+@AutoConfigureTestDatabase
+@Transactional
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class ListaCompraServiceTest {
 
     @Autowired
-    private ListaCompraService listaCompraService;
+    private ListaCompraService service;
 
-    @MockitoBean
-    private ListaCompraRepository listaCompraRepository;
+    @Autowired
+    private UsuarioRepository usuarioRepo;
 
-    @MockitoBean
-    private RecetaIngredienteRepository recetaIngredienteRepository;
+    @Autowired
+    private RecetaRepository recetaRepo;
 
-    @MockitoBean
-    private ListaCompraIngredienteRepository listaCompraIngredienteRepository;
+    @Autowired
+    private IngredienteRepository ingredienteRepo;
+
+    @Autowired
+    private ListaCompraRepository listaCompraRepo;
+
+    @Autowired
+    private RecetaIngredienteRepository recetaIngredienteRepo;
+
+    @Autowired
+    private ListaCompraIngredienteRepository listaCompraIngredienteRepo;
+
+    private Integer usuarioId;
+    private Integer recetaIdConIngredientes;
+    private Integer recetaIdVacia;
+
+    @BeforeAll
+    void cargarDatos() {
+        Usuario u = new Usuario();
+        u.setNombre("Comprador");
+        u.setCorreoElectronico("compras@test.com");
+        u.setContrasena("123");
+        u = usuarioRepo.save(u);
+        this.usuarioId = u.getId();
+
+        ListaCompra lc = new ListaCompra();
+        lc.setUsuario(u);
+        listaCompraRepo.save(lc);
+
+        Ingrediente tomate = new Ingrediente();
+        tomate.setNombre("Tomate");
+        tomate = ingredienteRepo.save(tomate);
+
+        Receta r1 = new Receta();
+        r1.setTitulo("Receta con Tomate");
+        r1 = recetaRepo.save(r1);
+        this.recetaIdConIngredientes = r1.getId();
+
+        RecetaIngrediente ri = new RecetaIngrediente();
+        ri.setId(new RecetaIngredienteId(r1.getId(), tomate.getId()));
+        ri.setReceta(r1);
+        ri.setIngrediente(tomate);
+        ri.setCantidad(2.0);
+        recetaIngredienteRepo.save(ri);
+
+        Receta r2 = new Receta();
+        r2.setTitulo("Receta Vacía");
+        r2 = recetaRepo.save(r2);
+        this.recetaIdVacia = r2.getId();
+    }
 
     @Test
     @DisplayName("Test Unitario Positivo -> Añadir receta al carrito")
     public void testAnadirRecetaAlCarritoUnitario() {
-        Integer idUsuario = 1;
-        Integer idReceta = 50;
+        service.anadirRecetaAlCarrito(this.usuarioId, this.recetaIdConIngredientes);
 
-        ListaCompra listaMock = new ListaCompra();
-        listaMock.setId(100);
-        when(listaCompraRepository.findByUsuarioId(idUsuario)).thenReturn(Optional.of(listaMock));
+        List<ListaCompraIngrediente> itemsCarrito = listaCompraIngredienteRepo.findAll();
 
-        Ingrediente tomate = new Ingrediente();
-        tomate.setId(10);
-        tomate.setNombre("Tomate");
+        assertFalse(itemsCarrito.isEmpty(), "El carrito no debería estar vacío");
 
-        RecetaIngrediente ri = new RecetaIngrediente();
-        ri.setIngrediente(tomate);
-        ri.setCantidad(2.0);
+        boolean tieneTomate = itemsCarrito.stream()
+                .anyMatch(item -> item.getIngrediente().getNombre().equals("Tomate") && item.getCantidad() == 2.0);
 
-        when(recetaIngredienteRepository.findByRecetaIdEagerly(idReceta)).thenReturn(List.of(ri));
-
-        when(listaCompraIngredienteRepository.findById(any(ListaCompraIngredienteId.class)))
-                .thenReturn(Optional.empty());
-
-        listaCompraService.anadirRecetaAlCarrito(idUsuario, idReceta);
-
-        verify(listaCompraIngredienteRepository, times(1)).save(argThat(item ->
-                item.getCantidad().equals(2.0) && item.getIngrediente().getId().equals(10)
-        ));
+        assertTrue(tieneTomate, "El tomate con cantidad 2.0 debería estar en la lista de compra");
     }
 
     @Test
     @DisplayName("Test Unitario Negativo -> No hace nada si la receta no tiene ingredientes")
     public void testAnadirRecetaVaciaAlCarrito() {
-        when(listaCompraRepository.findByUsuarioId(1)).thenReturn(Optional.of(new ListaCompra()));
-        when(recetaIngredienteRepository.findByRecetaIdEagerly(anyInt())).thenReturn(List.of());
+        int cantidadAntes = listaCompraIngredienteRepo.findAll().size();
 
-        listaCompraService.anadirRecetaAlCarrito(1, 99);
+        service.anadirRecetaAlCarrito(this.usuarioId, this.recetaIdVacia);
 
-        verify(listaCompraIngredienteRepository, never()).save(any());
+        int cantidadDespues = listaCompraIngredienteRepo.findAll().size();
+        assertEquals(cantidadAntes, cantidadDespues, "No deberían haberse añadido ingredientes al carrito");
     }
 }

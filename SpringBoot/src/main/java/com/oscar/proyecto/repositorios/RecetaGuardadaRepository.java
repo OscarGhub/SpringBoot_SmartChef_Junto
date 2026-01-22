@@ -19,7 +19,7 @@ public interface RecetaGuardadaRepository extends JpaRepository<RecetaGuardada, 
     @Query("SELECT rg.usuario FROM RecetaGuardada rg WHERE rg.id.idReceta = :idReceta")
     List<Usuario> findUsuariosPorReceta(@Param("idReceta") Integer idReceta);
 
-    @Query(value = "SELECT id_receta FROM Receta_Guardada GROUP BY id_receta ORDER BY COUNT(*) DESC LIMIT 1", nativeQuery = true)
+    @Query(value = "SELECT id_receta FROM smartchef.receta_guardada GROUP BY id_receta ORDER BY COUNT(*) DESC LIMIT 1", nativeQuery = true)
     Integer findRecetaMasGuardada();
 
     @Query("SELECT COUNT(rg) FROM RecetaGuardada rg WHERE rg.receta.id = :idReceta")

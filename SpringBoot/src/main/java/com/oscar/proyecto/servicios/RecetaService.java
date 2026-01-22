@@ -44,6 +44,9 @@ public class RecetaService {
     }
 
     public RecetaResponseDTO crearReceta(RecetaRequestDTO dto) {
+        if (dto.getTitulo() == null || dto.getTitulo().isBlank()) {
+            throw new IllegalArgumentException("El título es obligatorio");
+        }
         Receta receta = recetaMapper.toEntity(dto);
         Receta guardada = recetaRepo.save(receta);
         return mapRecetaConFavoritos(guardada);
@@ -72,9 +75,11 @@ public class RecetaService {
     @Transactional
     public RecetaResponseDTO guardarReceta(Integer idReceta, Integer idUsuario) {
 
-        Receta receta = recetaRepo.findById(idReceta).orElse(null);
-        Usuario usuario = usuarioRepo.findById(idUsuario).orElse(null);
-        if (receta == null || usuario == null) return null;
+        Receta receta = recetaRepo.findById(idReceta)
+                .orElseThrow(() -> new RuntimeException("Receta no encontrada"));
+
+        Usuario usuario = usuarioRepo.findById(idUsuario)
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
 
         RecetaGuardadaId rgId = new RecetaGuardadaId(idUsuario, idReceta);
 
