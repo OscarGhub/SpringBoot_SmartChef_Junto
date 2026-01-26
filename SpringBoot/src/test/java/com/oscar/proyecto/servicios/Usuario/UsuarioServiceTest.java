@@ -3,34 +3,29 @@ package com.oscar.proyecto.servicios.Usuario;
 import com.oscar.proyecto.dto.Usuario.UsuarioDTO;
 import com.oscar.proyecto.exception.ElementoNoEncontradoException;
 import com.oscar.proyecto.modelos.Usuario;
+import com.oscar.proyecto.repositorios.UsuarioRepository;
 import com.oscar.proyecto.servicios.UsuarioService;
-import jakarta.persistence.EntityManager;
-import org.junit.jupiter.api.BeforeAll;
+import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @Transactional
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class UsuarioServiceTest {
 
     @Autowired
     private UsuarioService service;
 
     @Autowired
-    private EntityManager entityManager;
-
-    @BeforeAll
-    static void cargarDatos() {
-        Usuario u = new Usuario();
-        u.setNombre("Chef Existente");
-        u.setCorreoElectronico("existente@test.com");
-        u.setContrasena("hash_password_123");
-    }
+    private UsuarioRepository usuarioRepo;
 
     @Test
     @DisplayName("Servicio Usuario -> Caso Positivo: Registro")
@@ -43,13 +38,12 @@ public class UsuarioServiceTest {
 
         service.crearUsuario(nuevoUsuarioDTO);
 
-        Usuario usuarioEnBD = entityManager.createQuery(
-                        "SELECT u FROM Usuario u WHERE u.correoElectronico = :email", Usuario.class)
-                .setParameter("email", "oscar@nuevo.com")
-                .getSingleResult();
+        Optional<Usuario> usuarioEnBD = usuarioRepo.findAll().stream()
+                .filter(u -> u.getCorreoElectronico().equals("oscar@nuevo.com"))
+                .findFirst();
 
-        assertNotNull(usuarioEnBD, "El usuario debería existir en la BD");
-        assertEquals("Oscar Nuevo", usuarioEnBD.getNombre());
+        assertTrue(usuarioEnBD.isPresent(), "El usuario debería existir en la BD");
+        assertEquals("Oscar Nuevo", usuarioEnBD.get().getNombre());
     }
 
     @Test
@@ -65,5 +59,4 @@ public class UsuarioServiceTest {
             service.crearUsuario(dto);
         }, "El servicio debería lanzar excepción si las contraseñas no coinciden");
     }
-
 }

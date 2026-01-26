@@ -9,14 +9,14 @@ import java.util.List;
 public interface RecetaCocinadaFechaRepository extends JpaRepository<RecetaCocinadaFecha, RecetaCocinadaFechaId> {
     @Query(value = """
         SELECT
-            R.titulo AS NombreReceta, 
+            R.titulo AS nombreReceta, 
             COUNT(H.id_receta) AS vecesCocinada
         FROM
-            receta R
+            smartchef.receta R 
         JOIN
-            historial_cocinado H ON R.id = H.id_receta
+            smartchef.historial_cocinado H ON R.id = H.id_receta
         WHERE
-            H.fecha_cocinado >= DATE_SUB(CURDATE(), INTERVAL 7 DAY) 
+            H.fecha_cocinado >= CURRENT_DATE - INTERVAL '7' DAY
         GROUP BY
             R.id, R.titulo
         ORDER BY
