@@ -1,6 +1,6 @@
 -- ============================
 -- Creación de la base de datos (Opcional, ejecutar aparte si es necesario)
--- CREATE DATABASE smartchef;
+CREATE DATABASE smartchef;
 -- ============================
 
 -- Nota: En PostgreSQL, el comando 'USE' no existe. 

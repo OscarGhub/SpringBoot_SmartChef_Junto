@@ -23,7 +23,7 @@ public class Receta {
     @Column(columnDefinition = "TEXT")
     private String descripcion;
 
-    @Column(columnDefinition = "LONGTEXT")
+    @Column(columnDefinition = "TEXT")
     private String tutorial;
 
     @Column(name = "tiempo_preparacion")
